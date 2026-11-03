@@ -1,0 +1,55 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../js/**/*.vue';
+
+@theme {
+    --font-sans: 'Aptos', 'Segoe UI', ui-sans-serif, system-ui, sans-serif;
+    --color-clinic-50: #edf3fa;
+    --color-clinic-100: #dce8f5;
+    --color-clinic-500: #6a8ec4;
+    --color-clinic-600: #405f91;
+    --color-clinic-700: #365685;
+    --color-clinic-900: #2b4369;
+    --color-coral-50: #fff4f0;
+    --color-coral-100: #fbe2d9;
+    --color-coral-500: #e18b73;
+    --color-coral-700: #914e3d;
+    --color-slate-500: #5c6878;
+}
+
+:root {
+    font-family: 'Aptos', 'Segoe UI', ui-sans-serif, system-ui, sans-serif;
+    color: #334155;
+    background: #f9f7f5;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+}
+
+body {
+    min-width: 320px;
+    min-height: 100vh;
+    margin: 0;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+button:not(:disabled) {
+    cursor: pointer;
+}
+
+:focus-visible {
+    outline: 3px solid #6a8ec4;
+    outline-offset: 2px;
+}
+
+::selection {
+    color: #2b4369;
+    background: #dce8f5;
+}
