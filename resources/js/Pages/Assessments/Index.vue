@@ -8,7 +8,7 @@ defineProps({ assessments: Object });
 
 const page = usePage();
 const canSchedule = computed(() => page.props.auth?.user?.roles?.some((role) => ['owner', 'front_office'].includes(role)) ?? false);
-const canCollectPayment = computed(() => page.props.auth?.user?.roles?.includes('owner') ?? false);
+const canCollectPayment = computed(() => page.props.auth?.user?.roles?.some((role) => ['owner', 'front_office', 'finance'].includes(role)) ?? false);
 const completedStatuses = ['completed', 'scheduled'];
 
 function statusLabel(status) {

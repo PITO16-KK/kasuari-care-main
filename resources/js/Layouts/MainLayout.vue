@@ -63,7 +63,7 @@ const navGroups = computed(() => {
         groups.push({ label: 'Operasional', items: operationItems });
     }
 
-    if (roles.value.some((role) => ['owner', 'finance'].includes(role))) {
+    if (roles.value.some((role) => ['owner', 'finance', 'front_office'].includes(role))) {
         groups.push({
             label: 'Keuangan',
             items: [

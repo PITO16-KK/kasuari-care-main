@@ -68,7 +68,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/assessments/{assessment}/pdf', [AssessmentController::class, 'pdf'])->name('assessments.pdf');
     });
 
-    Route::middleware('role:owner|finance')->group(function () {
+    Route::middleware('role:owner|finance|front_office')->group(function () {
         Route::get('/finance/records', [FinanceRecordController::class, 'index'])->name('finance.records');
         Route::post('/finance/expenses', [FinanceRecordController::class, 'storeExpense'])->name('finance.expenses.store');
         Route::get('/finance/expenses/{clinicExpense}/proof', [FinanceRecordController::class, 'expenseProof'])->name('finance.expenses.proof');
@@ -96,4 +96,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/sessions/{appointment}/report', [SessionReportController::class, 'store'])->name('sessions.report.store');
         Route::put('/sessions/{appointment}/report', [SessionReportController::class, 'update'])->name('sessions.report.update');
     });
+});
+
+Route::get('/bersihkan-cache', function () {
+    \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+
+    return '<pre>'.\Illuminate\Support\Facades\Artisan::output().'</pre><p style="color: green; font-weight: bold; font-family: sans-serif;">✓ Cache Laravel berhasil dibersihkan!</p>';
 });

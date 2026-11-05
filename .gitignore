@@ -14,6 +14,9 @@
 /.zed
 /auth.json
 /node_modules
+/cpanel_deploy/
+*.zip
+/public/bersihkan-cache.php
 /public/build
 /public/fonts-manifest.dev.json
 /public/hot

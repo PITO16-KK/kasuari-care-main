@@ -38,7 +38,7 @@ class DashboardController extends Controller
         $monthStart = $now->copy()->startOfMonth();
         $monthEnd = $now->copy()->endOfMonth();
         $user = request()->user();
-        $canSeeFinance = $user->hasAnyRole(['owner', 'finance']);
+        $canSeeFinance = $user->hasAnyRole(['owner', 'finance', 'front_office']);
         $canHandleIntake = $user->hasAnyRole(['owner', 'front_office']);
         $canFilterTherapist = $user->hasAnyRole(['owner', 'finance', 'front_office']);
         $isTherapistDashboard = $user->hasRole('therapist')
