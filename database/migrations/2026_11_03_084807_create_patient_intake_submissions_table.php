@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('verification_status', 30)->default('pending');
             $table->foreignId('patient_id')->nullable()->constrained()->nullOnDelete();
             $table->timestamps();
-            $table->index(['verification_status', 'submitted_at']);
+            $table->index(['verification_status', 'submitted_at'], 'pis_verification_status_submitted_at_idx');
         });
     }
 

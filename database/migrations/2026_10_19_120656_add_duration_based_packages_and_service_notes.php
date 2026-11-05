@@ -26,7 +26,7 @@ return new class extends Migration
             $table->unsignedSmallInteger('duration_minutes');
             $table->unsignedInteger('granted_sessions');
             $table->unsignedInteger('remaining_sessions');
-            $table->unique(['patient_package_id', 'duration_minutes']);
+            $table->unique(['patient_package_id', 'duration_minutes'], 'dpe_patient_package_duration_unique');
         });
 
         Schema::create('duration_package_ledger', function (Blueprint $table): void {
