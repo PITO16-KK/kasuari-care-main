@@ -3,32 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panduan Alur Penggunaan Sistem - Kasuari Care</title>
+    <title>Panduan Visual & Simulasi Penggunaan — Kasuari Care</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #059669;
-            --primary-dark: #047857;
-            --primary-light: #ecfdf5;
-            --accent: #2563eb;
-            --accent-light: #eff6ff;
-            --purple: #7c3aed;
-            --purple-light: #f5f3ff;
-            --dark: #0f172a;
+            --bg-cream: #F9F7F5;
+            --clinic-900: #1e293b;
+            --clinic-700: #2b4c7e;
+            --clinic-600: #3b639c;
+            --clinic-100: #e8eff8;
+            --clinic-50: #f3f7fc;
+            --emerald-600: #059669;
+            --emerald-500: #10b981;
+            --emerald-100: #d1fae5;
+            --emerald-50: #ecfdf5;
+            --amber-600: #d97706;
+            --amber-100: #fef3c7;
+            --amber-50: #fffbeb;
+            --rose-600: #e11d48;
+            --rose-100: #ffe4e6;
+            --rose-50: #fff1f2;
+            --purple-600: #7c3aed;
+            --purple-100: #ede9fe;
+            --purple-50: #f5f3ff;
+            --slate-900: #0f172a;
             --slate-800: #1e293b;
             --slate-700: #334155;
             --slate-600: #475569;
+            --slate-500: #64748b;
             --slate-400: #94a3b8;
             --slate-200: #e2e8f0;
             --slate-100: #f1f5f9;
-            --slate-50: #f8fafc;
-            --card-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
-            --card-hover: 0 12px 24px -4px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.04);
+            --border-warm: #e9e6de;
+            --radius-xl: 20px;
             --radius-lg: 16px;
             --radius-md: 12px;
             --radius-sm: 8px;
+            --shadow-sm: 0 2px 4px rgba(15, 23, 42, 0.04);
+            --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.07), 0 4px 10px -3px rgba(15, 23, 42, 0.04);
+            --shadow-lg: 0 20px 35px -10px rgba(15, 23, 42, 0.12);
         }
 
         * {
@@ -38,27 +53,26 @@
         }
 
         body {
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #f8fafc;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-cream);
             color: var(--slate-800);
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Top Banner */
-        .top-nav {
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            color: white;
-            padding: 16px 24px;
+        /* Sticky Header */
+        .topbar {
             position: sticky;
             top: 0;
             z-index: 100;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-warm);
+            padding: 12px 24px;
         }
 
-        .top-nav-inner {
-            max-width: 1200px;
+        .topbar-inner {
+            max-width: 1320px;
             margin: 0 auto;
             display: flex;
             align-items: center;
@@ -71,1256 +85,2086 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            text-decoration: none;
+            color: inherit;
         }
 
-        .brand-logo {
-            background: linear-gradient(135deg, #10b981, #059669);
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #2b4c7e, #1e3a5f);
+            color: white;
             display: grid;
             place-items: center;
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 800;
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+            box-shadow: 0 4px 12px rgba(43, 76, 126, 0.25);
         }
 
-        .brand-text h1 {
-            font-size: 17px;
-            font-weight: 700;
-            letter-spacing: -0.3px;
+        .brand-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--slate-900);
+            display: block;
+            line-height: 1.2;
         }
 
-        .brand-text p {
+        .brand-sub {
             font-size: 12px;
-            color: #94a3b8;
+            color: var(--slate-500);
+            font-weight: 500;
         }
 
-        .nav-actions {
+        .topbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .nav-jump {
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--slate-600);
+            padding: 8px 14px;
+            border-radius: 999px;
+            transition: all 0.2s;
+        }
+
+        .nav-jump:hover {
+            background: var(--slate-100);
+            color: var(--slate-900);
+        }
+
+        .btn-app {
+            background: var(--emerald-600);
+            color: white;
+            text-decoration: none;
+            padding: 9px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+        }
+
+        .btn-app:hover {
+            background: #047857;
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background: white;
+            color: var(--slate-700);
+            border: 1px solid var(--slate-200);
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-outline:hover {
+            background: var(--slate-100);
+        }
+
+        /* Hero Banner */
+        .hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+            color: white;
+            padding: 48px 24px 56px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-inner {
+            max-width: 1320px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 32px;
+            align-items: center;
+        }
+
+        @media (max-width: 960px) {
+            .hero-inner {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .hero-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(52, 211, 153, 0.35);
+            color: #6ee7b7;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .hero h1 {
+            font-size: 36px;
+            font-weight: 800;
+            line-height: 1.2;
+            letter-spacing: -0.8px;
+            margin-bottom: 14px;
+        }
+
+        .hero p {
+            color: #cbd5e1;
+            font-size: 16px;
+            max-width: 600px;
+            margin-bottom: 24px;
+        }
+
+        .hero-quick-roles {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .hero-role-pill {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hero-role-pill:hover {
+            background: rgba(255, 255, 255, 0.22);
+            transform: translateY(-2px);
+        }
+
+        /* 3 Golden Rules Box in Hero */
+        .golden-rules-box {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+        }
+
+        .golden-rules-box h3 {
+            font-size: 15px;
+            font-weight: 800;
+            color: #fcd34d;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .rule-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: #f1f5f9;
+        }
+
+        .rule-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .rule-num {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #f59e0b;
+            color: #0f172a;
+            font-weight: 800;
+            font-size: 12px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        /* Main Wrapper */
+        .main-wrap {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 36px 20px 80px;
+        }
+
+        /* Section Titles */
+        .sec-head {
+            margin-bottom: 24px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .sec-badge {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: var(--clinic-100);
+            color: var(--clinic-700);
+            margin-bottom: 6px;
+        }
+
+        .sec-head h2 {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--slate-900);
+            letter-spacing: -0.5px;
+        }
+
+        .sec-head p {
+            font-size: 14px;
+            color: var(--slate-600);
+            margin-top: 4px;
+        }
+
+        /* =========================================================
+           END-TO-END STORY SIMULATOR (SIMULASI KASUS NYATA A-Z)
+           ========================================================= */
+        .story-card {
+            background: white;
+            border: 1px solid var(--border-warm);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            margin-bottom: 52px;
+        }
+
+        .story-stepper {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            background: #f3f1ec;
+            border-bottom: 1px solid var(--border-warm);
+            overflow-x: auto;
+        }
+
+        @media (max-width: 900px) {
+            .story-stepper {
+                display: flex;
+            }
+            .story-tab {
+                min-width: 150px;
+            }
+        }
+
+        .story-tab {
+            padding: 14px 12px;
+            border: none;
+            border-right: 1px solid var(--border-warm);
+            background: transparent;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .story-tab:last-child {
+            border-right: none;
+        }
+
+        .story-tab:hover {
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        .story-tab.active {
+            background: white;
+            box-shadow: inset 0 3px 0 var(--emerald-600);
+        }
+
+        .story-tab-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .story-step-badge {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--slate-500);
+        }
+
+        .story-tab.active .story-step-badge {
+            color: var(--emerald-600);
+        }
+
+        .story-actor {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .actor-admin { background: var(--emerald-100); color: #065f46; }
+        .actor-terapis { background: var(--clinic-100); color: var(--clinic-700); }
+        .actor-owner { background: var(--purple-100); color: #5b21b6; }
+
+        .story-tab-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--slate-800);
+            line-height: 1.3;
+        }
+
+        .story-content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.15fr;
+            gap: 0;
+        }
+
+        @media (max-width: 960px) {
+            .story-content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .story-explain {
+            padding: 28px 32px;
+            border-right: 1px solid var(--border-warm);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .story-Visual {
+            padding: 24px 28px;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .story-nav-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 24px;
+            padding-top: 18px;
+            border-top: 1px solid var(--slate-100);
+        }
+
+        /* =========================================================
+           ROLE DEEP-DIVE SECTION (OWNER, ADMIN, TERAPIS)
+           ========================================================= */
+        .role-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        @media (max-width: 820px) {
+            .role-selector {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .role-card-btn {
+            background: white;
+            border: 2px solid var(--border-warm);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            position: relative;
+        }
+
+        .role-card-btn:hover {
+            border-color: var(--slate-400);
+            transform: translateY(-2px);
+        }
+
+        .role-card-btn.active-owner {
+            border-color: var(--purple-600);
+            background: linear-gradient(135deg, #ffffff 0%, #f5f3ff 100%);
+            box-shadow: 0 12px 24px -6px rgba(124, 58, 237, 0.18);
+        }
+
+        .role-card-btn.active-admin {
+            border-color: var(--emerald-600);
+            background: linear-gradient(135deg, #ffffff 0%, #ecfdf5 100%);
+            box-shadow: 0 12px 24px -6px rgba(5, 150, 105, 0.18);
+        }
+
+        .role-card-btn.active-therapist {
+            border-color: var(--clinic-700);
+            background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%);
+            box-shadow: 0 12px 24px -6px rgba(43, 76, 126, 0.18);
+        }
+
+        .role-avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            font-size: 26px;
+            flex-shrink: 0;
+        }
+
+        .avatar-owner { background: var(--purple-100); }
+        .avatar-admin { background: var(--emerald-100); }
+        .avatar-therapist { background: var(--clinic-100); }
+
+        .role-card-btn h3 {
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--slate-900);
+            margin-bottom: 4px;
+        }
+
+        .role-card-btn p {
+            font-size: 13px;
+            color: var(--slate-600);
+            line-height: 1.4;
+        }
+
+        .role-active-pill {
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 3px 10px;
+            border-radius: 999px;
+            background: var(--slate-100);
+            color: var(--slate-600);
+        }
+
+        .active-owner .role-active-pill { background: var(--purple-600); color: white; }
+        .active-admin .role-active-pill { background: var(--emerald-600); color: white; }
+        .active-therapist .role-active-pill { background: var(--clinic-700); color: white; }
+
+        /* Login Banner per Role */
+        .login-strip {
+            background: white;
+            border: 1px solid var(--border-warm);
+            border-radius: var(--radius-lg);
+            padding: 18px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .login-creds {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .cred-chip {
+            background: var(--bg-cream);
+            border: 1px solid var(--border-warm);
+            padding: 8px 14px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cred-chip small {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--slate-500);
+            text-transform: uppercase;
+        }
+
+        .cred-chip code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--slate-900);
+        }
+
+        .copy-btn {
+            background: white;
+            border: 1px solid var(--slate-200);
+            border-radius: 6px;
+            padding: 3px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            color: var(--slate-700);
+            transition: all 0.15s;
+        }
+
+        .copy-btn:hover {
+            background: var(--emerald-600);
+            color: white;
+            border-color: var(--emerald-600);
+        }
+
+        /* Master-Detail Explorer for Role Modules */
+        .explorer-grid {
+            display: grid;
+            grid-template-columns: 330px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        @media (max-width: 960px) {
+            .explorer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .module-list {
+            background: white;
+            border: 1px solid var(--border-warm);
+            border-radius: var(--radius-lg);
+            padding: 12px;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 84px;
+        }
+
+        .module-list-title {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--slate-400);
+            padding: 6px 12px 10px;
+        }
+
+        .module-item-btn {
+            width: 100%;
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 12px;
+            padding: 12px 14px;
+            text-align: left;
+            cursor: pointer;
             display: flex;
             align-items: center;
             gap: 12px;
+            transition: all 0.18s;
+            margin-bottom: 4px;
         }
 
-        .btn-link {
-            background: rgba(255,255,255,0.08);
-            color: white;
-            text-decoration: none;
-            padding: 8px 16px;
+        .module-item-btn:hover {
+            background: var(--bg-cream);
+        }
+
+        .module-item-btn.active {
+            background: var(--clinic-50);
+            border-color: #bfd3ec;
+        }
+
+        .mod-num {
+            width: 28px;
+            height: 28px;
             border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            border: 1px solid rgba(255,255,255,0.15);
-            transition: all 0.2s;
+            background: var(--slate-100);
+            color: var(--slate-700);
+            font-size: 12px;
+            font-weight: 800;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+        }
+
+        .module-item-btn.active .mod-num {
+            background: var(--clinic-700);
+            color: white;
+        }
+
+        .mod-text b {
+            display: block;
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--slate-900);
+            line-height: 1.25;
+        }
+
+        .mod-text small {
+            font-size: 11.5px;
+            color: var(--slate-500);
+        }
+
+        /* Detail Panel */
+        .detail-panel {
+            background: white;
+            border: 1px solid var(--border-warm);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
+        .detail-header {
+            padding: 24px 28px;
+            border-bottom: 1px solid var(--border-warm);
+            background: linear-gradient(180deg, #ffffff 0%, #fcfbf9 100%);
+        }
+
+        .menu-breadcrumb {
             display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--amber-50);
+            border: 1px solid #fde68a;
+            color: #92400e;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .detail-header h3 {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--slate-900);
+            margin-bottom: 6px;
+        }
+
+        .detail-header p {
+            font-size: 14.5px;
+            color: var(--slate-600);
+        }
+
+        .detail-body {
+            padding: 28px;
+        }
+
+        /* Step-by-Step Action Cards inside Detail */
+        .action-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+
+        .action-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            background: var(--bg-cream);
+            border: 1px solid var(--border-warm);
+            border-radius: 14px;
+            padding: 16px 18px;
+        }
+
+        .action-pin {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--clinic-700);
+            color: white;
+            font-weight: 800;
+            font-size: 13px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .action-content h4 {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--slate-900);
+            margin-bottom: 4px;
+        }
+
+        .action-content p {
+            font-size: 13.5px;
+            color: var(--slate-700);
+        }
+
+        .ui-kbd {
+            display: inline-block;
+            background: white;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            padding: 1px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--slate-900);
+            margin: 0 2px;
+        }
+
+        .ui-btn-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--clinic-700);
+            color: white;
+            padding: 2px 9px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            margin: 0 2px;
+        }
+
+        .ui-btn-emerald {
+            background: var(--emerald-600);
+        }
+
+        /* Realistic App UI Mockup Frame */
+        .app-mockup-window {
+            border: 1px solid #cbd5e1;
+            border-radius: 14px;
+            overflow: hidden;
+            background: #F9F7F5;
+            box-shadow: 0 12px 28px -8px rgba(15, 23, 42, 0.15);
+            margin-bottom: 24px;
+        }
+
+        .mockup-browser-bar {
+            background: #1e293b;
+            color: #cbd5e1;
+            padding: 8px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 11px;
+        }
+
+        .browser-dots {
+            display: flex;
+            gap: 5px;
+        }
+
+        .browser-dots span {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+        }
+
+        .dot-r { background: #f43f5e; }
+        .dot-y { background: #f59e0b; }
+        .dot-g { background: #10b981; }
+
+        .browser-url {
+            background: rgba(255,255,255,0.1);
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: #e2e8f0;
+            flex: 1;
+        }
+
+        .mockup-layout {
+            display: grid;
+            grid-template-columns: 185px 1fr;
+            min-height: 270px;
+        }
+
+        @media (max-width: 640px) {
+            .mockup-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .mockup-sidebar {
+            background: white;
+            border-right: 1px solid var(--border-warm);
+            padding: 12px 10px;
+            font-size: 11.5px;
+        }
+
+        .mock-brand {
+            font-weight: 800;
+            color: var(--slate-900);
+            padding: 4px 8px 10px;
+            border-bottom: 1px solid var(--border-warm);
+            margin-bottom: 8px;
+            display: flex;
             align-items: center;
             gap: 6px;
         }
 
-        .btn-link:hover {
-            background: rgba(255,255,255,0.18);
-            border-color: rgba(255,255,255,0.3);
-        }
-
-        /* Hero */
-        .hero {
-            background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
-            color: white;
-            padding: 56px 24px 72px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(15, 23, 42, 0) 70%);
-            top: -200px;
-            left: 50%;
-            transform: translateX(-50%);
-            pointer-events: none;
-        }
-
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(16, 185, 129, 0.15);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            color: #34d399;
-            padding: 6px 16px;
-            border-radius: 999px;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 20px;
-        }
-
-        .hero h2 {
-            font-size: 38px;
+        .mock-group-title {
+            font-size: 10px;
             font-weight: 800;
-            letter-spacing: -1px;
-            max-width: 800px;
-            margin: 0 auto 16px;
-            line-height: 1.25;
-        }
-
-        .hero p {
-            color: #94a3b8;
-            font-size: 17px;
-            max-width: 640px;
-            margin: 0 auto 28px;
-        }
-
-        /* Container */
-        .container {
-            max-width: 1140px;
-            margin: -36px auto 60px;
-            padding: 0 20px;
-            position: relative;
-            z-index: 10;
-        }
-
-        /* Role Switcher Tabs */
-        .role-switcher-card {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 12px;
-            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 32px;
-            border: 1px solid var(--slate-200);
-        }
-
-        @media (max-width: 768px) {
-            .role-switcher-card {
-                grid-template-columns: 1fr;
-            }
-            .hero h2 {
-                font-size: 28px;
-            }
-        }
-
-        .role-btn {
-            background: white;
-            border: 1px solid transparent;
-            padding: 16px 20px;
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            text-align: left;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .role-btn:hover {
-            background: var(--slate-50);
-            border-color: var(--slate-200);
-        }
-
-        .role-btn.active {
-            background: var(--slate-50);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-        }
-
-        .role-btn.owner.active {
-            border-color: #8b5cf6;
-            background: linear-gradient(135deg, #faf5ff 0%, #f5f3ff 100%);
-        }
-
-        .role-btn.admin.active {
-            border-color: #059669;
-            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
-        }
-
-        .role-btn.therapist.active {
-            border-color: #2563eb;
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-        }
-
-        .role-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            display: grid;
-            place-items: center;
-            font-size: 22px;
-            flex-shrink: 0;
-        }
-
-        .role-btn.owner .role-icon { background: #ede9fe; color: #7c3aed; }
-        .role-btn.admin .role-icon { background: #d1fae5; color: #059669; }
-        .role-btn.therapist .role-icon { background: #dbeafe; color: #2563eb; }
-
-        .role-info h4 {
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 2px;
-        }
-
-        .role-info p {
-            font-size: 12px;
-            color: var(--slate-600);
-        }
-
-        /* Search Filter */
-        .search-bar {
-            background: white;
-            border-radius: var(--radius-md);
-            border: 1px solid var(--slate-200);
-            padding: 8px 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 28px;
-            box-shadow: var(--card-shadow);
-        }
-
-        .search-bar input {
-            border: none;
-            outline: none;
-            width: 100%;
-            font-size: 14px;
-            font-family: inherit;
-            color: var(--slate-800);
-        }
-
-        /* Credentials Box */
-        .cred-card {
-            background: white;
-            border-radius: var(--radius-md);
-            border: 1px solid var(--slate-200);
-            padding: 20px 24px;
-            margin-bottom: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            flex-wrap: wrap;
-            box-shadow: var(--card-shadow);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .cred-card::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 5px;
-        }
-
-        .cred-card.owner::before { background: #8b5cf6; }
-        .cred-card.admin::before { background: #059669; }
-        .cred-card.therapist::before { background: #2563eb; }
-
-        .cred-details {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .cred-item {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .cred-label {
-            font-size: 11px;
-            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--slate-400);
-        }
-
-        .cred-value {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--dark);
-            background: var(--slate-100);
-            padding: 4px 10px;
+            color: var(--slate-500);
+            padding: 6px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             border-radius: 6px;
-            border: 1px solid var(--slate-200);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
         }
 
-        .btn-copy {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: var(--slate-600);
-            font-size: 14px;
-            transition: color 0.15s;
-        }
-
-        .btn-copy:hover {
-            color: var(--primary);
-        }
-
-        /* Workflow Steps */
-        .role-section {
-            display: none;
-        }
-
-        .role-section.active {
-            display: block;
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .section-header {
-            margin-bottom: 24px;
-        }
-
-        .section-header h3 {
-            font-size: 24px;
-            font-weight: 800;
-            color: var(--dark);
-            letter-spacing: -0.5px;
-        }
-
-        .section-header p {
-            color: var(--slate-600);
-            font-size: 15px;
-            margin-top: 4px;
-        }
-
-        /* Timeline Card */
-        .timeline {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .step-card {
-            background: white;
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--slate-200);
-            box-shadow: var(--card-shadow);
-            overflow: hidden;
-            transition: all 0.25s ease;
-        }
-
-        .step-card:hover {
-            box-shadow: var(--card-hover);
-            border-color: #cbd5e1;
-        }
-
-        .step-header {
-            padding: 20px 24px;
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 16px;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .step-badge-wrap {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .step-number {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: var(--dark);
-            color: white;
-            display: grid;
-            place-items: center;
-            font-size: 14px;
-            font-weight: 700;
-            flex-shrink: 0;
-        }
-
-        .step-header-text h4 {
-            font-size: 17px;
-            font-weight: 700;
-            color: var(--dark);
-        }
-
-        .step-route {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 12px;
-            color: var(--primary);
-            background: var(--primary-light);
-            padding: 2px 8px;
-            border-radius: 4px;
-            display: inline-block;
-            margin-top: 4px;
-            font-weight: 600;
-        }
-
-        .step-toggle-icon {
-            font-size: 20px;
-            color: var(--slate-400);
-            transition: transform 0.2s;
-        }
-
-        .step-card.open .step-toggle-icon {
-            transform: rotate(180deg);
-        }
-
-        .step-body {
-            padding: 0 24px 24px;
-            border-top: 1px solid var(--slate-100);
-            display: none;
-        }
-
-        .step-card.open .step-body {
-            display: block;
-            padding-top: 20px;
-        }
-
-        .step-instruction {
-            font-size: 15px;
-            color: var(--slate-700);
-            margin-bottom: 16px;
-        }
-
-        .instruction-list {
-            margin: 12px 0 16px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .instruction-list li {
-            font-size: 14px;
-            color: var(--slate-700);
-        }
-
-        .instruction-list strong {
-            color: var(--dark);
-        }
-
-        /* Callouts */
-        .callout {
-            border-radius: var(--radius-sm);
-            padding: 14px 18px;
-            margin-top: 16px;
-            font-size: 13px;
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-        }
-
-        .callout-tip {
-            background: #ecfdf5;
-            border: 1px solid #a7f3d0;
-            color: #065f46;
-        }
-
-        .callout-warn {
-            background: #fffbeb;
-            border: 1px solid #fde68a;
+        .mock-group-title.active-group {
+            background: #fef3c7;
             color: #92400e;
         }
 
-        .callout-info {
-            background: #eff6ff;
-            border: 1px solid #bfdbfe;
-            color: #1e40af;
+        .mock-nav-item {
+            padding: 6px 10px 6px 14px;
+            border-radius: 6px;
+            color: var(--slate-600);
+            font-weight: 600;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
-        .callout-icon {
-            font-size: 18px;
-            flex-shrink: 0;
-            line-height: 1;
-        }
-
-        /* Interactive Process Flow */
-        .workflow-overview {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 28px;
-            border: 1px solid var(--slate-200);
-            box-shadow: var(--card-shadow);
-            margin-bottom: 40px;
-        }
-
-        .workflow-title {
-            font-size: 18px;
+        .mock-nav-item.active-menu {
+            background: var(--clinic-100);
+            color: var(--clinic-700);
             font-weight: 800;
-            color: var(--dark);
+            border-left: 3px solid var(--clinic-700);
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--rose-600);
+            box-shadow: 0 0 0 4px rgba(225, 29, 72, 0.25);
+        }
+
+        .mockup-main {
+            padding: 16px;
+            background: #F9F7F5;
+        }
+
+        .mock-card {
+            background: white;
+            border: 1px solid var(--border-warm);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 10px;
+        }
+
+        .mock-card-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--slate-900);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .mock-form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .mock-field {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 6px 8px;
+            font-size: 11px;
+        }
+
+        .mock-field label {
+            display: block;
+            font-size: 9.5px;
+            font-weight: 700;
+            color: var(--slate-500);
+            margin-bottom: 2px;
+        }
+
+        .mock-field span {
+            font-weight: 700;
+            color: var(--slate-800);
+        }
+
+        .mock-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--clinic-700);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 7px 12px;
+            border-radius: 6px;
+        }
+
+        .mock-btn.green { background: var(--emerald-600); }
+
+        .mock-pin {
+            display: inline-grid;
+            place-items: center;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--rose-600);
+            color: white;
+            font-size: 10px;
+            font-weight: 800;
+            margin-right: 4px;
+        }
+
+        /* Alert / Tip Box */
+        .tip-box {
+            border-radius: 12px;
+            padding: 16px 18px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 13.5px;
+        }
+
+        .tip-box.amber {
+            background: var(--amber-50);
+            border: 1px solid #fcd34d;
+            color: #78350f;
+        }
+
+        .tip-box.emerald {
+            background: var(--emerald-50);
+            border: 1px solid #6ee7b7;
+            color: #064e3b;
+        }
+
+        /* FAQ / Troubleshooting Accordion */
+        .faq-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 820px) {
+            .faq-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .faq-card {
+            background: white;
+            border: 1px solid var(--border-warm);
+            border-radius: var(--radius-md);
+            padding: 18px 20px;
+        }
+
+        .faq-card h4 {
+            font-size: 14.5px;
+            font-weight: 800;
+            color: var(--rose-600);
             margin-bottom: 6px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .workflow-desc {
-            font-size: 14px;
-            color: var(--slate-600);
-            margin-bottom: 24px;
+        .faq-card p {
+            font-size: 13.5px;
+            color: var(--slate-700);
         }
 
-        .flow-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 14px;
-            position: relative;
-        }
-
-        .flow-node {
-            background: var(--slate-50);
-            border: 1px solid var(--slate-200);
-            border-radius: var(--radius-md);
-            padding: 16px;
-            text-align: center;
-            transition: all 0.2s;
-            position: relative;
-        }
-
-        .flow-node:hover {
-            transform: translateY(-2px);
-            border-color: var(--primary);
-            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.1);
-        }
-
-        .flow-step-num {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: var(--primary);
+        /* Toast notification */
+        #toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--slate-900);
             color: white;
-            font-size: 11px;
-            font-weight: 700;
-            margin: 0 auto 8px;
-            display: grid;
-            place-items: center;
-        }
-
-        .flow-node h5 {
+            padding: 12px 20px;
+            border-radius: 12px;
             font-size: 13px;
             font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 4px;
+            box-shadow: var(--shadow-lg);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.25s;
+            z-index: 999;
         }
 
-        .flow-node p {
-            font-size: 11px;
-            color: var(--slate-600);
+        #toast.show {
+            transform: translateY(0);
+            opacity: 1;
         }
 
-        .flow-role-badge {
-            display: inline-block;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-top: 8px;
-        }
-
-        .badge-fo { background: #d1fae5; color: #047857; }
-        .badge-therapist { background: #dbeafe; color: #1d4ed8; }
-        .badge-owner { background: #ede9fe; color: #6d28d9; }
-
-        /* Footer */
-        footer {
-            border-top: 1px solid var(--slate-200);
-            padding: 32px 24px;
-            text-align: center;
-            color: var(--slate-400);
-            font-size: 13px;
-            background: white;
-        }
-
-        /* Print styles */
         @media print {
-            .top-nav, .role-switcher-card, .search-bar, .hero { display: none !important; }
-            .role-section { display: block !important; margin-bottom: 40px; page-break-after: always; }
-            .step-body { display: block !important; }
-            .container { margin: 0; max-width: 100%; }
-            body { background: white; color: black; }
+            .topbar, .hero-quick-roles, .btn-app, .btn-outline { display: none !important; }
+            body { background: white; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Header Navigation -->
-    <header class="top-nav">
-        <div class="top-nav-inner">
-            <div class="brand">
-                <div class="brand-logo">🏥</div>
-                <div class="brand-text">
-                    <h1>Kasuari Care</h1>
-                    <p>Buku Panduan &amp; Standard Operating Procedure (SOP) Digital</p>
+    <!-- Top Sticky Bar -->
+    <header class="topbar">
+        <div class="topbar-inner">
+            <a href="#" class="brand">
+                <div class="brand-icon">K</div>
+                <div>
+                    <span class="brand-title">Kasuari Care — Rumah Terapi Anak</span>
+                    <span class="brand-sub">Panduan Visual &amp; Simulasi Langkah Demi Langkah</span>
                 </div>
-            </div>
-            <div class="nav-actions">
-                <a href="/dashboard" class="btn-link" target="_blank">🌐 Buka Dashboard Kasuari</a>
-                <button onclick="window.print()" class="btn-link">🖨️ Cetak / Simpan PDF</button>
+            </a>
+            <div class="topbar-nav">
+                <a href="#simulasi-nyata" class="nav-jump">🎯 1. Simulasi Pasien Baru (A–Z)</a>
+                <a href="#panduan-role" class="nav-jump">👥 2. Panduan Per Login</a>
+                <a href="#solusi-kendala" class="nav-jump">❓ 3. Solusi Kendala</a>
+                <button class="btn-outline" onclick="window.print()">🖨️ Cetak Panduan</button>
+                <a href="/login" target="_blank" class="btn-app">🚀 Buka Aplikasi Kasuari Care</a>
             </div>
         </div>
     </header>
 
-    <!-- Hero Section -->
+    <!-- Hero & 3 Golden Rules -->
     <section class="hero">
-        <div class="hero-badge">Panduan Terintegrasi Multi-Peran</div>
-        <h2>Kupas Tuntas Alur Operasional Klinik</h2>
-        <p>Pelajari langkah demi langkah pengoperasian sistem Kasuari Care untuk Pimpinan (Owner), Admin Front Office / Kasir, dan Terapis Spesialis.</p>
+        <div class="hero-inner">
+            <div>
+                <div class="hero-tag">✨ PANDUAN VISUAL TERBARU — MUDAH DIPAHAMI</div>
+                <h1>Cara Menggunakan Sistem Kasuari Care dari Nol</h1>
+                <p>Dirancang khusus dengan ilustrasi layar asli agar Owner, Admin Front Office, dan Terapis langsung paham menu mana yang harus diklik dan urutan kerjanya.</p>
+                <div class="hero-quick-roles">
+                    <button class="hero-role-pill" onclick="jumpToRole('owner')">👑 Lihat Alur Login Owner</button>
+                    <button class="hero-role-pill" onclick="jumpToRole('admin')">💼 Lihat Alur Login Admin</button>
+                    <button class="hero-role-pill" onclick="jumpToRole('therapist')">🩺 Lihat Alur Login Terapis</button>
+                </div>
+            </div>
+
+            <div class="golden-rules-box">
+                <h3>🔑 3 Kunci Utama Agar Tidak Bingung Saat Pakai Aplikasi:</h3>
+                <div class="rule-item">
+                    <span class="rule-num">1</span>
+                    <div>
+                        <strong>Menu Sidebar Kiri Sistemnya Lipat (Klik untuk Buka):</strong><br>
+                        Di sebelah kiri layar ada 4 judul kategori: <b>Umum</b>, <b>Pasien &amp; layanan</b>, <b>Operasional</b>, dan <b>Keuangan</b>. Klik judul kategorinya dulu agar daftar menunya terbuka ke bawah!
+                    </div>
+                </div>
+                <div class="rule-item">
+                    <span class="rule-num">2</span>
+                    <div>
+                        <strong>Assessment Harus Dibayar Dulu Baru Bisa Diisi:</strong><br>
+                        Setelah Admin membuat Jadwal Assessment, lunasi dulu tagihannya di menu <b>Keuangan &rarr; Tagihan</b> agar Terapis bisa mengisi hasil pemeriksaan.
+                    </div>
+                </div>
+                <div class="rule-item">
+                    <span class="rule-num">3</span>
+                    <div>
+                        <strong>Jadwal Terapi Rutin Butuh Assessment yang Sudah Selesai:</strong><br>
+                        Anak baru wajib memiliki <b>Assessment berstatus Selesai</b> sebelum bisa dijadwalkan sesi terapi di menu <b>Jadwal terapi</b>.
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 
-    <div class="container">
+    <main class="main-wrap">
 
-        <!-- Role Switcher -->
-        <div class="role-switcher-card">
-            <button class="role-btn owner active" onclick="switchRole('owner')">
-                <div class="role-icon">👑</div>
-                <div class="role-info">
-                    <h4>Pimpinan (Owner)</h4>
-                    <p>Kendalikan KPI, keuangan, master data &amp; payroll</p>
-                </div>
-            </button>
-            <button class="role-btn admin" onclick="switchRole('admin')">
-                <div class="role-icon">💼</div>
-                <div class="role-info">
-                    <h4>Admin Front Office / Kasir</h4>
-                    <p>Daftarkan pasien, kasir multi-item &amp; jadwal</p>
-                </div>
-            </button>
-            <button class="role-btn therapist" onclick="switchRole('therapist')">
-                <div class="role-icon">🩺</div>
-                <div class="role-info">
-                    <h4>Terapis Spesialis</h4>
-                    <p>Asesmen tumbuh kembang &amp; laporan SOAP</p>
-                </div>
-            </button>
-        </div>
-
-        <!-- Global Search -->
-        <div class="search-bar">
-            <span>🔍</span>
-            <input type="text" id="searchInput" placeholder="Cari langkah atau fitur (misal: kasir, struk, resep, jadwal, payroll, asesmen)..." oninput="filterSteps()">
-        </div>
-
-        <!-- Interactive Process Flow Summary -->
-        <div class="workflow-overview">
-            <div class="workflow-title">
-                <span>🔄</span> Alur Perjalanan Pasien dari Pendaftaran Hingga Selesai Terapi
-            </div>
-            <p class="workflow-desc">Siklus lengkap interaksi antara Orang Tua, Admin Front Office, Kasir, Terapis, dan Pimpinan Klinik:</p>
-            <div class="flow-grid">
-                <div class="flow-node">
-                    <div class="flow-step-num">1</div>
-                    <h5>Pendaftaran Awal</h5>
-                    <p>Formulir intake online / registrasi baru</p>
-                    <span class="flow-role-badge badge-fo">Front Office</span>
-                </div>
-                <div class="flow-node">
-                    <div class="flow-step-num">2</div>
-                    <h5>Bayar Asesmen</h5>
-                    <p>Kasir bayar assessment awal Rp300rb</p>
-                    <span class="flow-role-badge badge-fo">Kasir</span>
-                </div>
-                <div class="flow-node">
-                    <div class="flow-step-num">3</div>
-                    <h5>Pelaksanaan Asesmen</h5>
-                    <p>Terapis periksa tumbuh kembang &amp; cetak PDF</p>
-                    <span class="flow-role-badge badge-therapist">Terapis</span>
-                </div>
-                <div class="flow-node">
-                    <div class="flow-step-num">4</div>
-                    <h5>Beli Paket Terapi</h5>
-                    <p>Beli paket 4x/8x/12x sesi di modul Kasir</p>
-                    <span class="flow-role-badge badge-fo">Kasir</span>
-                </div>
-                <div class="flow-node">
-                    <div class="flow-step-num">5</div>
-                    <h5>Penjadwalan Rutin</h5>
-                    <p>Pilih jam &amp; ruangan tanpa bentrok</p>
-                    <span class="flow-role-badge badge-fo">Front Office</span>
-                </div>
-                <div class="flow-node">
-                    <div class="flow-step-num">6</div>
-                    <h5>Sesi &amp; Laporan SOAP</h5>
-                    <p>Terapis catat kegiatan &amp; foto di ruangan</p>
-                    <span class="flow-role-badge badge-therapist">Terapis</span>
-                </div>
-                <div class="flow-node">
-                    <div class="flow-step-num">7</div>
-                    <h5>Rekap &amp; Payroll</h5>
-                    <p>Pantau omzet, laba rugi &amp; gaji sesi</p>
-                    <span class="flow-role-badge badge-owner">Owner</span>
+        <!-- =================================================================
+             BAGIAN 1: SIMULASI KASUS NYATA (ALUR 1 PASIEN DARI AWAL - AKHIR)
+             ================================================================= -->
+        <section id="simulasi-nyata">
+            <div class="sec-head">
+                <div>
+                    <span class="sec-badge">BAGIAN 1 — URUTAN KERJA KLINIK</span>
+                    <h2>🎯 Simulasi Kasus Nyata: Anak Baru Datang Sampai Selesai Terapi</h2>
+                    <p>Klik <b>Tahap 1 sampai Tahap 7</b> di bawah ini untuk melihat urutan kerja antar bagian dari awal hingga akhir.</p>
                 </div>
             </div>
-        </div>
 
-        <!-- ========================================================================= -->
-        <!-- ROLE 1: OWNER / PIMPINAN KLINIK                                           -->
-        <!-- ========================================================================= -->
-        <div id="section-owner" class="role-section active">
-            
-            <div class="cred-card owner">
-                <div class="cred-details">
-                    <div class="cred-item">
-                        <span class="cred-label">Akun Login Owner</span>
-                        <span class="cred-value">owner@rumahterapi.test <button class="btn-copy" onclick="copyText('owner@rumahterapi.test')">📋</button></span>
-                    </div>
-                    <div class="cred-item">
-                        <span class="cred-label">Password Default</span>
-                        <span class="cred-value">password <button class="btn-copy" onclick="copyText('password')">📋</button></span>
-                    </div>
+            <div class="story-card">
+                <div class="story-stepper" id="storyTabs">
+                    <!-- Rendered via JS -->
                 </div>
-                <a href="/login" class="btn-link" target="_blank" style="background: #7c3aed; border-color: #8b5cf6;">🚀 Masuk sebagai Owner</a>
+                <div class="story-content-grid" id="storyBody">
+                    <!-- Rendered via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- =================================================================
+             BAGIAN 2: KUPAS TUNTAS PER LOGIN (OWNER, ADMIN, TERAPIS)
+             ================================================================= -->
+        <section id="panduan-role">
+            <div class="sec-head">
+                <div>
+                    <span class="sec-badge">BAGIAN 2 — KUPAS TUNTAS FITUR PER AKUN</span>
+                    <h2>👥 Pilih Peran Login Anda</h2>
+                    <p>Klik salah satu kotak peran di bawah ini untuk melihat seluruh menu, tombol, dan cara pakainya secara lengkap.</p>
+                </div>
             </div>
 
-            <div class="section-header">
-                <h3>Panduan Lengkap: Pimpinan Klinik (Owner)</h3>
-                <p>Owner memiliki kewenangan tertinggi (Super Admin) untuk memantau performa klinik secara real-time, mengaudit operasional, mengelola tim, dan mengeksekusi payroll.</p>
+            <!-- 3 Role Selector Cards -->
+            <div class="role-selector">
+                <button class="role-card-btn active-owner" id="btn-role-owner" onclick="selectRole('owner')">
+                    <div class="role-avatar avatar-owner">👑</div>
+                    <div>
+                        <h3>1. Login Owner (Pimpinan)</h3>
+                        <p>Memantau ringkasan klinik, kelola akun terapis, paket terapi, stok buku, kasir, hingga input gaji (payroll) terapis.</p>
+                        <span class="role-active-pill">Akses Penuh Semua Menu (13 Menu)</span>
+                    </div>
+                </button>
+
+                <button class="role-card-btn" id="btn-role-admin" onclick="selectRole('admin')">
+                    <div class="role-avatar avatar-admin">💼</div>
+                    <div>
+                        <h3>2. Login Admin Front Office</h3>
+                        <p>Mendaftarkan pasien baru, atur jadwal assessment &amp; terapi, konfirmasi hadir, kasir pembayaran, &amp; cetak struk.</p>
+                        <span class="role-active-pill">Operasional &amp; Kasir (12 Menu)</span>
+                    </div>
+                </button>
+
+                <button class="role-card-btn" id="btn-role-therapist" onclick="selectRole('therapist')">
+                    <div class="role-avatar avatar-therapist">🩺</div>
+                    <div>
+                        <h3>3. Login Terapis</h3>
+                        <p>Melihat jadwal terapi pribadi hari ini, baca form rekam medis ortu, isi hasil assessment, &amp; buat laporan sesi.</p>
+                        <span class="role-active-pill">Fokus Klinis &amp; Laporan (4 Menu)</span>
+                    </div>
+                </button>
             </div>
 
-            <div class="timeline">
-                
-                <!-- Step 1 -->
-                <div class="step-card open">
-                    <div class="step-header" onclick="toggleStep(this)">
-                        <div class="step-badge-wrap">
-                            <div class="step-number">1</div>
-                            <div class="step-header-text">
-                                <h4>Membaca Dashboard Ringkasan &amp; KPI Eksekutif</h4>
-                                <span class="step-route">GET /dashboard</span>
-                            </div>
-                        </div>
-                        <span class="step-toggle-icon">▼</span>
-                    </div>
-                    <div class="step-body">
-                        <p class="step-instruction">Saat pertama kali login, Owner akan langsung diarahkan ke Dashboard Ringkasan Utama:</p>
-                        <ul class="instruction-list">
-                            <li><strong>Kartu Metrik Finansial:</strong> Menampilkan total pendapatan kotor bulan ini, total sesi yang terlaksana, pasien aktif, serta jumlah assessment yang belum terselesaikan.</li>
-                            <li><strong>Jadwal Hari Ini:</strong> Menampilkan seluruh sesi terapi dan assessment yang berjalan pada hari ini secara kronologis beserta status kehadirannya.</li>
-                            <li><strong>Filter Interaktif:</strong> Gunakan dropdown terapis dan filter tanggal di pojok kanan atas untuk memfilter jadwal terapis tertentu.</li>
-                            <li><strong>Shortcut Cepat:</strong> Akses tombol cepat untuk tambah pasien baru, buat jadwal, atau buka kasir.</li>
-                        </ul>
-                        <div class="callout callout-tip">
-                            <span class="callout-icon">💡</span>
-                            <div><strong>Tips Owner:</strong> Periksa badge kehadiran di jadwal hari ini. Jika ada sesi yang belum dikonfirmasi kehadirannya, ingatkan Admin Front Office untuk melakukan check-in pasien.</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 2 -->
-                <div class="step-card open">
-                    <div class="step-header" onclick="toggleStep(this)">
-                        <div class="step-badge-wrap">
-                            <div class="step-number">2</div>
-                            <div class="step-header-text">
-                                <h4>Manajemen Tim Terapis &amp; Akun Karyawan</h4>
-                                <span class="step-route">GET /therapists</span>
-                            </div>
-                        </div>
-                        <span class="step-toggle-icon">▼</span>
-                    </div>
-                    <div class="step-body">
-                        <p class="step-instruction">Owner berwenang menambahkan dan memperbarui akun terapis klinik:</p>
-                        <ul class="instruction-list">
-                            <li>Klik menu <strong>Terapis</strong> pada bilah navigasi atas.</li>
-                            <li><strong>Menambah Terapis Baru:</strong> Isi formulir di sisi kiri layar: Nama Lengkap (beserta gelar, misal: <em>Nurul Fadilah, S.Tr.Kes</em>), Email, Nomor WhatsApp, Nomor STR/Lisensi, dan Spesialisasi (Wicara / Okupasi / Fisioterapi).</li>
-                            <li>Tentukan kata sandi akun login untuk terapis tersebut, lalu klik <strong>Simpan Akun Terapis</strong>.</li>
-                            <li><strong>Mengedit atau Menonaktifkan:</strong> Klik tombol <strong>Edit</strong> pada kartu terapis untuk memperbarui profil atau menonaktifkan akun jika terapis sudah tidak bertugas.</li>
-                        </ul>
-                        <div class="callout callout-info">
-                            <span class="callout-icon">ℹ️</span>
-                            <div><strong>Keunggulan Versi Terbaru:</strong> Satu akun terapis kini dapat ditugaskan ke banyak anak sekaligus tanpa batasan sistem, mempermudah rotasi pasien.</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 3 -->
-                <div class="step-card open">
-                    <div class="step-header" onclick="toggleStep(this)">
-                        <div class="step-badge-wrap">
-                            <div class="step-number">3</div>
-                            <div class="step-header-text">
-                                <h4>Pengelolaan Master Paket Terapi &amp; Layanan Klinik</h4>
-                                <span class="step-route">GET /packages &bull; GET /products</span>
-                            </div>
-                        </div>
-                        <span class="step-toggle-icon">▼</span>
-                    </div>
-                    <div class="step-body">
-                        <p class="step-instruction">Kelola paket sesi dan produk fisik yang dijual di klinik:</p>
-                        <ul class="instruction-list">
-                            <li>Buka menu <strong>Paket</strong> untuk melihat paket durasi 1 Jam (60 menit) dan Paket 30 Menit.</li>
-                            <li>Owner dapat menonaktifkan paket lama atau menambahkan paket promo baru dengan masa berlaku hari tertentu.</li>
-                            <li>Buka tab <strong>Produk &amp; Buku</strong> untuk mengelola stok barang fisik (kartu stimulasi wicara, sensori toys, buku panduan orang tua).</li>
-                            <li>Saat transaksi kasir menjual produk fisik, stok barang akan otomatis berkurang secara real-time.</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Step 4 -->
-                <div class="step-card open">
-                    <div class="step-header" onclick="toggleStep(this)">
-                        <div class="step-badge-wrap">
-                            <div class="step-number">4</div>
-                            <div class="step-header-text">
-                                <h4>Audit Keuangan Klinik &amp; Ekspor Pembayaran</h4>
-                                <span class="step-route">GET /payment-history &bull; GET /finance/records</span>
-                            </div>
-                        </div>
-                        <span class="step-toggle-icon">▼</span>
-                    </div>
-                    <div class="step-body">
-                        <p class="step-instruction">Pantau arus kas masuk dan kas keluar klinik:</p>
-                        <ul class="instruction-list">
-                            <li><strong>Riwayat Pembayaran (/payment-history):</strong> Tinjau seluruh transaksi kasir lengkap dengan nomor struk/invoice, metode bayar (Tunai, Transfer Bank, QRIS), dan nama kasir yang melayani.</li>
-                            <li>Klik tombol <strong>Ekspor Excel / CSV</strong> untuk mengunduh laporan penjualan ke spreadsheet akuntansi Anda.</li>
-                            <li><strong>Catatan Keuangan &amp; Biaya Operasional (/finance/records):</strong> Catat pengeluaran klinik (sewa, listrik, konsumsi, pembelian alat terapi) beserta bukti upload kuitansi.</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Step 5 -->
-                <div class="step-card open">
-                    <div class="step-header" onclick="toggleStep(this)">
-                        <div class="step-badge-wrap">
-                            <div class="step-number">5</div>
-                            <div class="step-header-text">
-                                <h4>Penggajian &amp; Payroll Terapis (Fitur Eksklusif Owner)</h4>
-                                <span class="step-route">POST /finance/payroll &bull; GET /finance/payroll/export</span>
-                            </div>
-                        </div>
-                        <span class="step-toggle-icon">▼</span>
-                    </div>
-                    <div class="step-body">
-                        <p class="step-instruction">Kalkulasi dan dokumentasi gaji terapis berdasarkan jumlah sesi terapi yang telah selesai dijalankan:</p>
-                        <ul class="instruction-list">
-                            <li>Buka menu <strong>Rekap Keuangan</strong> lalu pilih tab <strong>Payroll Terapis</strong>.</li>
-                            <li>Pilih profil terapis yang akan digaji, tentukan periode penggajian, nominal gaji bersih, tanggal transfer, serta unggah bukti struk transfer bank.</li>
-                            <li>Klik tombol <strong>Ekspor Rekap Payroll</strong> untuk arsip kompensasi bulanan terapis.</li>
-                        </ul>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- ========================================================================= -->
-        <!-- ROLE 2: ADMIN FRONT OFFICE & KASIR                                        -->
-        <!-- ========================================================================= -->
-        <div id="section-admin" class="role-section">
-            
-            <div class="cred-card admin">
-                <div class="cred-details">
-                    <div class="cred-item">
-                        <span class="cred-label">Akun Admin Front Office</span>
-                        <span class="cred-value">admin@rumahterapi.test <button class="btn-copy" onclick="copyText('admin@rumahterapi.test')">📋</button></span>
-                    </div>
-                    <div class="cred-item">
-                        <span class="cred-label">Akun Kasir Keuangan</span>
-                        <span class="cred-value">kasir@rumahterapi.test <button class="btn-copy" onclick="copyText('kasir@rumahterapi.test')">📋</button></span>
-                    </div>
-                    <div class="cred-item">
-                        <span class="cred-label">Password Default</span>
-                        <span class="cred-value">password <button class="btn-copy" onclick="copyText('password')">📋</button></span>
-                    </div>
-                </div>
-                <a href="/login" class="btn-link" target="_blank" style="background: #059669; border-color: #10b981;">🚀 Masuk sebagai Admin FO</a>
+            <!-- Dynamic Credentials Strip -->
+            <div class="login-strip" id="roleCredStrip">
+                <!-- Rendered via JS -->
             </div>
 
-            <div class="section-header">
-                <h3>Panduan Lengkap: Admin Front Office &amp; Kasir</h3>
-                <p>Front Office adalah jantung operasional harian: melayani pendaftaran anak, konversi formulir intake, kasir multi-item, dan penjadwalan terapi tanpa bentrok.</p>
+            <!-- Master-Detail Module Explorer -->
+            <div class="explorer-grid">
+                <aside class="module-list">
+                    <div class="module-list-title" id="moduleListHeader">DAFTAR LANGKAH &amp; MENU</div>
+                    <div id="moduleListButtons">
+                        <!-- Rendered via JS -->
+                    </div>
+                </aside>
+
+                <div class="detail-panel" id="moduleDetailPanel">
+                    <!-- Rendered via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- =================================================================
+             BAGIAN 3: SOLUSI KENDALA UMUM (FAQ)
+             ================================================================= -->
+        <section id="solusi-kendala" style="margin-top: 56px;">
+            <div class="sec-head">
+                <div>
+                    <span class="sec-badge">BAGIAN 3 — TANYA JAWAB &amp; SOLUSI CEPAT</span>
+                    <h2>❓ Sering Ditanyakan Saat Operasional (Troubleshooting)</h2>
+                    <p>Jika Anda menemui tombol yang tidak bisa diklik atau pasien tidak muncul, cek penyebabnya di sini:</p>
+                </div>
             </div>
 
-            <div class="timeline">
-                
-                <!-- Step 1 -->
-                <div class="step-card open">
-                    <div class="step-header" onclick="toggleStep(this)">
-                        <div class="step-badge-wrap">
-                            <div class="step-number">1</div>
-                            <div class="step-header-text">
-                                <h4>Menerima Pasien Baru &amp; Pencegahan Duplikasi Rekam Medis</h4>
-                                <span class="step-route">GET /patients &bull; GET /registrations</span>
-                            </div>
-                        </div>
-                        <span class="step-toggle-icon">▼</span>
-                    </div>
-                    <div class="step-body">
-                        <p class="step-instruction">Ada dua cara pasien baru masuk ke sistem:</p>
-                        <ul class="instruction-list">
-                            <li><strong>Jalur 1 (Pendaftaran Langsung di Meja FO):</strong>
-                                <br>Buka menu <strong>Pasien</strong> > Klik tombol <strong>+ Tambah Pasien Baru</strong>. Isi nama anak, tanggal lahir, jenis kelamin, nama orang tua, nomor WhatsApp, dan keluhan utama.
-                                <br><em>Sistem secara otomatis akan mendeteksi kemiripan nama dan nomor WhatsApp untuk mencegah terbuatnya rekam medis ganda secara tidak sengaja.</em>
-                            </li>
-                            <li><strong>Jalur 2 (Formulir Online Orang Tua):</strong>
-                                <br>Buka menu <strong>Registrasi Masuk</strong>. Anda akan melihat data kiriman dari formulir online publik. Cukup klik tombol <strong>Konversi ke Pasien Baru</strong> atau <strong>Tautkan ke Pasien Lama</strong>.
-                            </li>
-                            <li>Nomor Rekam Medis unik berformat <code>KL-YYYY-XXX</code> (contoh: <code>KL-2026-001</code>) akan terbuat secara otomatis dan aman dari bentrok nomor.</li>
-                        </ul>
-                    </div>
+            <div class="faq-grid">
+                <div class="faq-card">
+                    <h4>❓ 1. Kenapa hasil Assessment tidak bisa diisi oleh Terapis?</h4>
+                    <p><strong>Penyebab:</strong> Tagihan jadwal assessment pasien tersebut masih berstatus <b>Belum Dibayar (Menunggu Pembayaran)</b>.<br>
+                    <strong>Solusi:</strong> Masuk ke menu <b>Keuangan &rarr; Tagihan</b>, cari nama pasien tersebut, klik <b>Buka Tagihan</b>, lalu catat pembayarannya. Setelah lunas, tombol <b>Isi Hasil</b> di menu Assessment akan langsung aktif.</p>
                 </div>
 
-                <!-- Step 2 -->
-                <div class="step-card open">
-                    <div class="step-header" onclick="toggleStep(this)">
-                        <div class="step-badge-wrap">
-                            <div class="step-number">2</div>
-                            <div class="step-header-text">
-                                <h4>Pendaftaran Assessment Awal</h4>
-                                <span class="step-route">GET /assessments/create</span>
-                            </div>
-                        </div>
-                        <span class="step-toggle-icon">▼</span>
-                    </div>
-                    <div class="step-body">
-                        <p class="step-instruction">Setiap pasien baru wajib menjalani assessment awal sebelum sesi terapi rutin dimulai:</p>
-                        <ul class="instruction-list">
-                            <li>Buka menu <strong>Assessment</strong> > Klik <strong>+ Jadwalkan Assessment</strong>.</li>
-                            <li>Pilih nama pasien anak dari daftar autocomplete responsif.</li>
-                            <li>Pilih terapis penilai dan tentukan tanggal serta jam pertemuan assessment.</li>
-                            <li>Sistem secara otomatis akan membuatkan tagihan assessment (senilai Rp300.000) yang menunggu pembayaran di Kasir.</li>
-                        </ul>
-                    </div>
+                <div class="faq-card">
+                    <h4>❓ 2. Kenapa saat buat Jadwal Terapi, pilihan Assessment kosong?</h4>
+                    <p><strong>Penyebab:</strong> Pasien baru bisa dijadwalkan sesi terapi rutin apabila <b>Assessment awalnya sudah diselesaikan</b>.<br>
+                    <strong>Solusi:</strong> Pastikan Terapis sudah mengisi dan menyimpan <b>Isi Hasil Assessment</b> hingga statusnya berubah menjadi <b>Selesai</b>.</p>
                 </div>
 
-                <!-- Step 3 -->
-                <div class="step-card open">
-                    <div class="step-header" onclick="toggleStep(this)">
-                        <div class="step-badge-wrap">
-                            <div class="step-number">3</div>
-                            <div class="step-header-text">
-                                <h4>Transaksi Kasir Multi-Item &amp; Cetak Struk Resmi</h4>
-                                <span class="step-route">GET /sales/create &bull; GET /sales/{id}/receipt</span>
-                            </div>
-                        </div>
-                        <span class="step-toggle-icon">▼</span>
-                    </div>
-                    <div class="step-body">
-                        <p class="step-instruction">Modul kasir terbaru mendukung transaksi multi-item dalam 1 struk pembayaran:</p>
-                        <ul class="instruction-list">
-                            <li>Buka menu <strong>Kasir</strong> > Klik <strong>+ Transaksi Baru</strong>.</li>
-                            <li>Pilih nama pasien. Anda dapat memasukkan berbagai item sekaligus:
-                                <br>&bull; <em>Tagihan Assessment yang tertunda</em>
-                                <br>&bull; <em>Paket Terapi Durasi 1 Jam atau 30 Menit (kuota sesi otomatis masuk ke saldo anak)</em>
-                                <br>&bull; <em>Sesi Lepas (Single Session)</em>
-                                <br>&bull; <em>Produk fisik (buku / mainan edukasi dengan pengecekan stok otomatis)</em>
-                            </li>
-                            <li>Masukkan diskon (jika ada), pilih metode bayar (Tunai, Transfer Bank Mandiri/BCA, QRIS), dan masukkan nama pengirim atau bukti transfer.</li>
-                            <li>Klik <strong>Simpan Transaksi &amp; Cetak Struk</strong>.</li>
-                            <li>Struk Kasir langsung tampil rapi dengan Kop Surat Resmi Klinik, logo, alamat lengkap, dan nomor invoice.</li>
-                        </ul>
-                        <div class="callout callout-tip">
-                            <span class="callout-icon">💡</span>
-                            <div><strong>Otomasi Kuota:</strong> Saat orang tua membeli Paket Terapi (misal Paket 8 Sesi), sistem secara otomatis mencatatkan kuota 8 sesi ke buku besar durasi anak. FO tinggal menjadwalkan 8 sesi tersebut!</div>
-                        </div>
-                    </div>
+                <div class="faq-card">
+                    <h4>❓ 3. Kenapa muncul peringatan "Terapis sudah memiliki jadwal pada waktu tersebut"?</h4>
+                    <p><strong>Penyebab:</strong> Sistem dilengkapi <b>Anti-Bentrok Otomatis</b>. Terapis tersebut sudah memiliki sesi terapi atau jadwal assessment dengan anak lain di jam yang beririsan.<br>
+                    <strong>Solusi:</strong> Ganti jam mulai sesi ke jam lain yang kosong, atau pilih terapis pendamping lainnya.</p>
                 </div>
 
-                <!-- Step 4 -->
-                <div class="step-card open">
-                    <div class="step-header" onclick="toggleStep(this)">
-                        <div class="step-badge-wrap">
-                            <div class="step-number">4</div>
-                            <div class="step-header-text">
-                                <h4>Penjadwalan Terapi Rutin &amp; Pencegahan Bentrok Jadwal</h4>
-                                <span class="step-route">GET /scheduling</span>
-                            </div>
-                        </div>
-                        <span class="step-toggle-icon">▼</span>
-                    </div>
-                    <div class="step-body">
-                        <p class="step-instruction">Penjadwalan sesi terapi dilakukan secara presisi dengan deteksi bentrok otomatis:</p>
-                        <ul class="instruction-list">
-                            <li>Buka menu <strong>Jadwal Terapi</strong>.</li>
-                            <li>Ketik nama anak di kolom pencarian pasien (autocomplete instan, mendukung navigasi tombol panah keyboard).</li>
-                            <li>Pilih <strong>Jenis Terapi</strong> (Wicara, Okupasi, Fisioterapi), <strong>Terapis</strong> yang bertugas, dan <strong>Ruangan</strong> terapi.</li>
-                            <li>Tentukan tanggal serta jam mulai sesi.</li>
-                            <li><strong>Deteksi Bentrok Cerdas:</strong> Jika terapis yang dipilih sudah memiliki jadwal terapi atau assessment lain di rentang jam yang sama, sistem langsung menampilkan banner peringatan merah dan menolak pembuatan jadwal bentrok.</li>
-                            <li>Klik <strong>Simpan Jadwal</strong>. Sesi langsung muncul di kalender kerja harian terapis.</li>
-                        </ul>
-                    </div>
+                <div class="faq-card">
+                    <h4>❓ 4. Bagaimana agar kuota Paket Terapi anak otomatis muncul saat penjadwalan?</h4>
+                    <p><strong>Penyebab:</strong> Kuota paket aktif setelah dibeli di Kasir.<br>
+                    <strong>Solusi:</strong> Buka menu <b>Keuangan &rarr; Kasir &amp; POS</b>, pilih nama pasien, pilih baris <b>Paket Terapi</b> (misal Paket 4x atau 8x Sesi), lalu simpan pembayaran. Kuota sesi akan otomatis terisi dan siap dipakai di menu <b>Jadwal terapi</b>.</p>
                 </div>
-
-                <!-- Step 5 -->
-                <div class="step-card open">
-                    <div class="step-header" onclick="toggleStep(this)">
-                        <div class="step-badge-wrap">
-                            <div class="step-number">5</div>
-                            <div class="step-header-text">
-                                <h4>Check-In Kehadiran Pasien (Absensi Sesi &amp; Asesmen)</h4>
-                                <span class="step-route">PATCH /scheduling/{id}/attendance</span>
-                            </div>
-                        </div>
-                        <span class="step-toggle-icon">▼</span>
-                    </div>
-                    <div class="step-body">
-                        <p class="step-instruction">Ketika pasien tiba di klinik:</p>
-                        <ul class="instruction-list">
-                            <li>Buka halaman <strong>Dashboard</strong> atau <strong>Jadwal Terapi</strong> hari ini.</li>
-                            <li>Pada kartu atau baris nama pasien yang baru tiba, klik tombol <strong>Konfirmasi Kehadiran</strong>.</li>
-                            <li>Status sesi akan berubah menjadi Hadir, memberi sinyal kepada terapis di ruang terapi bahwa pasien sudah siap masuk ruangan.</li>
-                        </ul>
-                    </div>
-                </div>
-
             </div>
-        </div>
+        </section>
 
-        <!-- ========================================================================= -->
-        <!-- ROLE 3: TERAPIS SPESIALIS                                                 -->
-        <!-- ========================================================================= -->
-        <div id="section-therapist" class="role-section">
-            
-            <div class="cred-card therapist">
-                <div class="cred-details">
-                    <div class="cred-item">
-                        <span class="cred-label">Akun Login Terapis Demo</span>
-                        <span class="cred-value">terapis@rumahterapi.test <button class="btn-copy" onclick="copyText('terapis@rumahterapi.test')">📋</button></span>
-                    </div>
-                    <div class="cred-item">
-                        <span class="cred-label">Terapis Wicara (TW)</span>
-                        <span class="cred-value">terapis.tw1@rumahterapi.test <button class="btn-copy" onclick="copyText('terapis.tw1@rumahterapi.test')">📋</button></span>
-                    </div>
-                    <div class="cred-item">
-                        <span class="cred-label">Password Default</span>
-                        <span class="cred-value">password <button class="btn-copy" onclick="copyText('password')">📋</button></span>
-                    </div>
-                </div>
-                <a href="/login" class="btn-link" target="_blank" style="background: #2563eb; border-color: #3b82f6;">🚀 Masuk sebagai Terapis</a>
-            </div>
+    </main>
 
-            <div class="section-header">
-                <h3>Panduan Lengkap: Terapis Spesialis</h3>
-                <p>Terapis fokus pada aspek klinis: melakukan assessment tumbuh kembang anak, menyusun rekomendasi terapi, melaksanakan sesi, dan membuat laporan kemajuan (SOAP).</p>
-            </div>
+    <div id="toast">Berhasil disalin!</div>
 
-            <div class="timeline">
-                
-                <!-- Step 1 -->
-                <div class="step-card open">
-                    <div class="step-header" onclick="toggleStep(this)">
-                        <div class="step-badge-wrap">
-                            <div class="step-number">1</div>
-                            <div class="step-header-text">
-                                <h4>Dashboard Kerja Pribadi Terapis</h4>
-                                <span class="step-route">GET /dashboard</span>
-                            </div>
-                        </div>
-                        <span class="step-toggle-icon">▼</span>
-                    </div>
-                    <div class="step-body">
-                        <p class="step-instruction">Saat terapis login, tampilan dashboard disesuaikan khusus untuk aktivitas terapis bersangkutan:</p>
-                        <ul class="instruction-list">
-                            <li>Menampilkan salam personal: <em>"Halo [Nama Terapis], Pantau jadwal dan laporan sesi Anda hari ini."</em></li>
-                            <li><strong>Kartu Sesi Hari Ini:</strong> Hanya memuat pasien-pasien anak yang ditangani oleh Anda pada hari ini.</li>
-                            <li><strong>Laporan Menunggu:</strong> Indikator berapa sesi terapi yang sudah selesai namun belum Anda input catatan laporannya.</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Step 2 -->
-                <div class="step-card open">
-                    <div class="step-header" onclick="toggleStep(this)">
-                        <div class="step-badge-wrap">
-                            <div class="step-number">2</div>
-                            <div class="step-header-text">
-                                <h4>Membaca Riwayat Intake Form Pasien</h4>
-                                <span class="step-route">GET /patient-intakes/{id}</span>
-                            </div>
-                        </div>
-                        <span class="step-toggle-icon">▼</span>
-                    </div>
-                    <div class="step-body">
-                        <p class="step-instruction">Sebelum memulai assessment, pelajari latar belakang anak:</p>
-                        <ul class="instruction-list">
-                            <li>Buka menu <strong>Kuesioner Masuk</strong>.</li>
-                            <li>Baca riwayat kehamilan dan persalinan, tonggak perkembangan (kapan pertama kali merangkak, berjalan, bicara), riwayat medis, serta keluhan perilaku yang diisi oleh ayah/ibu anak.</li>
-                            <li>Informasi ini menjadi bahan dasar observasi Anda di ruang assessment.</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Step 3 -->
-                <div class="step-card open">
-                    <div class="step-header" onclick="toggleStep(this)">
-                        <div class="step-badge-wrap">
-                            <div class="step-number">3</div>
-                            <div class="step-header-text">
-                                <h4>Mengisi Hasil Assessment Awal &amp; Rekomendasi Terapi</h4>
-                                <span class="step-route">GET /assessments/{id}/complete</span>
-                            </div>
-                        </div>
-                        <span class="step-toggle-icon">▼</span>
-                    </div>
-                    <div class="step-body">
-                        <p class="step-instruction">Setelah observasi langsung dengan anak selesai dilakukan:</p>
-                        <ul class="instruction-list">
-                            <li>Buka menu <strong>Assessment</strong> > Klik tombol <strong>Lengkapi Hasil Assessment</strong> pada nama anak.</li>
-                            <li><strong>Form Hasil Klinis:</strong>
-                                <br>&bull; Masukkan keluhan klinis &amp; observasi awal (Chief Complaint).
-                                <br>&bull; Isi riwayat perkembangan (Motorik Kasar, Motorik Halus, Komunikasi/Wicara, Sosial &amp; Kemandirian).
-                                <br>&bull; Isi aspek perilaku belajar (atensi, kepatuhan instruksi, regulasi emosi).
-                                <br>&bull; Masukkan ringkasan diagnosis &amp; catatan rujukan dokter (bila ada).
-                            </li>
-                            <li><strong>Rekomendasi Terapi:</strong> Tentukan jenis terapi yang dibutuhkan (misal: Terapi Wicara &amp; Okupasi), frekuensi sesi per minggu (misal: 2x seminggu), serta durasi (60 menit).</li>
-                            <li>Klik <strong>Simpan &amp; Selesaikan Assessment</strong>.</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Step 4 -->
-                <div class="step-card open">
-                    <div class="step-header" onclick="toggleStep(this)">
-                        <div class="step-badge-wrap">
-                            <div class="step-number">4</div>
-                            <div class="step-header-text">
-                                <h4>Mencetak Laporan PDF Resmi Berkop Surat</h4>
-                                <span class="step-route">GET /assessments/{id}/pdf</span>
-                            </div>
-                        </div>
-                        <span class="step-toggle-icon">▼</span>
-                    </div>
-                    <div class="step-body">
-                        <p class="step-instruction">Laporan resmi untuk diserahkan kepada orang tua atau dokter spesialis anak:</p>
-                        <ul class="instruction-list">
-                            <li>Setelah assessment selesai, klik tombol <strong>Unduh PDF Laporan</strong>.</li>
-                            <li>Sistem secara otomatis mengenerate dokumen PDF resmi dengan:
-                                <br>&bull; Kop Surat Resmi Klinik (Logo Kasuari Care, Nama Klinik, Alamat, Kontak WhatsApp).
-                                <br>&bull; Garis pembatas ganda formal (double-rule line).
-                                <br>&bull; Tabel identitas lengkap anak &amp; nomor rekam medis.
-                                <br>&bull; Kolom tanda tangan resmi terapis pemeriksa.
-                            </li>
-                            <li>Dokumen ini siap dicetak langsung atau dikirimkan via WhatsApp ke orang tua.</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Step 5 -->
-                <div class="step-card open">
-                    <div class="step-header" onclick="toggleStep(this)">
-                        <div class="step-badge-wrap">
-                            <div class="step-number">5</div>
-                            <div class="step-header-text">
-                                <h4>Pengisian Laporan Sesi Terapi (SOAP &amp; Foto Dokumentasi)</h4>
-                                <span class="step-route">GET /sessions &bull; POST /sessions/{id}/report</span>
-                            </div>
-                        </div>
-                        <span class="step-toggle-icon">▼</span>
-                    </div>
-                    <div class="step-body">
-                        <p class="step-instruction">Setiap kali sesi terapi tatap muka selesai dilaksanakan:</p>
-                        <ul class="instruction-list">
-                            <li>Buka menu <strong>Laporan Sesi</strong>.</li>
-                            <li>Pilih sesi anak yang baru selesai, lalu klik <strong>Tulis Laporan Sesi</strong>.</li>
-                            <li><strong>Isi Catatan Sesi:</strong>
-                                <br>&bull; <em>Aktivitas yang Dijalankan:</em> Kegiatan terapi yang dilakukan selama 60/30 menit (contoh: latihan artikulasi huruf R, stimulasi sensori vestibular, koordinasi mata-tangan).
-                                <br>&bull; <em>Catatan untuk Orang Tua:</em> Respons anak hari ini, kemajuan positif, atau hal yang perlu diperhatikan.
-                                <br>&bull; <em>PR / Tugas Latihan di Rumah (Homework):</em> Latihan sederhana yang harus dilanjutkan orang tua di rumah agar perkembangan anak konsisten.
-                            </li>
-                            <li><strong>Unggah Foto Dokumentasi:</strong> Anda dapat mengunggah foto anak saat melakukan aktivitas terapi di ruangan (foto akan tersimpan aman dan terproteksi).</li>
-                            <li>Klik <strong>Kirim Laporan Sesi</strong>. Laporan tersimpan dan kuota paket sesi anak otomatis terpotong 1 sesi.</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Step 6 -->
-                <div class="step-card open">
-                    <div class="step-header" onclick="toggleStep(this)">
-                        <div class="step-badge-wrap">
-                            <div class="step-number">6</div>
-                            <div class="step-header-text">
-                                <h4>Evaluasi Berkala Pasien (Tiap 24 Sesi)</h4>
-                                <span class="step-route">GET /scheduling</span>
-                            </div>
-                        </div>
-                        <span class="step-toggle-icon">▼</span>
-                    </div>
-                    <div class="step-body">
-                        <p class="step-instruction">SOP klinik menetapkan evaluasi berkala setelah 24 pertemuan terapi:</p>
-                        <ul class="instruction-list">
-                            <li>Sistem memiliki indikator penghitung otomatis <em>(Sessions Since Evaluation)</em>.</li>
-                            <li>Ketika pasien telah menyelesaikan 24 sesi terapi, sistem akan menandai bahwa anak membutuhkan sesi evaluasi hasil sebelum memperpanjang paket baru.</li>
-                            <li>Terapis melakukan tes perbandingan antara baseline assessment awal dengan pencapaian saat ini.</li>
-                        </ul>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-    </div>
-
-    <!-- Footer -->
-    <footer>
-        <p>&copy; 2026 <strong>Kasuari Care - Ruang Tumbuh</strong>. Hak Cipta Dilindungi Undang-Undang.</p>
-        <p style="margin-top: 4px; font-size: 12px; color: #94a3b8;">Sistem Manajemen Klinik Tumbuh Kembang Anak Terintegrasi</p>
-    </footer>
-
-    <!-- Interactive Script -->
     <script>
-        function switchRole(role) {
-            // Update active role buttons
-            document.querySelectorAll('.role-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.querySelector('.role-btn.' + role).classList.add('active');
+        /* =====================================================================
+           DATA 1: SIMULASI KASUS NYATA A-Z (7 TAHAP BERURUTAN)
+           ===================================================================== */
+        const storySteps = [
+            {
+                step: 1,
+                actor: 'Admin FO',
+                actorClass: 'actor-admin',
+                title: 'Daftar Pasien Baru',
+                sidebarGroup: 'Pasien & layanan',
+                sidebarMenu: 'Data pasien',
+                headline: 'Tahap 1: Admin Mendaftarkan Data Anak Baru',
+                summary: 'Misalkan orang tua datang membawa anaknya bernama "Adik Budi". Langkah paling pertama adalah mendaftarkan data Budi agar mendapat Nomor Rekam Medis.',
+                actions: [
+                    'Di sidebar kiri, klik kategori <b>Pasien & layanan</b> lalu klik menu <b>Data pasien</b>.',
+                    'Pada kotak form <b>Registrasi Pasien Baru</b> di sebelah kiri, ketik <b>Nama lengkap anak</b>, <b>Tanggal lahir</b>, <b>Nomor WhatsApp utama</b>, dan <b>Nama orang tua/wali</b>.',
+                    'Pada bagian <b>Terapis Pendamping per Layanan</b>, pilih terapis untuk Terapi Wicara / Okupasi / Fisioterapi.',
+                    'Klik tombol biru <b>Simpan Pasien</b>. Nomor rekam medis otomatis terbuat (contoh: <code>KL-2026-001</code>).'
+                ],
+                tip: 'Jika orang tua mengisi form pendaftaran dari HP (/daftar), Admin cukup buka menu "Pendaftaran" lalu klik tombol "Konversi ke Rekam Medis".',
+                mockupUrl: 'testingklinik.my.id/patients',
+                mockupTitle: 'Form Registrasi Pasien Baru',
+                mockupFields: [
+                    { label: '① Nama lengkap anak', val: 'Budi Santoso Junior' },
+                    { label: '② Tanggal lahir & Gender', val: '12/05/2022 • Laki-laki' },
+                    { label: '③ Nomor WhatsApp utama', val: '0812-3456-7890' },
+                    { label: '④ Terapis Pendamping (TW)', val: 'Siti Rahmawati, S.Tr.Kes' }
+                ],
+                mockupBtn: '⑤ Klik "Simpan Pasien" ➔ Kode KL-2026-001 Terbuat!'
+            },
+            {
+                step: 2,
+                actor: 'Admin FO',
+                actorClass: 'actor-admin',
+                title: 'Jadwalkan Assessment',
+                sidebarGroup: 'Pasien & layanan',
+                sidebarMenu: 'Assessment',
+                headline: 'Tahap 2: Admin Membuat Jadwal & Tagihan Assessment Awal',
+                summary: 'Sebelum terapi dimulai, anak wajib diperiksa (Assessment Awal). Admin menjadwalkan tanggal & jam pemeriksaan.',
+                actions: [
+                    'Masih di kategori <b>Pasien & layanan</b>, klik menu <b>Assessment</b> lalu klik tombol <b>Jadwalkan assessment</b>.',
+                    'Pilih <b>Pasien</b> ("KL-2026-001 · Budi"), pilih <b>Jenis layanan assessment</b> ("Assessment & Konsultasi — Rp 300.000").',
+                    'Pilih <b>Tanggal</b>, ketik <b>Jam</b> (format 24 jam, contoh <code>09:00</code>), dan pilih <b>Terapis</b> pemeriksa.',
+                    'Klik tombol <b>Simpan & Buat Tagihan</b>. Sistem otomatis membuat jadwal sekaligus tagihan Rp 300.000.'
+                ],
+                tip: 'Sistem otomatis mengecek jadwal terapis. Jika terapis sedang sibuk di jam tersebut, akan muncul tulisan "(Sudah ada jadwal)".',
+                mockupUrl: 'testingklinik.my.id/assessments/create',
+                mockupTitle: 'Jadwalkan Assessment',
+                mockupFields: [
+                    { label: '① Pasien', val: 'KL-2026-001 · Budi Santoso Junior' },
+                    { label: '② Jenis layanan', val: 'Assessment & Konsultasi (Rp 300.000)' },
+                    { label: '③ Tanggal & Jam (WIB)', val: '23/11/2026 • Pukul 09:00' },
+                    { label: '④ Terapis Pemeriksa', val: 'Siti Rahmawati, S.Tr.Kes' }
+                ],
+                mockupBtn: '⑤ Klik "Simpan & Buat Tagihan"'
+            },
+            {
+                step: 3,
+                actor: 'Admin / Kasir',
+                actorClass: 'actor-admin',
+                title: 'Bayar Tagihan Assessment',
+                sidebarGroup: 'Keuangan',
+                sidebarMenu: 'Tagihan',
+                headline: 'Tahap 3: Kasir Melunasi Tagihan Assessment & Konfirmasi Hadir',
+                summary: 'Agar Terapis bisa mengisi lembar hasil pemeriksaan, tagihan Assessment Rp 300.000 harus dicatat pembayarannya terlebih dahulu.',
+                actions: [
+                    'Klik kategori <b>Keuangan</b> di sidebar kiri, lalu klik menu <b>Tagihan</b>.',
+                    'Cari tagihan "Budi Santoso Junior" yang berstatus <b>Menunggu Pembayaran</b>, lalu klik <b>Buka Tagihan / Bayar</b>.',
+                    'Pilih <b>Metode Pembayaran</b> (Tunai / Transfer Bank / QRIS), lalu klik <b>Simpan Pembayaran</b>.',
+                    'Saat Budi datang ke klinik, klik tombol <b>Hadir</b> pada daftar jadwal di menu <b>Ringkasan</b> atau <b>Jadwal terapi</b>.'
+                ],
+                tip: 'Struk lunas berlogo & berkop surat klinik dapat langsung dicetak atau diunduh PDF untuk diberikan ke orang tua.',
+                mockupUrl: 'testingklinik.my.id/bills',
+                mockupTitle: 'Pelunasan Tagihan Assessment',
+                mockupFields: [
+                    { label: '① Nomor Invoice', val: 'INV-202611-0001 (Rp 300.000)' },
+                    { label: '② Status Tagihan', val: 'Menunggu Pembayaran ➔ LUNAS' },
+                    { label: '③ Metode Bayar', val: 'QRIS / Transfer BCA' },
+                    { label: '④ Absensi Kedatangan', val: 'Klik Tombol "Hadir"' }
+                ],
+                mockupBtn: '⑤ Klik "Simpan Pembayaran" & Cetak Struk'
+            },
+            {
+                step: 4,
+                actor: 'Terapis',
+                actorClass: 'actor-terapis',
+                title: 'Isi Hasil Assessment',
+                sidebarGroup: 'Pasien & layanan',
+                sidebarMenu: 'Assessment',
+                headline: 'Tahap 4: Terapis Mengisi Hasil Pemeriksaan & Rekomendasi Terapi',
+                summary: 'Setelah anak selesai diperiksa di ruangan, Terapis mencatat hasil observasi dan rekomendasi jenis terapi.',
+                actions: [
+                    'Login menggunakan akun <b>Terapis</b> (atau melalui akun Owner/Admin), buka menu <b>Assessment</b>.',
+                    'Pada baris pasien Budi, klik tombol <b>Isi hasil</b>.',
+                    'Isi <b>Keluhan utama</b>, <b>Riwayat perkembangan</b>, <b>Perilaku belajar</b>, dan <b>Ringkasan hasil assessment</b>.',
+                    'Di bagian bawah, centang/pilih <b>Rekomendasi Terapi</b> (misal: Terapi Wicara, 2x sesi/minggu, durasi 60 menit), lalu klik <b>Simpan & Selesaikan Assessment</b>.',
+                    'Klik tombol <b>Cetak PDF</b> untuk mengunduh laporan resmi berkop surat klinik.'
+                ],
+                tip: 'Begitu Assessment disimpan sebagai "Selesai", pasien Budi resmi bisa dijadwalkan untuk sesi terapi rutin!',
+                mockupUrl: 'testingklinik.my.id/assessments/1/complete',
+                mockupTitle: 'Form Hasil Assessment & Rekomendasi',
+                mockupFields: [
+                    { label: '① Keluhan Utama', val: 'Kosakata terbatas, belum bisa merangkai 2 kata' },
+                    { label: '② Ringkasan Observasi', val: 'Kontak mata baik, perlu stimulasi oromotor' },
+                    { label: '③ Rekomendasi Layanan', val: 'Terapi Wicara (TW) • 2x / minggu' },
+                    { label: '④ Durasi Sesi', val: '60 Menit per pertemuan' }
+                ],
+                mockupBtn: '⑤ Klik "Simpan & Selesaikan" + "Unduh PDF"'
+            },
+            {
+                step: 5,
+                actor: 'Admin / Kasir',
+                actorClass: 'actor-admin',
+                title: 'Beli Paket Terapi di Kasir',
+                sidebarGroup: 'Keuangan',
+                sidebarMenu: 'Kasir & POS',
+                headline: 'Tahap 5: Orang Tua Membeli Paket Terapi (& Buku/Produk) di Kasir',
+                summary: 'Berdasarkan rekomendasi terapis, orang tua membeli paket terapi (misal Paket 4x Sesi 1 Jam) di Kasir.',
+                actions: [
+                    'Klik kategori <b>Keuangan</b> di sidebar kiri, lalu klik menu <b>Kasir & POS</b>.',
+                    'Pilih nama pasien <b>Budi Santoso Junior</b>.',
+                    'Pada baris item transaksi, pilihTipe <b>Paket Terapi</b> lalu pilih <b>Paket 1 Jam - Paket 2 (4x Terapi) — Rp 630.000</b>.',
+                    'Jika orang tua sekalian membeli kartu/buku, klik <b>+ Tambah Item</b> lalu pilih <b>Produk / Buku</b>.',
+                    'Pilih metode pembayaran (Tunai / Transfer / QRIS) lalu klik <b>Proses Pembayaran & Cetak Struk</b>.'
+                ],
+                tip: 'Begitu transaksi kasir disimpan, saldo kuota "4 Sesi (Durasi 60 Menit)" otomatis aktif pada akun pasien Budi!',
+                mockupUrl: 'testingklinik.my.id/sales/create',
+                mockupTitle: 'Kasir & POS (Multi-Item)',
+                mockupFields: [
+                    { label: '① Pasien', val: 'KL-2026-001 · Budi Santoso Junior' },
+                    { label: '② Item 1 (Paket Terapi)', val: 'Paket 1 Jam - Paket 2 (4x Terapi) • Rp 630.000' },
+                    { label: '③ Item 2 (Produk Fisik)', val: 'Kartu Aktivitas Komunikasi • Rp 85.000' },
+                    { label: '④ Total Bayar & Metode', val: 'Rp 715.000 • Transfer Bank' }
+                ],
+                mockupBtn: '⑤ Klik "Simpan Transaksi" ➔ Kuota 4 Sesi Aktif!'
+            },
+            {
+                step: 6,
+                actor: 'Admin FO',
+                actorClass: 'actor-admin',
+                title: 'Buat Jadwal Terapi',
+                sidebarGroup: 'Operasional',
+                sidebarMenu: 'Jadwal terapi',
+                headline: 'Tahap 6: Admin Menjadwalkan Sesi Terapi & Konfirmasi Kehadiran',
+                summary: 'Sekarang Budi sudah punya Assessment Selesai dan Paket 4 Sesi. Admin tinggal memasukkan jadwal sesi terapinya.',
+                actions: [
+                    'Klik kategori <b>Operasional</b> di sidebar kiri, lalu klik menu <b>Jadwal terapi</b>.',
+                    'Pada form di sebelah kiri, ketik nama <b>Budi</b> di kotak pencarian pasien lalu klik namanya.',
+                    'Pilih <b>Hasil Assessment</b> Budi, pilih <b>Gunakan Paket Aktif (Sisa 4 sesi)</b>, pilih <b>Jenis Terapi (Terapi Wicara)</b>, <b>Terapis</b>, dan <b>Ruangan</b>.',
+                    'Isi <b>Tanggal</b> & <b>Jam mulai</b> (misal <code>10:00</code>), lalu klik <b>Simpan Jadwal Terapi</b>.',
+                    'Saat Budi hadir di hari terapi, klik tombol <b>Hadir</b> pada kartu jadwalnya (kuota paket otomatis berkurang 1 menjadi sisa 3 sesi).'
+                ],
+                tip: 'Ada tombol "Kirim Pengingat WA" di setiap jadwal untuk mengirim pesan pengingat otomatis ke WhatsApp orang tua!',
+                mockupUrl: 'testingklinik.my.id/scheduling',
+                mockupTitle: 'Buat Jadwal Sesi Terapi',
+                mockupFields: [
+                    { label: '① Cari Pasien & Assessment', val: 'Budi Santoso Junior • Assessment #1' },
+                    { label: '② Sumber Kuota', val: 'Paket 1 Jam (Sisa 4 dari 4 sesi)' },
+                    { label: '③ Layanan & Terapis', val: 'Terapi Wicara • Siti Rahmawati' },
+                    { label: '④ Ruangan & Waktu', val: 'Ruang Wicara • 25/11/2026 Pukul 10:00' }
+                ],
+                mockupBtn: '⑤ Klik "Simpan Jadwal" & Klik "Hadir" Saat Datang'
+            },
+            {
+                step: 7,
+                actor: 'Terapis & Owner',
+                actorClass: 'actor-terapis',
+                title: 'Laporan Sesi & Keuangan',
+                sidebarGroup: 'Operasional',
+                sidebarMenu: 'Laporan sesi',
+                headline: 'Tahap 7: Terapis Mengisi Laporan Sesi & Owner Memantau Keuangan',
+                summary: 'Sesi terapi selesai! Terapis mengisi buku penghubung digital (Laporan Sesi) dan Owner melihat rekapitulasi klinik.',
+                actions: [
+                    '<b>Untuk Terapis:</b> Buka kategori <b>Operasional &rarr; Laporan sesi</b>. Klik jadwal Budi yang sudah selesai.',
+                    'Isi <b>Kegiatan terapi hari ini</b>, <b>Catatan untuk orang tua</b>, <b>PR / Latihan di rumah</b>, dan <b>Upload Foto Kegiatan Anak</b>, lalu klik <b>Simpan Laporan Sesi</b>.',
+                    '<b>Untuk Owner:</b> Buka menu <b>Ringkasan</b> untuk melihat kenaikan pendapatan & sesi selesai, serta buka <b>Keuangan &rarr; Pengeluaran & gaji</b> untuk mencatat biaya operasional dan pembayaran gaji terapis.'
+                ],
+                tip: 'Setiap pasien mencapai 24 sesi terapi sejak evaluasi terakhir, sistem otomatis memberi pengingat "Waktunya Evaluasi 24 Sesi".',
+                mockupUrl: 'testingklinik.my.id/sessions',
+                mockupTitle: 'Form Laporan Sesi Terapi & Foto',
+                mockupFields: [
+                    { label: '① Aktivitas Terapi', val: 'Latihan meniup, imitasi vokal A-I-U-E-O & kartu kata' },
+                    { label: '② Catatan Orang Tua', val: 'Anak kooperatif, mampu meniru 5 kata benda baru' },
+                    { label: '③ PR Latihan di Rumah', val: 'Latihan menunjuk & menyebut nama anggota tubuh 10 menit/hari' },
+                    { label: '④ Dokumentasi Sesi', val: '📷 foto-sesi-budi.jpg (Terunggah)' }
+                ],
+                mockupBtn: '⑤ Klik "Simpan Laporan Sesi"'
+            }
+        ];
 
-            // Update active sections
-            document.querySelectorAll('.role-section').forEach(sec => {
-                sec.classList.remove('active');
-            });
-            document.getElementById('section-' + role).classList.add('active');
-
-            // Reset search filter
-            document.getElementById('searchInput').value = '';
-            filterSteps();
-        }
-
-        function toggleStep(header) {
-            const card = header.closest('.step-card');
-            card.classList.toggle('open');
-        }
-
-        function filterSteps() {
-            const query = document.getElementById('searchInput').value.toLowerCase().trim();
-            const activeSection = document.querySelector('.role-section.active');
-            const stepCards = activeSection.querySelectorAll('.step-card');
-
-            stepCards.forEach(card => {
-                const text = card.textContent.toLowerCase();
-                if (!query || text.includes(query)) {
-                    card.style.display = 'block';
-                    if (query) {
-                        card.classList.add('open');
+        /* =====================================================================
+           DATA 2: KUPAS TUNTAS PER ROLE (OWNER, ADMIN, TERAPIS)
+           ===================================================================== */
+        const rolesData = {
+            owner: {
+                name: 'Pimpinan Klinik (Owner)',
+                badgeColor: '#7c3aed',
+                creds: [
+                    { label: 'Email Login Owner', val: 'owner@rumahterapi.test' },
+                    { label: 'Password', val: 'password' }
+                ],
+                modules: [
+                    {
+                        id: 'owner-1',
+                        title: 'Login & Peta Sidebar Owner',
+                        sub: 'Cara membuka 4 grup menu utama',
+                        breadcrumb: 'Halaman Login ➔ Sidebar Kiri (4 Kategori)',
+                        headline: 'Langkah 1: Login Owner & Mengenali 4 Kategori Menu di Sidebar Kiri',
+                        desc: 'Sebagai Owner, Anda memegang akses penuh ke seluruh fitur klinik. Ketika baru login, perhatikan panel menu di sebelah kiri layar:',
+                        steps: [
+                            { title: 'Buka Halaman Login & Masuk', text: 'Buka alamat website klinik, masukkan email <span class="ui-kbd">owner@rumahterapi.test</span> dan password <span class="ui-kbd">password</span>, lalu klik tombol <span class="ui-btn-badge">Masuk</span>.' },
+                            { title: 'Cara Membuka Menu di Sidebar Kiri', text: 'Menu di sebelah kiri dikelompokkan ke dalam <b>4 kategori lipat</b> agar rapi: <b>1. Umum</b>, <b>2. Pasien & layanan</b>, <b>3. Operasional</b>, dan <b>4. Keuangan</b>.' },
+                            { title: 'Klik Nama Kategori untuk Melihat Sub-Menu', text: 'Klik tulisan <span class="ui-kbd">Pasien & layanan ▾</span>, <span class="ui-kbd">Operasional ▾</span>, atau <span class="ui-kbd">Keuangan ▾</span> untuk membuka daftar menu di dalamnya.' }
+                        ],
+                        sidebarGroup: 'Umum',
+                        sidebarMenu: 'Ringkasan',
+                        allGroups: ['Umum (1 menu)', 'Pasien & layanan (7 menu)', 'Operasional (2 menu)', 'Keuangan (4 menu)'],
+                        mockupTitle: 'Tampilan Sidebar Kiri Owner (Akses Penuh)',
+                        mockupFields: [
+                            { label: 'Kategori 1: Umum', val: '• Ringkasan (Dashboard Utama)' },
+                            { label: 'Kategori 2: Pasien & layanan', val: '• Pendaftaran • Form rekam medis • Data pasien • Terapis • Paket terapi • Produk & buku • Assessment' },
+                            { label: 'Kategori 3: Operasional', val: '• Jadwal terapi • Laporan sesi' },
+                            { label: 'Kategori 4: Keuangan', val: '• Tagihan • Kasir & POS • Riwayat pembayaran • Pengeluaran & gaji' }
+                        ],
+                        mockupBtn: 'Klik salah satu kategori di kiri untuk berpindah halaman',
+                        tip: 'Di HP / Tablet, klik tombol ikon garis tiga (☰) di pojok kiri atas untuk membuka menu sidebar ini.'
+                    },
+                    {
+                        id: 'owner-2',
+                        title: 'Ringkasan (Dashboard KPI)',
+                        sub: 'Pantau omzet, jadwal & absensi hari ini',
+                        breadcrumb: 'Sidebar Kiri ➔ Umum ➔ Ringkasan',
+                        headline: 'Langkah 2: Memantau Performa Klinik di Menu "Ringkasan"',
+                        desc: 'Halaman Ringkasan menyajikan kondisi klinik hari ini secara langsung tanpa perlu membuka banyak laporan.',
+                        steps: [
+                            { title: 'Pantau 4 Kartu Statistik Utama di Atas', text: 'Menampilkan angka <b>Pasien Aktif</b>, <b>Jadwal Hari Ini</b>, <b>Laporan Sesi Tertunda</b>, dan <b>Pendapatan Bulan Ini</b>.' },
+                            { title: 'Filter Jadwal Harian Klinik', text: 'Di bagian tabel <b>Jadwal Terapi & Assessment Hari Ini</b>, Anda bisa memfilter berdasarkan <b>Tanggal</b>, <b>Nama Terapis</b>, atau <b>Jenis Layanan</b>.' },
+                            { title: 'Konfirmasi Kehadiran Langsung', text: 'Owner maupun Admin dapat langsung mengklik tombol <span class="ui-btn-badge ui-btn-emerald">Hadir</span> atau <span class="ui-kbd">Tidak Hadir</span> pada jadwal pasien hari ini.' },
+                            { title: 'Ikon Lonceng Notifikasi (Pojok Kanan Atas)', text: 'Klik ikon lonceng di kanan atas untuk melihat pengingat pasien yang sudah mencapai 24 sesi dan membutuhkan Evaluasi Berkala.' }
+                        ],
+                        sidebarGroup: 'Umum',
+                        sidebarMenu: 'Ringkasan',
+                        mockupTitle: 'Dashboard Ringkasan Eksekutif',
+                        mockupFields: [
+                            { label: '① Kartu Statistik', val: 'Pasien Aktif • Sesi Hari Ini • Omzet Bulan Ini' },
+                            { label: '② Lonceng Notifikasi', val: 'Pengingat pasien wajib Evaluasi 24 Sesi' },
+                            { label: '③ Filter Jadwal', val: 'Pilih Tanggal • Pilih Terapis • Pilih Layanan' },
+                            { label: '④ Tombol Absensi Cepat', val: 'Klik "Hadir" / "Tidak Hadir" langsung di tabel' }
+                        ],
+                        mockupBtn: 'Semua angka terupdate otomatis saat kasir/terapis bekerja',
+                        tip: 'Gunakan filter Tanggal di tabel jadwal untuk mengecek jadwal besok atau jadwal hari-hari sebelumnya.'
+                    },
+                    {
+                        id: 'owner-3',
+                        title: 'Kelola Akun & Data Terapis',
+                        sub: 'Tambah terapis baru & spesialisasi',
+                        breadcrumb: 'Sidebar Kiri ➔ Pasien & layanan ➔ Terapis',
+                        headline: 'Langkah 3: Menambah & Mengelola Akun Terapis Klinik',
+                        desc: 'Setiap terapis di klinik memiliki akun login masing-masing dan dapat ditugaskan menangani banyak anak.',
+                        steps: [
+                            { title: 'Buka Menu Terapis', text: 'Klik kategori <span class="ui-kbd">Pasien & layanan</span> di sidebar kiri, lalu klik menu <span class="ui-kbd">Terapis</span>.' },
+                            { title: 'Isi Form Tambah Terapis Baru (Sisi Kiri)', text: 'Ketik <b>Nama lengkap & gelar</b>, <b>Email login</b>, <b>Nomor HP/WA</b>, <b>Spesialisasi</b> (contoh: Terapi Wicara / Okupasi / Fisioterapi), <b>Nomor STR/SIP</b>, serta <b>Password login</b>.' },
+                            { title: 'Simpan Akun', text: 'Klik tombol <span class="ui-btn-badge">Simpan Terapis</span>. Akun tersebut langsung aktif dan bisa dipilih saat pendaftaran pasien maupun penjadwalan.' },
+                            { title: 'Edit Data / Nonaktifkan Terapis', text: 'Pada tabel daftar terapis di sebelah kanan, klik tombol <span class="ui-kbd">Edit</span> pada baris terapis jika ingin mengubah nama, spesialisasi, atau status aktifnya.' }
+                        ],
+                        sidebarGroup: 'Pasien & layanan',
+                        sidebarMenu: 'Terapis',
+                        mockupTitle: 'Manajemen Akun & Profil Terapis',
+                        mockupFields: [
+                            { label: '① Nama & Email Login', val: 'Putri Amelia, S.ST • terapis.to2@rumahterapi.test' },
+                            { label: '② Spesialisasi & No. STR', val: 'Terapi Okupasi • STR-OT-10007' },
+                            { label: '③ Password Akun', val: 'Minimal 8 karakter' },
+                            { label: '④ Tabel Daftar Terapis', val: 'Klik "Edit" untuk ubah profil / nonaktifkan' }
+                        ],
+                        mockupBtn: 'Klik "Simpan Terapis"',
+                        tip: '1 Terapis kini bebas ditugaskan ke banyak pasien anak sekaligus (sistem otomatis menjaga agar jam terapinya tidak bentrok).'
+                    },
+                    {
+                        id: 'owner-4',
+                        title: 'Kelola Paket Terapi & Produk/Buku',
+                        sub: 'Atur harga paket sesi & stok barang fisik',
+                        breadcrumb: 'Sidebar Kiri ➔ Pasien & layanan ➔ Paket terapi / Produk & buku',
+                        headline: 'Langkah 4: Mengatur Master Paket Terapi & Stok Produk/Buku',
+                        desc: 'Owner dapat menyesuaikan daftar harga paket sesi terapi serta mengontrol stok barang/buku yang dijual di kasir.',
+                        steps: [
+                            { title: 'Mengatur Paket Terapi (Menu "Paket terapi")', text: 'Buka <span class="ui-kbd">Pasien & layanan &rarr; Paket terapi</span>. Isi Nama paket (misal: <em>Paket 1 Jam - 8x Terapi</em>), Durasi sesi (60 atau 30 menit), Jumlah kuota sesi, Masa aktif (hari), dan Harga paket, lalu klik <span class="ui-btn-badge">Simpan Paket</span>.' },
+                            { title: 'Aktifkan / Nonaktifkan Paket', text: 'Klik tombol <span class="ui-kbd">Nonaktifkan</span> pada paket lama jika paket tersebut sudah tidak dijual lagi di kasir.' },
+                            { title: 'Mengelola Produk Fisik & Buku (Menu "Produk & buku")', text: 'Buka <span class="ui-kbd">Pasien & layanan &rarr; Produk & buku</span>. Masukkan <b>Kode SKU</b>, <b>Nama Produk/Buku</b>, <b>Harga Jual</b>, dan <b>Jumlah Stok</b>, lalu klik <span class="ui-btn-badge">Simpan Produk</span>.' },
+                            { title: 'Pemotongan Stok Otomatis', text: 'Setiap kali kasir menjual produk tersebut di menu Kasir & POS, jumlah stok di halaman ini otomatis berkurang.' }
+                        ],
+                        sidebarGroup: 'Pasien & layanan',
+                        sidebarMenu: 'Paket terapi',
+                        mockupTitle: 'Master Paket Terapi & Katalog Produk Fisik',
+                        mockupFields: [
+                            { label: '① Paket Durasi 60 Menit', val: '1x (160rb) • 4x (630rb) • 8x (1,24jt) • 12x (1,8jt)' },
+                            { label: '② Paket Durasi 30 Menit', val: '1x (110rb) • 6x (570rb) • 12x (1,08jt) • 16x (1,36jt)' },
+                            { label: '③ Katalog Produk & Buku', val: 'SKU: MEDIA-KARTU-01 • Kartu Aktivitas (Stok: 20)' },
+                            { label: '④ Kontrol Status', val: 'Tombol Aktif / Nonaktifkan per item' }
+                        ],
+                        mockupBtn: 'Klik "Simpan Paket" atau "Simpan Produk"',
+                        tip: 'Di halaman Paket Terapi terdapat tombol pintasan ke menu "Produk & buku" di pojok kanan atas.'
+                    },
+                    {
+                        id: 'owner-5',
+                        title: 'Pengeluaran Klinik & Gaji Terapis',
+                        sub: 'Catat biaya operasional & slip payroll terapis',
+                        breadcrumb: 'Sidebar Kiri ➔ Keuangan ➔ Pengeluaran & gaji',
+                        headline: 'Langkah 5: Mencatat Pengeluaran Klinik & Pembayaran Gaji (Payroll) Terapis',
+                        desc: 'Menu ini digunakan untuk mencatat seluruh uang keluar klinik sekaligus fitur khusus Owner untuk mencatat gaji terapis.',
+                        steps: [
+                            { title: 'Buka Menu Pengeluaran & Gaji', text: 'Klik kategori <span class="ui-kbd">Keuangan</span> di sidebar kiri, lalu klik menu <span class="ui-kbd">Pengeluaran & gaji</span>.' },
+                            { title: 'Mencatat Pengeluaran Operasional Klinik', text: 'Pada form <b>Catat Pengeluaran</b>, isi Nama pengeluaran (misal: Listrik, Alat Tulis, Konsumsi), Nominal (Rp), Tanggal, dan unggah foto nota/bukti bayar, lalu klik <span class="ui-btn-badge">Simpan Pengeluaran</span>.' },
+                            { title: 'Mencatat Gaji / Payroll Terapis (Khusus Owner)', text: 'Pada form <b>Catat Pembayaran Gaji Terapis</b>, pilih <b>Nama Terapis</b>, <b>Periode Bulan Gaji</b>, <b>Nominal Gaji (Rp)</b>, <b>Tanggal Pembayaran</b>, serta <b>Upload Bukti Transfer</b>, lalu klik <span class="ui-btn-badge ui-btn-emerald">Simpan Gaji Terapis</span>.' },
+                            { title: 'Unduh Laporan Excel / CSV', text: 'Klik tombol <span class="ui-kbd">Export CSV Pengeluaran</span> atau <span class="ui-kbd">Export CSV Gaji</span> untuk mengunduh rekapitulasi pembukuan.' }
+                        ],
+                        sidebarGroup: 'Keuangan',
+                        sidebarMenu: 'Pengeluaran & gaji',
+                        mockupTitle: 'Pencatatan Biaya Operasional & Payroll Terapis',
+                        mockupFields: [
+                            { label: '① Form Pengeluaran Klinik', val: 'Beli Alat Terapi Sensori • Rp 450.000 + Bukti Nota' },
+                            { label: '② Form Gaji Terapis (Owner)', val: 'Siti Rahmawati • Periode Nov 2026 • Rp 4.500.000' },
+                            { label: '③ Bukti Transfer Bank', val: 'Lihat Bukti Foto / PDF tersimpan aman' },
+                            { label: '④ Ekspor Pembukuan', val: 'Tombol Export CSV Pengeluaran & Export CSV Payroll' }
+                        ],
+                        mockupBtn: 'Klik "Simpan Pengeluaran" / "Simpan Gaji"',
+                        tip: 'Fitur Input & Export Gaji Terapis hanya muncul pada akun Login Owner demi menjaga kerahasiaan nominal gaji antar staf.'
+                    },
+                    {
+                        id: 'owner-6',
+                        title: 'Audit Riwayat Pembayaran & Laporan Sesi',
+                        sub: 'Kontrol uang masuk kasir & kualitas laporan terapis',
+                        breadcrumb: 'Sidebar Kiri ➔ Keuangan ➔ Riwayat pembayaran & Laporan sesi',
+                        headline: 'Langkah 6: Mengaudit Uang Masuk Kasir & Laporan Sesi Terapis',
+                        desc: 'Owner dapat mengaudit seluruh uang masuk dari pasien serta membaca seluruh catatan perkembangan anak yang ditulis terapis.',
+                        steps: [
+                            { title: 'Cek Uang Masuk di "Riwayat pembayaran"', text: 'Buka <span class="ui-kbd">Keuangan &rarr; Riwayat pembayaran</span>. Filter berdasarkan rentang tanggal atau metode bayar (Tunai, Transfer, QRIS), lihat foto bukti transfer, atau klik <span class="ui-kbd">Export CSV</span>.' },
+                            { title: 'Cek Tagihan Belum Lunas di "Tagihan"', text: 'Buka <span class="ui-kbd">Keuangan &rarr; Tagihan</span> untuk melihat daftar invoice pasien yang masih berstatus menunggu pembayaran.' },
+                            { title: 'Audit Catatan Terapis di "Laporan sesi"', text: 'Buka <span class="ui-kbd">Operasional &rarr; Laporan sesi</span>. Owner dapat membaca laporan kegiatan, catatan orang tua, PR anak, melihat foto sesi, hingga mengedit laporan jika diperlukan.' }
+                        ],
+                        sidebarGroup: 'Keuangan',
+                        sidebarMenu: 'Riwayat pembayaran',
+                        mockupTitle: 'Audit Riwayat Pembayaran & Laporan Sesi',
+                        mockupFields: [
+                            { label: '① Filter Tanggal & Metode', val: '01 Nov – 30 Nov 2026 • Semua Metode Bayar' },
+                            { label: '② Detail Invoice & Bukti', val: 'Klik "Struk" atau "Lihat Bukti Transfer"' },
+                            { label: '③ Export Rekap Kasir', val: 'Unduh seluruh transaksi ke Excel / CSV' },
+                            { label: '④ Audit Laporan Sesi', val: 'Pantau kelengkapan laporan harian tiap terapis' }
+                        ],
+                        mockupBtn: 'Klik "Export CSV" untuk laporan bulanan',
+                        tip: 'Jika laporan sesi pernah diedit, sistem menampilkan catatan waktu edit dan nama pengguna yang memperbaruinya.'
                     }
-                } else {
-                    card.style.display = 'none';
-                }
+                ]
+            },
+
+            admin: {
+                name: 'Admin Front Office & Kasir',
+                badgeColor: '#059669',
+                creds: [
+                    { label: 'Email Login Admin FO', val: 'admin@rumahterapi.test' },
+                    { label: 'Email Login Kasir', val: 'kasir@rumahterapi.test' },
+                    { label: 'Password', val: 'password' }
+                ],
+                modules: [
+                    {
+                        id: 'admin-1',
+                        title: 'Pendaftaran Online & Form Intake',
+                        sub: 'Memproses pendaftaran dari website publik',
+                        breadcrumb: 'Sidebar Kiri ➔ Pasien & layanan ➔ Pendaftaran / Form rekam medis',
+                        headline: 'Langkah 1: Memproses Pendaftaran Online & Kuesioner Rekam Medis Orang Tua',
+                        desc: 'Orang tua dapat mendaftar secara mandiri dari rumah. Admin bertugas memverifikasi dan mengubahnya menjadi data pasien resmi.',
+                        steps: [
+                            { title: 'Cek Menu "Pendaftaran" (Pendaftaran Publik)', text: 'Klik kategori <span class="ui-kbd">Pasien & layanan</span> lalu klik <span class="ui-kbd">Pendaftaran</span>. Jika anak belum pernah terdaftar, klik <span class="ui-btn-badge">Konversi Jadi Pasien Baru</span>. Jika anak sudah pernah terdaftar, pilih nama anak lalu klik <span class="ui-kbd">Tautkan ke Pasien Lama</span> agar data tidak ganda.' },
+                            { title: 'Cek Menu "Form rekam medis" (Kuesioner Lengkap)', text: 'Klik menu <span class="ui-kbd">Form rekam medis</span> untuk melihat kiriman kuesioner tumbuh kembang detail dari orang tua.' },
+                            { title: 'Verifikasi & Buat Rekam Medis Otomatis', text: 'Klik <span class="ui-kbd">Lihat Jawaban</span> untuk membaca detail keluhan anak, ubah status verifikasi menjadi <b>Terverifikasi</b>, lalu klik tombol <span class="ui-btn-badge ui-btn-emerald">Buat Pasien Baru</span>.' }
+                        ],
+                        sidebarGroup: 'Pasien & layanan',
+                        sidebarMenu: 'Pendaftaran',
+                        mockupTitle: 'Konversi Pendaftaran Online Anti-Duplikat',
+                        mockupFields: [
+                            { label: '① Data Pendaftar Masuk', val: 'Ananda Rizky • Ortu: Ibu Maya (0812-xxxx)' },
+                            { label: '② Deteksi Duplikasi', val: 'Peringatan otomatis jika nama/WA mirip pasien lama' },
+                            { label: '③ Opsi 1 (Pasien Baru)', val: 'Klik "Konversi Jadi Pasien Baru"' },
+                            { label: '④ Opsi 2 (Pasien Lama)', val: 'Pilih pasien terdaftar ➔ Klik "Tautkan"' }
+                        ],
+                        mockupBtn: 'Nomor Rekam Medis KL-2026-XXX Otomatis Terbuat',
+                        tip: 'Fitur "Tautkan ke Pasien Terdaftar" mencegah terbuatnya 2 nomor rekam medis berbeda untuk anak yang sama.'
+                    },
+                    {
+                        id: 'admin-2',
+                        title: 'Input Data Pasien Baru & Terapis',
+                        sub: 'Daftar pasien langsung di meja resepsionis',
+                        breadcrumb: 'Sidebar Kiri ➔ Pasien & layanan ➔ Data pasien',
+                        headline: 'Langkah 2: Mendaftarkan Pasien Baru & Menetapkan Terapis Pendamping',
+                        desc: 'Jika orang tua datang langsung ke meja Front Office, daftarkan anak melalui menu Data Pasien.',
+                        steps: [
+                            { title: 'Buka Menu Data Pasien', text: 'Klik kategori <span class="ui-kbd">Pasien & layanan</span> lalu klik <span class="ui-kbd">Data pasien</span>.' },
+                            { title: 'Isi Biodata Anak & Orang Tua (Form Kiri)', text: 'Ketik <b>Nama lengkap anak</b>, <b>Tanggal lahir</b>, <b>Jenis kelamin</b>, <b>Nomor WhatsApp utama</b>, <b>Keluhan utama</b>, serta <b>Nama & hubungan orang tua</b>.' },
+                            { title: 'Perhatikan Banner Peringatan Kemiripan Nama', text: 'Jika saat mengetik nama muncul kotak kuning <em>"Ditemukan pasien dengan data serupa"</em>, cek dulu apakah anak tersebut sudah terdaftar. Jika memang anak berbeda, centang kotak konfirmasi untuk melanjutkan.' },
+                            { title: 'Pilih Terapis Pendamping & Simpan', text: 'Pilih terapis untuk layanan Terapi Wicara / Okupasi / Fisioterapi, lalu klik <span class="ui-btn-badge">Simpan Pasien</span>.' }
+                        ],
+                        sidebarGroup: 'Pasien & layanan',
+                        sidebarMenu: 'Data pasien',
+                        mockupTitle: 'Form Data Pasien & Detail Rekam Medis',
+                        mockupFields: [
+                            { label: '① Biodata Anak', val: 'Nama, Tgl Lahir, Gender, Sekolah, Alamat' },
+                            { label: '② Kontak Orang Tua', val: 'Nama Ayah/Ibu & Nomor WhatsApp Aktif' },
+                            { label: '③ Penugasan Terapis', val: 'Pilih Terapis TW, OT, dan FT' },
+                            { label: '④ Tabel Pasien (Kanan)', val: 'Klik "Detail", "Edit", atau "+ Assessment"' }
+                        ],
+                        mockupBtn: 'Klik "Simpan Pasien"',
+                        tip: 'Pada daftar pasien di sebelah kanan, Anda bisa langsung mengklik tombol "+ Assessment" untuk menjadwalkan pemeriksaan anak tersebut.'
+                    },
+                    {
+                        id: 'admin-3',
+                        title: 'Jadwalkan Assessment Awal',
+                        sub: 'Buat jadwal pemeriksaan & tagihan otomatis',
+                        breadcrumb: 'Sidebar Kiri ➔ Pasien & layanan ➔ Assessment',
+                        headline: 'Langkah 3: Menjadwalkan Assessment Awal atau Evaluasi Berkala',
+                        desc: 'Setiap pasien baru harus dijadwalkan Assessment terlebih dahulu. Saat jadwal dibuat, tagihan otomatis masuk ke menu Tagihan.',
+                        steps: [
+                            { title: 'Buka Menu Assessment', text: 'Klik <span class="ui-kbd">Pasien & layanan &rarr; Assessment</span>, lalu klik tombol <span class="ui-btn-badge">Jadwalkan assessment</span> di pojok kanan atas.' },
+                            { title: 'Pilih Pasien & Layanan Assessment', text: 'Pilih <b>Nama Pasien</b> dan pilih <b>Jenis Layanan</b> (<em>Assessment & Konsultasi — Rp 300.000</em> untuk anak baru, atau <em>Evaluasi — Rp 250.000</em> untuk evaluasi 24 sesi).' },
+                            { title: 'Pilih Tanggal, Jam (24 Jam) & Terapis', text: 'Pilih tanggal, ketik jam format 24 jam (contoh: <span class="ui-kbd">14:00</span>), lalu pilih <b>Terapis Pemeriksa</b> yang tidak sedang bentrok jadwal.' },
+                            { title: 'Klik Simpan & Buat Tagihan', text: 'Klik <span class="ui-btn-badge">Simpan & Buat Tagihan</span>. Anda akan diarahkan ke halaman Tagihan untuk memproses pembayarannya.' }
+                        ],
+                        sidebarGroup: 'Pasien & layanan',
+                        sidebarMenu: 'Assessment',
+                        mockupTitle: 'Penjadwalan Assessment & Pembuatan Tagihan',
+                        mockupFields: [
+                            { label: '① Pasien', val: 'KL-2026-001 · Budi Santoso Junior' },
+                            { label: '② Layanan Assessment', val: 'Assessment & Konsultasi (Rp 300.000)' },
+                            { label: '③ Waktu Pemeriksaan', val: 'Tanggal & Jam format 24 Jam (contoh 09:30)' },
+                            { label: '④ Terapis Pemeriksa', val: 'Otomatis menandai terapis yang sedang sibuk' }
+                        ],
+                        mockupBtn: 'Klik "Simpan & Buat Tagihan"',
+                        tip: 'Jika pasien berhalangan hadir di tanggal tersebut, Anda dapat mengubah jam/tanggalnya melalui tombol "Ubah Jadwal" di menu Jadwal Terapi.'
+                    },
+                    {
+                        id: 'admin-4',
+                        title: 'Kasir & POS (Transaksi Multi-Item)',
+                        sub: 'Jual paket terapi, sesi lepas & buku sekaligus',
+                        breadcrumb: 'Sidebar Kiri ➔ Keuangan ➔ Kasir & POS / Tagihan',
+                        headline: 'Langkah 4: Melayani Pembayaran di "Tagihan" & "Kasir & POS"',
+                        desc: 'Admin Front Office sudah terintegrasi penuh dengan fitur Kasir untuk memproses pelunasan tagihan maupun pembelian paket terapi dan buku.',
+                        steps: [
+                            { title: 'Melunasi Tagihan Assessment (Menu "Tagihan")', text: 'Buka <span class="ui-kbd">Keuangan &rarr; Tagihan</span>. Klik <span class="ui-kbd">Buka Tagihan</span> pada pasien yang berstatus <b>Menunggu Pembayaran</b>, pilih metode bayar (Tunai / Transfer / QRIS), lalu klik <span class="ui-btn-badge ui-btn-emerald">Simpan Pembayaran</span>.' },
+                            { title: 'Transaksi Pembelian Paket & Produk Baru (Menu "Kasir & POS")', text: 'Buka <span class="ui-kbd">Keuangan &rarr; Kasir & POS</span>. Pilih <b>Pasien</b> dan opsional <b>Terapis</b>.' },
+                            { title: 'Masukkan Beberapa Item Sekaligus dalam 1 Struk', text: 'Pilih baris item: bisa berupa <b>Paket Terapi</b> (4x/8x/12x sesi), <b>Layanan Sesi Lepas</b>, maupun <b>Produk & Buku</b>. Klik tombol <span class="ui-kbd">+ Tambah Item</span> jika orang tua membeli lebih dari 1 item.' },
+                            { title: 'Isi Diskon, Metode Bayar & Cetak Struk Resmi', text: 'Masukkan potongan diskon (jika ada), pilih metode pembayaran, unggah foto bukti transfer (jika transfer), lalu klik <span class="ui-btn-badge">Simpan Transaksi</span>. Klik <span class="ui-kbd">Cetak Struk</span> atau <span class="ui-kbd">Unduh PDF</span> untuk mencetak struk berkop surat klinik.' }
+                        ],
+                        sidebarGroup: 'Keuangan',
+                        sidebarMenu: 'Kasir & POS',
+                        mockupTitle: 'Kasir & POS Multi-Item + Struk Berkop Resmi',
+                        mockupFields: [
+                            { label: '① Pilih Pasien', val: 'Cari nama / kode rekam medis pasien' },
+                            { label: '② Daftar Belanja Multi-Item', val: 'Paket 8x Terapi + Buku Panduan + Kartu Komunikasi' },
+                            { label: '③ Kalkulasi Otomatis', val: 'Subtotal - Diskon = Grand Total Tagihan' },
+                            { label: '④ Metode Pembayaran', val: 'Tunai / Transfer Bank (+ Upload Bukti) / QRIS' }
+                        ],
+                        mockupBtn: 'Klik "Simpan Transaksi" & "Cetak Struk PDF"',
+                        tip: 'Setiap pembelian Paket Terapi yang lunas akan langsung menambah saldo kuota sesi pasien detik itu juga.'
+                    },
+                    {
+                        id: 'admin-5',
+                        title: 'Jadwal Terapi & Absensi Kehadiran',
+                        sub: 'Penjadwalan anti-bentrok & potong kuota paket',
+                        breadcrumb: 'Sidebar Kiri ➔ Operasional ➔ Jadwal terapi',
+                        headline: 'Langkah 5: Mengatur Jadwal Terapi Rutin & Konfirmasi Kehadiran Anak',
+                        desc: 'Halaman Jadwal Terapi dilengkapi pencarian pasien pintar (autocomplete), pengecekan kuota paket, dan pemblokiran jadwal bentrok otomatis.',
+                        steps: [
+                            { title: 'Buka Menu Jadwal Terapi & Cari Nama Anak', text: 'Klik <span class="ui-kbd">Operasional &rarr; Jadwal terapi</span>. Ketik nama atau kode pasien di kolom <b>Cari Pasien</b>, lalu klik nama anak dari daftar yang muncul.' },
+                            { title: 'Pilih Assessment & Paket Terapi Aktif', text: 'Pilih <b>Assessment Selesai</b> milik anak tersebut. Jika anak memiliki paket aktif, pilih paketnya di kolom <b>Gunakan Paket Aktif</b> (sisa kuota sesi akan ditampilkan).' },
+                            { title: 'Pilih Jenis Terapi, Terapis, Ruangan & Waktu', text: 'Pilih Jenis Terapi (TW / OT / FT). Sistem otomatis memilihkan terapis pendamping anak tersebut. Pilih Ruangan, Tanggal, dan Jam mulai, lalu klik <span class="ui-btn-badge">Simpan Jadwal</span>.' },
+                            { title: 'Konfirmasi Kehadiran (Hadir / Tidak Hadir)', text: 'Pada daftar jadwal di sebelah kanan, klik tombol <span class="ui-btn-badge ui-btn-emerald">Hadir</span> saat pasien datang (kuota paket otomatis terpotong 1 sesi), atau klik ikon WhatsApp untuk mengirim pesan pengingat jadwal ke orang tua.' }
+                        ],
+                        sidebarGroup: 'Operasional',
+                        sidebarMenu: 'Jadwal terapi',
+                        mockupTitle: 'Kalender Jadwal Terapi & Konfirmasi Kehadiran',
+                        mockupFields: [
+                            { label: '① Autocomplete Pasien', val: 'Ketik nama anak ➔ Pilih dari dropdown' },
+                            { label: '② Paket & Jenis Terapi', val: 'Paket 1 Jam (Sisa 3 sesi) • Terapi Wicara' },
+                            { label: '③ Cek Bentrok Otomatis', val: 'Peringatan merah jika jam terapis bertabrakan' },
+                            { label: '④ Aksi Jadwal Harian', val: 'Tombol "Hadir", "Tidak Hadir", "Ubah", & "WA"' }
+                        ],
+                        mockupBtn: 'Klik "Simpan Jadwal" / Konfirmasi "Hadir"',
+                        tip: 'Jika jadwal pasien belum lunas dan tidak memakai paket aktif, sistem akan memberi tanda "Belum Bayar" agar kasir segera menagih.'
+                    }
+                ]
+            },
+
+            therapist: {
+                name: 'Terapis Spesialis (TW / OT / FT)',
+                badgeColor: '#2b4c7e',
+                creds: [
+                    { label: 'Terapis Demo', val: 'terapis@rumahterapi.test' },
+                    { label: 'Terapis Wicara (Siti)', val: 'terapis.tw1@rumahterapi.test' },
+                    { label: 'Terapis Okupasi (Budi)', val: 'terapis.to1@rumahterapi.test' },
+                    { label: 'Password Semua Terapis', val: 'password' }
+                ],
+                modules: [
+                    {
+                        id: 'therapist-1',
+                        title: 'Dashboard & Jadwal Pribadi Terapis',
+                        sub: 'Pantau jadwal terapi & laporan hari ini',
+                        breadcrumb: 'Sidebar Kiri ➔ Umum ➔ Ringkasan',
+                        headline: 'Langkah 1: Melihat Jadwal Sesi Pribadi Hari Ini di Menu "Ringkasan"',
+                        desc: 'Tampilan akun Terapis dirancang bersih dan fokus hanya pada pasien dan jadwal yang ditangani oleh terapis tersebut.',
+                        steps: [
+                            { title: 'Login dengan Akun Terapis', text: 'Masuk dengan email terapis Anda (misal <span class="ui-kbd">terapis.tw1@rumahterapi.test</span>) dan password <span class="ui-kbd">password</span>.' },
+                            { title: 'Pantau Kartu Ringkasan Kerja Hari Ini', text: 'Di halaman <b>Ringkasan</b>, Anda langsung melihat jumlah jadwal Anda hari ini serta jumlah laporan sesi yang masih berstatus draft/belum dikirim.' },
+                            { title: 'Lihat Daftar Pasien Anda Hari Ini', text: 'Tabel jadwal di bawah menampilkan jam mulai, nama anak, nomor rekam medis, jenis terapi, ruangan, dan status kehadiran anak yang sudah dikonfirmasi Front Office.' }
+                        ],
+                        sidebarGroup: 'Umum',
+                        sidebarMenu: 'Ringkasan',
+                        mockupTitle: 'Dashboard Khusus Terapis ("Halo, Terapis!")',
+                        mockupFields: [
+                            { label: '① Statistik Pribadi', val: 'Sesi Anda Hari Ini • Laporan Perlu Diisi' },
+                            { label: '② Menu Sidebar Terapis', val: 'Ringkasan • Form intake • Assessment • Laporan sesi' },
+                            { label: '③ Tabel Jadwal Hari Ini', val: 'Daftar anak yang Anda tangani hari ini' },
+                            { label: '④ Status Kehadiran Anak', val: 'Terlihat apakah anak sudah Hadir di ruang tunggu' }
+                        ],
+                        mockupBtn: 'Fokus pada penanganan klinis tanpa gangguan menu kasir',
+                        tip: 'Menu di sidebar kiri Terapis lebih ringkas: Umum (Ringkasan), Rekam medis (Form intake), dan Operasional (Laporan sesi).'
+                    },
+                    {
+                        id: 'therapist-2',
+                        title: 'Baca Jawaban Form Intake Ortu',
+                        sub: 'Pelajari riwayat tumbuh kembang sebelum periksa',
+                        breadcrumb: 'Sidebar Kiri ➔ Rekam medis ➔ Form intake',
+                        headline: 'Langkah 2: Membaca Riwayat Tumbuh Kembang Anak di "Form intake"',
+                        desc: 'Sebelum memeriksa anak di ruang terapi, Terapis dapat membaca seluruh jawaban kuesioner yang telah diisi oleh orang tua.',
+                        steps: [
+                            { title: 'Buka Menu Form Intake', text: 'Klik kategori <span class="ui-kbd">Rekam medis</span> di sidebar kiri, lalu klik menu <span class="ui-kbd">Form intake</span>.' },
+                            { title: 'Cari Nama Anak & Klik Lihat Jawaban', text: 'Cari nama pasien di daftar, lalu klik tombol <span class="ui-btn-badge">Lihat Jawaban</span>.' },
+                            { title: 'Pelajari 6 Bagian Riwayat Anak', text: 'Halaman ini menampilkan data lengkap: <b>1. Data Anak</b>, <b>2. Data Ayah & Ibu</b>, <b>3. Konteks Keluarga</b>, <b>4. Riwayat Kehamilan & Tumbuh Kembang</b>, <b>5. Riwayat Kesehatan</b>, dan <b>6. Jawaban Tambahan</b>.' }
+                        ],
+                        sidebarGroup: 'Rekam medis',
+                        sidebarMenu: 'Form intake',
+                        mockupTitle: 'Detail Jawaban Kuesioner Rekam Medis Orang Tua',
+                        mockupFields: [
+                            { label: '① Identitas & Keluarga', val: 'Urutan kelahiran, bahasa sehari-hari di rumah' },
+                            { label: '② Riwayat Perkembangan', val: 'Usia tengkurap, duduk, berjalan, & kata pertama' },
+                            { label: '③ Riwayat Kesehatan', val: 'Riwayat kejang/alergi/pendengaran/penglihatan' },
+                            { label: '④ Harapan Orang Tua', val: 'Target utama yang diharapkan ayah & ibu' }
+                        ],
+                        mockupBtn: 'Klik "Lihat Jawaban" pada baris nama pasien',
+                        tip: 'Data ini sangat membantu terapis saat melakukan wawancara mendalam (anamnesis) dengan orang tua.'
+                    },
+                    {
+                        id: 'therapist-3',
+                        title: 'Isi Hasil Assessment & Cetak PDF',
+                        sub: 'Catat hasil observasi, rekomendasi & unduh PDF resmi',
+                        breadcrumb: 'Menu Assessment ➔ Isi hasil ➔ Cetak PDF',
+                        headline: 'Langkah 3: Mengisi Hasil Assessment & Mengunduh Laporan PDF Berkop Surat',
+                        desc: 'Setelah sesi pemeriksaan awal atau evaluasi 24 sesi selesai, Terapis mengisi laporan hasil assessment dan rekomendasi terapi.',
+                        steps: [
+                            { title: 'Buka Halaman Assessment', text: 'Akses daftar assessment melalui menu <span class="ui-kbd">Assessment</span> (`/assessments`), lalu cari nama anak yang sudah berstatus <b>Siap Diisi / Lunas</b>.' },
+                            { title: 'Klik Tombol "Isi hasil"', text: 'Klik tombol <span class="ui-btn-badge">Isi hasil</span> untuk membuka formulir pemeriksaan klinis.' },
+                            { title: 'Lengkapi Hasil Pemeriksaan & Rekomendasi Terapi', text: 'Isi <b>Keluhan Utama</b>, <b>Riwayat Perkembangan</b> (motorik, bahasa, sosial), <b>Perilaku Belajar</b> (fokus, kontak mata), <b>Ringkasan Hasil</b>, serta tambahkan baris <b>Rekomendasi Jenis Terapi</b> (TW/OT/FT, jumlah sesi per minggu, & durasi 60/30 menit).' },
+                            { title: 'Simpan & Cetak PDF Berkop Surat Resmi', text: 'Klik <span class="ui-btn-badge ui-btn-emerald">Simpan & Selesaikan Assessment</span>. Setelah tersimpan, klik tombol <span class="ui-kbd">Cetak PDF</span> untuk mengunduh laporan hasil evaluasi lengkap dengan Kop Surat, Logo, dan Alamat Resmi Kasuari Care.' }
+                        ],
+                        sidebarGroup: 'Rekam medis',
+                        sidebarMenu: 'Assessment (/assessments)',
+                        mockupTitle: 'Pengisian Hasil Assessment & Cetak PDF Resmi',
+                        mockupFields: [
+                            { label: '① Observasi Klinis', val: 'Keluhan Utama, Riwayat Tumbuh Kembang & Perilaku' },
+                            { label: '② Kesimpulan & Rujukan', val: 'Ringkasan hasil evaluasi & catatan rujukan' },
+                            { label: '③ Rekomendasi Terapi', val: 'Pilih Terapi Wicara / Okupasi • Sesi/Minggu • Durasi' },
+                            { label: '④ Output Dokumen', val: 'PDF Resmi dengan Kop Surat & Tanda Tangan' }
+                        ],
+                        mockupBtn: 'Klik "Simpan & Selesaikan" lalu "Cetak PDF"',
+                        tip: 'Pastikan kasir sudah mencatat pembayaran tagihan assessment tersebut agar formulir "Isi hasil" dapat dibuka.'
+                    },
+                    {
+                        id: 'therapist-4',
+                        title: 'Isi Laporan Sesi & Upload Foto',
+                        sub: 'Tulis aktivitas terapi, PR rumah & foto kegiatan',
+                        breadcrumb: 'Sidebar Kiri ➔ Operasional ➔ Laporan sesi',
+                        headline: 'Langkah 4: Menulis Laporan Sesi Harian & Mengunggah Foto Dokumentasi',
+                        desc: 'Setiap selesai mengajar 1 sesi terapi, Terapis wajib mengisi catatan perkembangan sesi dan foto dokumentasi anak.',
+                        steps: [
+                            { title: 'Buka Menu Laporan Sesi', text: 'Klik kategori <span class="ui-kbd">Operasional</span> di sidebar kiri, lalu klik menu <span class="ui-kbd">Laporan sesi</span>.' },
+                            { title: 'Pilih Sesi Pasien di Daftar Kiri', text: 'Klik kartu jadwal pasien di kolom sebelah kiri yang ingin Anda tulis laporannya.' },
+                            { title: 'Isi 3 Kolom Catatan Perkembangan & Pilih Status', text: 'Isi kolom: <b>1. Aktivitas yang dilakukan hari ini</b>, <b>2. Catatan untuk orang tua</b>, dan <b>3. PR / Latihan di rumah</b>. Ubah status laporan menjadi <b>Final / Dikirim (Submitted)</b>.' },
+                            { title: 'Unggah Foto Dokumentasi Kegiatan & Simpan', text: 'Klik <span class="ui-kbd">Pilih File Foto</span> untuk mengunggah foto anak saat terapi berlangsung (JPG/PNG/WebP), lalu klik tombol <span class="ui-btn-badge ui-btn-emerald">Simpan Laporan Sesi</span>.' }
+                        ],
+                        sidebarGroup: 'Operasional',
+                        sidebarMenu: 'Laporan sesi',
+                        mockupTitle: 'Form Laporan Sesi Terapi & Foto Dokumentasi',
+                        mockupFields: [
+                            { label: '① Pilih Jadwal Sesi', val: 'Budi Santoso • Terapi Wicara (Pukul 10:00)' },
+                            { label: '② Aktivitas & Catatan Ortu', val: 'Latihan artikulasi & respons anak selama di kelas' },
+                            { label: '③ PR Latihan di Rumah', val: 'Panduan stimulasi lanjutan bersama orang tua' },
+                            { label: '④ Foto Dokumentasi Sesi', val: 'Unggah & pratinjau foto aktivitas terapi' }
+                        ],
+                        mockupBtn: 'Klik "Simpan Laporan Sesi" (Bisa Diedit Kembali)',
+                        tip: 'Anda juga dapat mengunduh rekapitulasi seluruh laporan sesi ke Excel melalui tombol "Export CSV" di pojok kanan atas.'
+                    }
+                ]
+            }
+        };
+
+        /* =====================================================================
+           RENDERING ENGINE
+           ===================================================================== */
+        let currentStoryIndex = 0;
+        let currentRole = 'owner';
+        let currentModuleIndex = 0;
+
+        function renderStory() {
+            const tabsContainer = document.getElementById('storyTabs');
+            const bodyContainer = document.getElementById('storyBody');
+
+            tabsContainer.innerHTML = storySteps.map((s, idx) => `
+                <button class="story-tab ${idx === currentStoryIndex ? 'active' : ''}" onclick="setStoryStep(${idx})">
+                    <div class="story-tab-top">
+                        <span class="story-step-badge">TAHAP ${s.step}</span>
+                        <span class="story-actor ${s.actorClass}">${s.actor}</span>
+                    </div>
+                    <div class="story-tab-title">${s.title}</div>
+                </button>
+            `).join('');
+
+            const s = storySteps[currentStoryIndex];
+            bodyContainer.innerHTML = `
+                <div class="story-explain">
+                    <div>
+                        <div class="menu-breadcrumb">
+                            📍 Letak Menu: Sidebar Kiri &rarr; <b>${s.sidebarGroup}</b> &rarr; <b>${s.sidebarMenu}</b>
+                        </div>
+                        <h3 style="font-size: 20px; font-weight: 800; color: var(--slate-900); margin-bottom: 8px;">${s.headline}</h3>
+                        <p style="font-size: 14px; color: var(--slate-600); margin-bottom: 18px;">${s.summary}</p>
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            ${s.actions.map((act, i) => `
+                                <div style="display: flex; align-items: flex-start; gap: 10px; font-size: 13.5px; color: var(--slate-800);">
+                                    <span class="action-pin" style="width: 24px; height: 24px; font-size: 11px;">${i + 1}</span>
+                                    <div>${act}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="tip-box amber" style="margin-top: 18px;">
+                            <span>💡</span>
+                            <div><strong>Tips Penting:</strong> ${s.tip}</div>
+                        </div>
+                        <div class="story-nav-footer">
+                            <button class="btn-outline" onclick="setStoryStep(${Math.max(0, currentStoryIndex - 1)})" ${currentStoryIndex === 0 ? 'disabled style="opacity:0.4;cursor:not-allowed;"' : ''}>
+                                &larr; Tahap Sebelumnya
+                            </button>
+                            <span style="font-size: 12px; font-weight: 700; color: var(--slate-500);">Tahap ${s.step} dari ${storySteps.length}</span>
+                            <button class="btn-app" onclick="setStoryStep(${Math.min(storySteps.length - 1, currentStoryIndex + 1)})" ${currentStoryIndex === storySteps.length - 1 ? 'disabled style="opacity:0.4;cursor:not-allowed;"' : ''}>
+                                Tahap Selanjutnya &rarr;
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="story-Visual">
+                    <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--slate-500); margin-bottom: 8px; display: flex; justify-content: space-between;">
+                        <span>🖥️ ILUSTRASI LAYAR APLIKASI KASUARI CARE</span>
+                        <span style="color: var(--rose-600);">● Ikuti nomor merah ① ② ③ ④ ⑤</span>
+                    </div>
+                    ${buildMockupHtml(s.mockupUrl, s.sidebarGroup, s.sidebarMenu, s.mockupTitle, s.mockupFields, s.mockupBtn)}
+                </div>
+            `;
+        }
+
+        function setStoryStep(idx) {
+            currentStoryIndex = idx;
+            renderStory();
+        }
+
+        function buildMockupHtml(url, activeGroup, activeMenu, cardTitle, fields, btnText) {
+            const groups = ['Umum', 'Pasien & layanan', 'Operasional', 'Keuangan'];
+            return `
+                <div class="app-mockup-window" style="margin-bottom: 0;">
+                    <div class="mockup-browser-bar">
+                        <div class="browser-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+                        <div class="browser-url">https://${url}</div>
+                    </div>
+                    <div class="mockup-layout">
+                        <div class="mockup-sidebar">
+                            <div class="mock-brand">🏥 Kasuari Care</div>
+                            ${groups.map(g => {
+                                const isCurrent = g.toLowerCase() === activeGroup.toLowerCase() || (activeGroup === 'Rekam medis' && g === 'Pasien & layanan');
+                                const displayGroup = (activeGroup === 'Rekam medis' && g === 'Pasien & layanan') ? 'Rekam medis' : g;
+                                return `
+                                    <div class="mock-group-title ${isCurrent ? 'active-group' : ''}">
+                                        <span>${displayGroup}</span>
+                                        <span>${isCurrent ? '▴' : '▾'}</span>
+                                    </div>
+                                    ${isCurrent ? `
+                                        <div class="mock-nav-item active-menu">
+                                            <span>${activeMenu}</span>
+                                            <span class="pulse-dot" title="Klik menu ini"></span>
+                                        </div>
+                                    ` : ''}
+                                `;
+                            }).join('')}
+                        </div>
+                        <div class="mockup-main">
+                            <div style="font-size: 11px; color: var(--slate-500); margin-bottom: 8px;">
+                                Kasuari Care / <strong style="color: var(--slate-900);">${activeMenu}</strong>
+                            </div>
+                            <div class="mock-card">
+                                <div class="mock-card-title">
+                                    <span>${cardTitle}</span>
+                                    <span style="font-size: 10px; background: var(--emerald-100); color: #065f46; padding: 2px 6px; border-radius: 4px;">Layar Aktif</span>
+                                </div>
+                                <div class="mock-form-grid">
+                                    ${fields.map(f => `
+                                        <div class="mock-field">
+                                            <label>${f.label}</label>
+                                            <span>${f.val}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                <div class="mock-btn green">
+                                    <span>✓</span> <span>${btnText}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function selectRole(roleKey) {
+            currentRole = roleKey;
+            currentModuleIndex = 0;
+
+            ['owner', 'admin', 'therapist'].forEach(r => {
+                const btn = document.getElementById('btn-role-' + r);
+                btn.className = 'role-card-btn' + (r === roleKey ? ' active-' + r : '');
+            });
+
+            renderRoleSection();
+        }
+
+        function jumpToRole(roleKey) {
+            selectRole(roleKey);
+            document.getElementById('panduan-role').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function selectModule(idx) {
+            currentModuleIndex = idx;
+            renderRoleSection();
+        }
+
+        function renderRoleSection() {
+            const role = rolesData[currentRole];
+
+            // 1. Render Credentials Strip
+            const credStrip = document.getElementById('roleCredStrip');
+            credStrip.innerHTML = `
+                <div class="login-creds">
+                    <span style="font-size: 13px; font-weight: 800; color: var(--slate-900);">🔐 Akun Demo ${role.name}:</span>
+                    ${role.creds.map(c => `
+                        <div class="cred-chip">
+                            <small>${c.label}:</small>
+                            <code>${c.val}</code>
+                            <button class="copy-btn" onclick="copyToClipboard('${c.val}')">Salin</button>
+                        </div>
+                    `).join('')}
+                </div>
+                <a href="/login" target="_blank" class="btn-app" style="background: ${role.badgeColor};">
+                    Login Sekarang &rarr;
+                </a>
+            `;
+
+            // 2. Render Module List Buttons
+            document.getElementById('moduleListHeader').textContent = `LANGKAH & MENU (${role.name.toUpperCase()})`;
+            const listContainer = document.getElementById('moduleListButtons');
+            listContainer.innerHTML = role.modules.map((m, idx) => `
+                <button class="module-item-btn ${idx === currentModuleIndex ? 'active' : ''}" onclick="selectModule(${idx})">
+                    <span class="mod-num">${idx + 1}</span>
+                    <span class="mod-text">
+                        <b>${m.title}</b>
+                        <small>${m.sub}</small>
+                    </span>
+                </button>
+            `).join('');
+
+            // 3. Render Module Detail Panel
+            const mod = role.modules[currentModuleIndex];
+            const detailPanel = document.getElementById('moduleDetailPanel');
+            detailPanel.innerHTML = `
+                <div class="detail-header">
+                    <div class="menu-breadcrumb">📍 Posisi Menu: ${mod.breadcrumb}</div>
+                    <h3>${mod.headline}</h3>
+                    <p>${mod.desc}</p>
+                </div>
+                <div class="detail-body">
+                    <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: var(--slate-500); margin-bottom: 12px;">
+                        🖱️ PANDUAN KLIK DEMI KLIK (URUTAN 1 SAMPAI ${mod.steps.length}):
+                    </div>
+                    <div class="action-steps">
+                        ${mod.steps.map((st, i) => `
+                            <div class="action-step">
+                                <span class="action-pin">${i + 1}</span>
+                                <div class="action-content">
+                                    <h4>${st.title}</h4>
+                                    <p>${st.text}</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: var(--slate-500); margin-bottom: 10px;">
+                        🖥️ SIMULASI TAMPILAN LAYAR &amp; LETAK MENU DI SIDEBAR KIRI:
+                    </div>
+                    ${buildMockupHtml('testingklinik.my.id', mod.sidebarGroup, mod.sidebarMenu, mod.mockupTitle, mod.mockupFields, mod.mockupBtn)}
+
+                    <div class="tip-box emerald" style="margin-top: 20px;">
+                        <span>✨</span>
+                        <div><strong>Catatan &amp; Tips Cepat:</strong> ${mod.tip}</div>
+                    </div>
+
+                    <div class="story-nav-footer">
+                        <button class="btn-outline" onclick="selectModule(${Math.max(0, currentModuleIndex - 1)})" ${currentModuleIndex === 0 ? 'disabled style="opacity:0.4;cursor:not-allowed;"' : ''}>
+                            &larr; Menu Sebelumnya
+                        </button>
+                        <span style="font-size: 12px; font-weight: 700; color: var(--slate-500);">Langkah ${currentModuleIndex + 1} dari ${role.modules.length}</span>
+                        <button class="btn-app" onclick="selectModule(${Math.min(role.modules.length - 1, currentModuleIndex + 1)})" ${currentModuleIndex === role.modules.length - 1 ? 'disabled style="opacity:0.4;cursor:not-allowed;"' : ''}>
+                            Menu Selanjutnya &rarr;
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Tersalin: ' + text);
+            }).catch(() => {
+                prompt('Salin teks ini:', text);
             });
         }
 
-        function copyText(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                alert('Teks berhasil disalin: ' + text);
-            }).catch(err => {
-                prompt('Salin teks berikut secara manual:', text);
-            });
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = '✓ ' + msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2200);
         }
+
+        // Initialize on load
+        renderStory();
+        renderRoleSection();
     </script>
 </body>
 </html>
