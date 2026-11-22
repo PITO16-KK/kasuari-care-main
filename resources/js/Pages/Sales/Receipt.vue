@@ -63,7 +63,7 @@ function printReceipt() {
 
             <div class="receipt-content space-y-5 px-6 py-5">
                 <div class="receipt-meta grid grid-cols-2 gap-3 text-xs">
-                    <div><div class="text-[10px] uppercase text-slate-400">Pasien</div><div class="mt-1 font-bold text-slate-800">{{ sale.patient.name }}</div><div class="mt-1 font-mono text-[10px] text-clinic-700">{{ sale.patient.patient_code }}</div></div>
+                    <div><div class="text-[10px] uppercase text-slate-400">Pasien</div><div class="mt-1 font-bold text-slate-800">{{ sale.patient?.name || 'Pasien Umum' }}</div><div class="mt-1 font-mono text-[10px] text-clinic-700">{{ sale.patient?.patient_code || '-' }}</div></div>
                     <div class="text-right"><div class="text-[10px] uppercase text-slate-400">{{ sale.status === 'paid' ? 'Tanggal bayar' : 'Status tagihan' }}</div><div class="mt-1 font-semibold text-slate-700">{{ sale.status === 'paid' ? date(sale.paid_at) : 'Menunggu pembayaran' }}</div></div>
                 </div>
                 <div v-if="sale.appointment" class="rounded-md bg-slate-50 px-3 py-2 text-xs text-slate-600">

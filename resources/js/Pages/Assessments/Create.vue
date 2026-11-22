@@ -140,7 +140,7 @@ function jakartaDateTimeAsUtcIso(date, time) {
                     Terapis sesi assessment *
                     <select v-model="form.therapist_profile_id" class="field-input" required :disabled="!therapists.length">
                         <option value="">Pilih terapis</option>
-                        <option v-for="therapist in therapists" :key="therapist.id" :value="therapist.id" :disabled="isTherapistBusy(therapist.id)">{{ therapist.user.name }} · {{ therapist.specialty || 'Terapis' }}{{ isTherapistBusy(therapist.id) ? ' (sudah terjadwal)' : '' }}</option>
+                        <option v-for="therapist in therapists" :key="therapist.id" :value="therapist.id" :disabled="isTherapistBusy(therapist.id)">{{ therapist.user?.name || 'Terapis' }} · {{ therapist.specialty || 'Terapis' }}{{ isTherapistBusy(therapist.id) ? ' (sudah terjadwal)' : '' }}</option>
                     </select>
                     <span v-if="form.errors.therapist_profile_id" class="field-error">{{ form.errors.therapist_profile_id }}</span>
                 </label>

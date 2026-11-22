@@ -54,7 +54,7 @@ const scheduleTherapists = computed(() => {
 
     return props.therapists.map((therapist) => ({
         id: therapist.id,
-        name: therapist.user.name,
+        name: therapist.user?.name || 'Terapis',
         specialty: therapist.specialty,
     }));
 });
@@ -720,7 +720,7 @@ function sendWhatsAppReminder(appointment) {
         year: 'numeric',
     }).format(new Date(appointment.starts_at));
     const therapistName = appointment.therapist?.user?.name || 'belum ditentukan';
-    const message = `Halo, kami dari Kasuari Care ingin mengingatkan jadwal terapi ${appointment.patient.name} pada ${date}, pukul ${appointmentTimeOfDay(appointment.starts_at)} WIB. Jenis terapi: ${appointment.therapy_type.name}. Terapis: ${therapistName}.`;
+    const message = `Halo, kami dari Kasuari Care ingin mengingatkan jadwal terapi ${appointment.patient?.name || 'Pasien'} pada ${date}, pukul ${appointmentTimeOfDay(appointment.starts_at)} WIB. Jenis terapi: ${appointment.therapy_type?.name || 'Terapi'}. Terapis: ${therapistName}.`;
 
     window.open(`https://wa.me/${number}?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
 }
@@ -738,7 +738,7 @@ function sendWhatsAppReminder(appointment) {
             <section v-if="editingAssessmentId && assessmentBeingEdited" id="assessment-reschedule-form" class="rounded-xl border border-clinic-200 bg-white p-4 shadow-sm sm:p-5">
                 <div class="flex flex-wrap items-start justify-between gap-3">
                     <div>
-                        <p class="text-xs font-bold uppercase tracking-wide text-clinic-600">Assessment · {{ assessmentBeingEdited.patient.name }}</p>
+                        <p class="text-xs font-bold uppercase tracking-wide text-clinic-600">Assessment · {{ assessmentBeingEdited.patient?.name || 'Pasien' }}</p>
                         <h2 class="mt-1 text-sm font-bold text-clinic-900">Ubah jadwal assessment</h2>
                         <p v-if="assessmentBeingEdited.status === 'awaiting_payment'" class="mt-1 text-xs text-amber-700">Pembayaran assessment masih tertunda. Jadwal dapat diubah sebelum assessment diselesaikan.</p>
                     </div>
@@ -755,7 +755,7 @@ function sendWhatsAppReminder(appointment) {
                     <label class="field-label">Terapis sesi assessment *
                         <select v-model="assessmentRescheduleForm.therapist_profile_id" class="field-input" required>
                             <option value="">Pilih terapis</option>
-                            <option v-for="therapist in therapists" :key="therapist.id" :value="therapist.id" :disabled="busyAssessmentTherapistIds.has(Number(therapist.id))">{{ therapist.user.name }} Â· {{ therapist.specialty || 'Terapis' }}{{ busyAssessmentTherapistIds.has(Number(therapist.id)) ? ' (sudah terjadwal)' : '' }}</option>
+                            <option v-for="therapist in therapists" :key="therapist.id" :value="therapist.id" :disabled="busyAssessmentTherapistIds.has(Number(therapist.id))">{{ therapist.user?.name || 'Terapis' }} · {{ therapist.specialty || 'Terapis' }}{{ busyAssessmentTherapistIds.has(Number(therapist.id)) ? ' (sudah terjadwal)' : '' }}</option>
                         </select>
                         <span v-if="assessmentRescheduleForm.errors.therapist_profile_id" class="field-error">{{ assessmentRescheduleForm.errors.therapist_profile_id }}</span>
                     </label>
@@ -986,21 +986,21 @@ function sendWhatsAppReminder(appointment) {
                                     </header>
                                     <div class="min-h-[180px] space-y-2 p-1.5">
                                         <template v-for="entry in day.entries" :key="`${entry.agendaType}-${entry.id}`">
-                                            <button v-if="entry.agendaType === 'assessment'" type="button" class="block min-h-16 w-full rounded-lg border border-clinic-100 border-l-[3px] border-l-clinic-600 bg-clinic-50/70 px-1.5 py-2 text-left transition-colors hover:bg-clinic-100 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-clinic-700" :aria-label="`Ubah jadwal assessment ${entry.patient.name}, pukul ${appointmentTimeOfDay(entry.starts_at)}`" @click="editAssessmentSchedule(entry)">
+                                            <button v-if="entry.agendaType === 'assessment'" type="button" class="block min-h-16 w-full rounded-lg border border-clinic-100 border-l-[3px] border-l-clinic-600 bg-clinic-50/70 px-1.5 py-2 text-left transition-colors hover:bg-clinic-100 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-clinic-700" :aria-label="`Ubah jadwal assessment ${entry.patient?.name || 'Pasien'}, pukul ${appointmentTimeOfDay(entry.starts_at)}`" @click="editAssessmentSchedule(entry)">
                                                 <span class="inline-flex rounded-full bg-white px-1.5 py-0.5 text-[10px] font-bold text-clinic-700">{{ appointmentTimeOfDay(entry.starts_at) }}</span>
-                                                <span class="mt-1 block truncate text-[10px] font-semibold leading-tight text-slate-800">{{ entry.patient.name }}</span>
+                                                <span class="mt-1 block truncate text-[10px] font-semibold leading-tight text-slate-800">{{ entry.patient?.name || 'Pasien' }}</span>
                                                 <span class="mt-1 block truncate text-[9px] leading-tight text-clinic-700">{{ entry.status === 'awaiting_payment' ? 'Assessment · Belum dibayar' : 'Assessment' }} · {{ entry.therapist?.user?.name || 'Terapis belum ditentukan' }}</span>
                                             </button>
-                                            <button v-else-if="['scheduled', 'confirmed'].includes(entry.status)" type="button" class="block min-h-16 w-full rounded-lg border border-coral-100 border-l-[3px] border-l-coral-500 bg-white px-1.5 py-2 text-left shadow-sm transition-colors hover:bg-coral-50 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-clinic-700" :aria-label="`Ubah jadwal ${entry.patient.name}, pukul ${appointmentTimeOfDay(entry.starts_at)}`" @click="editAppointment(entry)">
+                                            <button v-else-if="['scheduled', 'confirmed'].includes(entry.status)" type="button" class="block min-h-16 w-full rounded-lg border border-coral-100 border-l-[3px] border-l-coral-500 bg-white px-1.5 py-2 text-left shadow-sm transition-colors hover:bg-coral-50 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-clinic-700" :aria-label="`Ubah jadwal ${entry.patient?.name || 'Pasien'}, pukul ${appointmentTimeOfDay(entry.starts_at)}`" @click="editAppointment(entry)">
                                                 <span class="inline-flex rounded-full bg-coral-50 px-1.5 py-0.5 text-[10px] font-bold text-coral-700">{{ appointmentTimeOfDay(entry.starts_at) }}</span>
-                                                <span class="mt-1 block truncate text-[10px] font-semibold leading-tight text-slate-800">{{ entry.patient.name }}</span>
-                                                <span class="mt-1 block truncate text-[9px] leading-tight text-slate-500">{{ entry.therapy_type.name }}</span>
+                                                <span class="mt-1 block truncate text-[10px] font-semibold leading-tight text-slate-800">{{ entry.patient?.name || 'Pasien' }}</span>
+                                                <span class="mt-1 block truncate text-[9px] leading-tight text-slate-500">{{ entry.therapy_type?.name || 'Terapi' }}</span>
                                                 <span v-if="entry.payment_warning" class="mt-1 block truncate text-[9px] font-bold text-amber-700">Belum dibayar</span>
                                                 <span v-if="entry.assessment_id" class="mt-1 block truncate text-[9px] font-semibold text-clinic-700">Assessment tertaut</span>
                                             </button>
                                             <article v-else class="min-h-16 rounded-lg border border-slate-200 bg-slate-50 px-1.5 py-2">
                                                 <span class="block text-[10px] font-bold text-slate-500">{{ appointmentTimeOfDay(entry.starts_at) }}</span>
-                                                <span class="mt-1 block truncate text-[10px] font-semibold leading-tight text-slate-700">{{ entry.patient.name }}</span>
+                                                <span class="mt-1 block truncate text-[10px] font-semibold leading-tight text-slate-700">{{ entry.patient?.name || 'Pasien' }}</span>
                                                 <span class="mt-1 block truncate text-[9px] leading-tight capitalize text-slate-500">{{ entry.status.replace('_', ' ') }}</span>
                                             </article>
                                         </template>
@@ -1025,9 +1025,9 @@ function sendWhatsAppReminder(appointment) {
                                             <p class="inline-flex rounded-full bg-clinic-50 px-2.5 py-1 text-xs font-bold text-clinic-700">
                                                 {{ appointmentTimeOfDay(entry.starts_at) }}<span v-if="entry.agendaType === 'therapy'">–{{ appointmentTimeOfDay(entry.ends_at) }}</span>
                                             </p>
-                                            <p class="mt-1 text-sm font-semibold text-slate-800">{{ entry.patient.name }} <span class="font-mono text-[10px] font-normal text-slate-400">{{ entry.patient.patient_code }}</span></p>
+                                            <p class="mt-1 text-sm font-semibold text-slate-800">{{ entry.patient?.name || 'Pasien' }} <span class="font-mono text-[10px] font-normal text-slate-400">{{ entry.patient?.patient_code || '—' }}</span></p>
                                             <p v-if="entry.agendaType === 'assessment'" class="mt-1 text-[11px] leading-relaxed text-clinic-700">{{ entry.status === 'awaiting_payment' ? 'Assessment · Belum dibayar' : 'Assessment' }} · {{ entry.therapist?.user?.name || 'Terapis belum ditentukan' }}</p>
-                                            <p v-else class="mt-1 text-[11px] leading-relaxed text-slate-500">{{ entry.therapy_type.name }} · {{ entry.therapist?.user?.name || 'Belum ditentukan' }} · {{ entry.room?.name || 'Belum ditentukan' }}</p>
+                                            <p v-else class="mt-1 text-[11px] leading-relaxed text-slate-500">{{ entry.therapy_type?.name || 'Terapi' }} · {{ entry.therapist?.user?.name || 'Belum ditentukan' }} · {{ entry.room?.name || 'Belum ditentukan' }}</p>
                                             <p v-if="entry.agendaType === 'therapy' && entry.payment_warning" role="status" class="mt-2 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-2 text-[11px] font-semibold text-amber-800">Belum ada pembayaran atau kuota paket untuk sesi ini.</p>
                                             <p v-if="entry.agendaType === 'therapy' && entry.assessment_id" class="mt-1 text-[10px] font-semibold text-clinic-700">Assessment tertaut</p>
                                             <div v-if="entry.agendaType === 'therapy' && ['scheduled', 'confirmed'].includes(entry.status)" class="mt-3 flex flex-wrap gap-2">
@@ -1063,15 +1063,15 @@ function sendWhatsAppReminder(appointment) {
 
                             <div class="min-w-0">
                                 <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
-                                    <h3 class="text-sm font-semibold leading-5 text-slate-900">{{ entry.patient.name }}</h3>
-                                    <span class="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] font-medium text-slate-600">{{ entry.patient.patient_code }}</span>
+                                    <h3 class="text-sm font-semibold leading-5 text-slate-900">{{ entry.patient?.name || 'Pasien' }}</h3>
+                                    <span class="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] font-medium text-slate-600">{{ entry.patient?.patient_code || '—' }}</span>
                                 </div>
                                 <div v-if="entry.agendaType === 'assessment'" class="mt-2 space-y-1 text-xs leading-5 text-slate-600">
                                     <p><span class="font-semibold text-clinic-700">Assessment</span></p>
                                     <p><span class="text-slate-500">Terapis:</span> {{ entry.therapist?.user?.name || 'Belum ditentukan' }}</p>
                                 </div>
                                 <div v-else class="mt-2 grid gap-x-4 gap-y-1 text-xs leading-5 text-slate-600 sm:grid-cols-2">
-                                    <p><span class="text-slate-500">Jenis terapi:</span> <span class="font-medium text-slate-800">{{ entry.therapy_type.name }}</span></p>
+                                    <p><span class="text-slate-500">Jenis terapi:</span> <span class="font-medium text-slate-800">{{ entry.therapy_type?.name || 'Terapi' }}</span></p>
                                     <p><span class="text-slate-500">Durasi:</span> {{ sessionDuration(entry) }}</p>
                                     <p><span class="text-slate-500">Terapis:</span> {{ entry.therapist?.user?.name || 'Belum ditentukan' }}</p>
                                     <p><span class="text-slate-500">Ruangan:</span> {{ entry.room?.name || 'Belum ditentukan' }}</p>

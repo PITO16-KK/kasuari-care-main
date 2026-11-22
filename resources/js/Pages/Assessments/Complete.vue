@@ -30,7 +30,7 @@ const date = (value) => value
 function isTherapistUnavailable(therapist, code) {
     const assignedPatientId = Number(therapist.assigned_patient_id ?? 0);
 
-    if (assignedPatientId && assignedPatientId !== Number(props.assessment.patient.id)) {
+    if (assignedPatientId && assignedPatientId !== Number(props.assessment.patient?.id || 0)) {
         return true;
     }
 
@@ -55,9 +55,9 @@ function submit() {
             </header>
 
             <section class="grid gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 sm:grid-cols-3">
-                <div><p class="text-[10px] font-bold uppercase tracking-wide text-emerald-800">Pasien</p><p class="mt-1 text-sm font-semibold text-emerald-950">{{ assessment.patient.name }} <span class="font-mono text-xs font-normal">{{ assessment.patient.patient_code }}</span></p></div>
+                <div><p class="text-[10px] font-bold uppercase tracking-wide text-emerald-800">Pasien</p><p class="mt-1 text-sm font-semibold text-emerald-950">{{ assessment.patient?.name || 'Pasien' }} <span class="font-mono text-xs font-normal">{{ assessment.patient?.patient_code || '-' }}</span></p></div>
                 <div><p class="text-[10px] font-bold uppercase tracking-wide text-emerald-800">Jadwal assessment</p><p class="mt-1 text-sm font-semibold text-emerald-950">{{ date(assessment.scheduled_at) }}</p></div>
-                <div><p class="text-[10px] font-bold uppercase tracking-wide text-emerald-800">Pembayaran</p><p class="mt-1 text-sm font-semibold text-emerald-950">{{ assessment.sale.invoice_number }} · {{ money(assessment.sale.grand_total) }} · Lunas</p></div>
+                <div><p class="text-[10px] font-bold uppercase tracking-wide text-emerald-800">Pembayaran</p><p class="mt-1 text-sm font-semibold text-emerald-950">{{ assessment.sale?.invoice_number || '-' }} · {{ money(assessment.sale?.grand_total) }} · Lunas</p></div>
             </section>
 
             <form class="space-y-4" @submit.prevent="submit">

@@ -20,9 +20,17 @@ class OwnerPagesTest extends TestCase
 
         $urls = [
             '/dashboard',
+            '/patients',
+            '/scheduling',
             '/assessments',
             '/sessions',
             '/bills',
+            '/packages',
+            '/products',
+            '/registrations',
+            '/patient-intakes',
+            '/therapists',
+            '/sales/create',
             '/payment-history',
             '/finance/records',
         ];

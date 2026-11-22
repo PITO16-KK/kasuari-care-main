@@ -35,12 +35,12 @@ function submit() {
 function startEditing(profile) {
     editingProfile.value = profile;
     editForm.clearErrors();
-    editForm.name = profile.user.name;
-    editForm.email = profile.user.email;
-    editForm.phone = profile.user.phone ?? '';
+    editForm.name = profile.user?.name || '';
+    editForm.email = profile.user?.email || '';
+    editForm.phone = profile.user?.phone ?? '';
     editForm.specialty = profile.specialty ?? '';
     editForm.license_number = profile.license_number ?? '';
-    editForm.is_active = Boolean(profile.user.is_active);
+    editForm.is_active = Boolean(profile.user?.is_active);
 }
 
 function cancelEditing() {
@@ -78,7 +78,7 @@ function update() {
                     <span class="grid size-10 shrink-0 place-items-center rounded-lg bg-clinic-50 text-clinic-700"><Stethoscope :size="18" aria-hidden="true" /></span>
                     <div>
                         <h2 id="therapist-form-heading" class="text-base font-semibold text-clinic-900">Edit data terapis</h2>
-                        <p class="mt-1 text-sm leading-5 text-slate-600">Perbarui informasi akun dan profil {{ editingProfile.user.name }}.</p>
+                        <p class="mt-1 text-sm leading-5 text-slate-600">Perbarui informasi akun dan profil {{ editingProfile.user?.name || 'Terapis' }}.</p>
                     </div>
                 </div>
 
@@ -143,11 +143,11 @@ function update() {
                         <thead><tr class="bg-[#F9F7F5] text-[11px] font-semibold text-slate-500"><th class="px-5 py-3">Terapis</th><th class="px-4 py-3">Spesialisasi</th><th class="px-4 py-3">No. izin</th><th class="px-4 py-3">Status akun</th><th class="px-4 py-3"><span class="sr-only">Aksi</span></th></tr></thead>
                         <tbody class="divide-y divide-slate-100">
                             <tr v-for="profile in therapists.data" :key="profile.id" class="hover:bg-slate-50/70">
-                                <td class="px-5 py-4"><p class="text-sm font-medium text-slate-800">{{ profile.user.name }}</p><p class="mt-1 text-xs text-slate-500">{{ profile.user.email }}</p><p v-if="profile.user.phone" class="mt-1 text-xs text-slate-500">{{ profile.user.phone }}</p></td>
+                                <td class="px-5 py-4"><p class="text-sm font-medium text-slate-800">{{ profile.user?.name || 'Terapis' }}</p><p class="mt-1 text-xs text-slate-500">{{ profile.user?.email || '-' }}</p><p v-if="profile.user?.phone" class="mt-1 text-xs text-slate-500">{{ profile.user.phone }}</p></td>
                                 <td class="px-4 py-4 text-sm text-slate-600">{{ profile.specialty || 'Belum diisi' }}</td>
                                 <td class="px-4 py-4 text-sm text-slate-600">{{ profile.license_number || 'Belum diisi' }}</td>
-                                <td class="px-4 py-4"><span class="rounded-full px-2.5 py-1 text-xs font-medium" :class="profile.user.is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'">{{ profile.user.is_active ? 'Aktif' : 'Nonaktif' }}</span></td>
-                                <td class="px-4 py-4 text-right"><button type="button" class="min-h-10 rounded-lg border border-slate-300 px-3 text-sm font-semibold text-slate-700 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clinic-700" :aria-label="`Edit data ${profile.user.name}`" @click="startEditing(profile)">Edit</button></td>
+                                <td class="px-4 py-4"><span class="rounded-full px-2.5 py-1 text-xs font-medium" :class="profile.user?.is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'">{{ profile.user?.is_active ? 'Aktif' : 'Nonaktif' }}</span></td>
+                                <td class="px-4 py-4 text-right"><button type="button" class="min-h-10 rounded-lg border border-slate-300 px-3 text-sm font-semibold text-slate-700 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clinic-700" :aria-label="`Edit data ${profile.user?.name || 'Terapis'}`" @click="startEditing(profile)">Edit</button></td>
                             </tr>
                             <tr v-if="!therapists.data.length"><td colspan="5" class="px-5 py-14 text-center"><p class="text-sm font-medium text-slate-700">Belum ada terapis</p><p class="mt-1 text-xs text-slate-500">Isi formulir untuk menambahkan akun pertama.</p></td></tr>
                         </tbody>
