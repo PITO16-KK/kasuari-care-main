@@ -110,6 +110,19 @@ function createPatient() {
                 </dl>
             </section>
 
+            <section v-if="submission.other_answers?.length" class="overflow-hidden rounded-xl border border-amber-200 bg-white">
+                <div class="border-b border-amber-100 bg-amber-50 px-5 py-4">
+                    <h2 class="text-sm font-bold text-clinic-900">Jawaban lainnya dari Google Form</h2>
+                    <p class="mt-1 text-xs text-slate-600">Jawaban ini tetap disimpan meskipun nama pertanyaannya belum dipetakan ke kolom intake.</p>
+                </div>
+                <dl class="grid gap-x-6 gap-y-5 px-5 py-5 sm:grid-cols-2">
+                    <div v-for="(answer, index) in submission.other_answers" :key="`${answer.question}-${index}`" class="min-w-0">
+                        <dt class="text-[11px] font-semibold text-slate-500">{{ answer.question }}</dt>
+                        <dd class="mt-1 whitespace-pre-wrap break-words text-sm leading-6 text-slate-800">{{ answer.answer }}</dd>
+                    </div>
+                </dl>
+            </section>
+
             <section v-if="canManage" class="grid gap-4 xl:grid-cols-2">
                 <form v-if="!submission.patient" class="space-y-4 rounded-xl border border-slate-200 bg-white p-5" @submit.prevent="linkPatient">
                     <div class="flex items-start gap-3">

@@ -7,11 +7,12 @@ import MainLayout from '../Layouts/MainLayout.vue';
 const props = defineProps({
     stats: Object,
     todaySchedule: Array,
-    therapySchedule: Array,
-    otherAgenda: Array,
+    dailySchedule: Array,
     scheduleFilters: Object,
     scheduleTherapists: Array,
     scheduleTherapyTypes: Array,
+    canConfirmAttendance: Boolean,
+    attendanceConfirmationOpen: Boolean,
     canFilterTherapist: Boolean,
     evaluationAlerts: Array,
     evaluationAlertCount: Number,
@@ -26,26 +27,16 @@ const props = defineProps({
 });
 
 const notificationsOpen = ref(false);
+const attendanceConfirming = ref(null);
 const notificationCount = computed(() => (props.unpaidSessionAlertCount ?? 0) + (props.expiringPackageAlertCount ?? 0));
 const money = (value) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value ?? 0);
 const time = (value) => new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit' }).format(new Date(value));
 const dateTime = (value) => new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(value));
 const date = (value) => new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(value));
-const fullDate = (value) => new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' }).format(new Date(value));
-const selectedDateLabel = computed(() => fullDate(`${props.scheduleFilters.date}T12:00:00+07:00`));
-const scheduleStatusLabels = { waiting: 'Menunggu', present: 'Hadir', absent: 'Tidak Hadir', completed: 'Selesai' };
-const scheduleStatusClasses = {
-    waiting: 'bg-amber-50 text-amber-800 ring-amber-200',
-    present: 'bg-sky-50 text-sky-800 ring-sky-200',
-    absent: 'bg-rose-50 text-rose-800 ring-rose-200',
-    completed: 'bg-emerald-50 text-emerald-800 ring-emerald-200',
-};
 const therapyBadgeClasses = {
     TW: 'bg-sky-50 text-sky-800 ring-sky-200',
     OT: 'bg-violet-50 text-violet-800 ring-violet-200',
-    SI: 'bg-amber-50 text-amber-800 ring-amber-200',
     FT: 'bg-emerald-50 text-emerald-800 ring-emerald-200',
-    ABA: 'bg-rose-50 text-rose-800 ring-rose-200',
 };
 const hour = new Date().getHours();
 const greeting = hour < 11 ? 'Selamat pagi' : hour < 15 ? 'Selamat siang' : hour < 18 ? 'Selamat sore' : 'Selamat malam';
@@ -77,6 +68,26 @@ function changeScheduleFilter(key, value) {
         preserveState: true,
         replace: true,
     });
+}
+
+function toggleAttendance(entry, isPresent) {
+    attendanceConfirming.value = entry.id;
+    const attendanceUrl = entry.agenda_type === 'assessment'
+        ? `/assessments/${entry.id}/attendance`
+        : `/scheduling/${entry.id}/attendance`;
+    router.patch(attendanceUrl, { attendance_status: isPresent ? 'present' : null }, {
+        preserveScroll: true,
+        onFinish: () => {
+            attendanceConfirming.value = null;
+        },
+    });
+}
+
+function canToggleAttendance(entry) {
+    return props.canConfirmAttendance
+        && props.attendanceConfirmationOpen
+        && Date.parse(entry.starts_at) <= Date.now()
+        && entry.attendance_status !== 'completed';
 }
 
 function shiftScheduleDate(days) {
@@ -224,7 +235,7 @@ function scheduleTherapyBadge(code) {
         <section class="mt-5 space-y-5">
             <div class="overflow-hidden rounded-xl border border-[#e9e6de] bg-white shadow-sm">
                 <div class="border-b border-[#efede6] px-5 py-4 sm:px-6">
-                    <h2 class="text-base font-semibold text-clinic-900">Jadwal terapi</h2>
+                    <h2 class="text-base font-semibold text-clinic-900">Jadwal harian</h2>
                 </div>
 
                 <div class="grid gap-3 border-b border-[#efede6] p-4 sm:grid-cols-2 sm:p-5 xl:grid-cols-[minmax(260px,1.4fr)_auto_minmax(180px,1fr)_minmax(180px,1fr)] xl:items-end">
@@ -253,15 +264,15 @@ function scheduleTherapyBadge(code) {
                     </div>
                 </div>
 
-                <div v-if="therapySchedule.length" class="hidden overflow-x-auto lg:block">
+                <div v-if="dailySchedule.length" class="hidden overflow-x-auto lg:block">
                     <table class="w-full table-fixed text-left text-xs text-slate-700">
-                        <colgroup><col class="w-[5%]"><col class="w-[17%]"><col class="w-[17%]"><col class="w-[11%]"><col class="w-[17%]"><col class="w-[14%]"><col class="w-[12%]"><col class="w-[7%]"></colgroup>
+                        <colgroup><col class="w-[5%]"><col class="w-[13%]"><col class="w-[17%]"><col class="w-[15%]"><col class="w-[11%]"><col class="w-[15%]"><col class="w-[13%]"><col class="w-[11%]"></colgroup>
                         <thead class="bg-[#f8f7f2] text-[11px] font-semibold uppercase tracking-wide text-slate-500">
                             <tr>
                                 <th scope="col" class="px-3 py-3.5">No</th>
                                 <th scope="col" class="px-3 py-3.5">Jam</th>
                                 <th scope="col" class="px-3 py-3.5">Nama Pasien</th>
-                                <th scope="col" class="px-3 py-3.5">Jenis Terapi</th>
+                                <th scope="col" class="px-3 py-3.5">Jenis Layanan</th>
                                 <th scope="col" class="px-3 py-3.5">Pertemuan Ke-</th>
                                 <th scope="col" class="px-3 py-3.5">Nama Terapis</th>
                                 <th scope="col" class="px-3 py-3.5">Paket Ke-</th>
@@ -269,22 +280,22 @@ function scheduleTherapyBadge(code) {
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-[#efede6]">
-                            <tr v-for="(entry, index) in therapySchedule" :key="entry.id" class="align-top transition-colors hover:bg-[#fcfbf8]">
+                            <tr v-for="(entry, index) in dailySchedule" :key="`${entry.agenda_type}-${entry.id}`" class="align-top transition-colors hover:bg-[#fcfbf8]">
                                 <td class="px-3 py-3.5 font-semibold tabular-nums text-slate-500">{{ index + 1 }}</td>
                                 <td class="px-3 py-3.5 font-medium tabular-nums text-slate-600">{{ time(entry.starts_at) }}</td>
                                 <td class="px-3 py-3.5"><div class="font-semibold text-slate-800">{{ entry.patient.name }}</div><div class="mt-1 font-mono text-[10px] text-slate-500">{{ entry.patient.patient_code || '—' }}</div></td>
-                                <td class="px-3 py-3.5"><span class="inline-flex max-w-full items-center gap-1.5 rounded-full px-2.5 py-1.5 font-semibold ring-1 ring-inset" :class="scheduleTherapyBadge(entry.therapy_type.code)"><span class="shrink-0 font-mono">{{ entry.therapy_type.code }}</span><span class="truncate font-normal">{{ entry.therapy_type.name }}</span></span></td>
+                                <td class="px-3 py-3.5"><span v-if="entry.agenda_type === 'therapy'" class="inline-flex max-w-full items-center gap-1.5 rounded-full px-2.5 py-1.5 font-semibold ring-1 ring-inset" :class="scheduleTherapyBadge(entry.therapy_type.code)"><span class="shrink-0 font-mono">{{ entry.therapy_type.code }}</span><span class="truncate font-normal">{{ entry.therapy_type.name }}</span></span><span v-else class="font-medium text-clinic-800">{{ entry.activity_name }}</span></td>
                                 <td class="px-3 py-3.5"><span v-if="entry.package_session" class="font-semibold tabular-nums text-clinic-800">{{ entry.package_session.number }}/{{ entry.package_session.total }}</span><span v-else class="text-slate-400">—</span></td>
                                 <td class="px-3 py-3.5">{{ entry.therapist_name || '—' }}</td>
-                                <td class="px-3 py-3.5"><template v-if="entry.package_session?.package_number"><div class="font-semibold text-slate-700">Paket ke-{{ entry.package_session.package_number }}</div><div class="mt-1 truncate text-[10px] text-slate-500" :title="entry.package_session.package_name">{{ entry.package_session.package_name }}</div></template><span v-else class="text-slate-400">—</span></td>
-                                <td class="px-3 py-3.5"><span class="inline-flex rounded-full px-2.5 py-1.5 text-[11px] font-semibold ring-1 ring-inset" :class="scheduleStatusClasses[entry.attendance_status]">{{ scheduleStatusLabels[entry.attendance_status] }}</span></td>
+                                <td class="px-3 py-3.5"><template v-if="entry.agenda_type === 'assessment'">{{ entry.package_label }}</template><template v-else-if="entry.package_session?.package_number"><div class="font-semibold text-slate-700">Paket ke-{{ entry.package_session.package_number }}</div><div class="mt-1 truncate text-[10px] text-slate-500" :title="entry.package_session.package_name">{{ entry.package_session.package_name }}</div></template><span v-else class="text-slate-400">—</span></td>
+                                <td class="px-3 py-3.5 text-center"><input type="checkbox" :checked="['present', 'completed'].includes(entry.attendance_status)" :disabled="!canToggleAttendance(entry) || attendanceConfirming !== null" :aria-label="`Konfirmasi kehadiran ${entry.patient.name} pukul ${time(entry.starts_at)}`" class="size-5 cursor-pointer rounded border-slate-300 text-emerald-700 accent-emerald-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 disabled:cursor-not-allowed disabled:opacity-60" @change="toggleAttendance(entry, $event.target.checked)"></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
-                <div v-if="therapySchedule.length" class="divide-y divide-[#efede6] lg:hidden">
-                    <article v-for="(entry, index) in therapySchedule" :key="entry.id" class="p-4 sm:p-5">
+                <div v-if="dailySchedule.length" class="divide-y divide-[#efede6] lg:hidden">
+                    <article v-for="(entry, index) in dailySchedule" :key="`${entry.agenda_type}-${entry.id}`" class="p-4 sm:p-5">
                         <div class="flex items-start justify-between gap-3">
                             <div class="flex min-w-0 items-start gap-3">
                                 <span class="grid size-8 shrink-0 place-items-center rounded-lg bg-[#f4f3ed] text-xs font-bold tabular-nums text-slate-600">{{ index + 1 }}</span>
@@ -293,38 +304,26 @@ function scheduleTherapyBadge(code) {
                                     <p class="mt-0.5 font-mono text-[11px] text-slate-500">{{ entry.patient.patient_code || '—' }}</p>
                                 </div>
                             </div>
-                            <span class="shrink-0 rounded-full px-2.5 py-1.5 text-[11px] font-semibold ring-1 ring-inset" :class="scheduleStatusClasses[entry.attendance_status]">{{ scheduleStatusLabels[entry.attendance_status] }}</span>
+                            <input type="checkbox" :checked="['present', 'completed'].includes(entry.attendance_status)" :disabled="!canToggleAttendance(entry) || attendanceConfirming !== null" :aria-label="`Konfirmasi kehadiran ${entry.patient.name} pukul ${time(entry.starts_at)}`" class="size-5 shrink-0 cursor-pointer rounded border-slate-300 text-emerald-700 accent-emerald-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 disabled:cursor-not-allowed disabled:opacity-60" @change="toggleAttendance(entry, $event.target.checked)">
                         </div>
                         <div class="mt-3 flex flex-wrap items-center gap-2">
-                            <span class="inline-flex max-w-full items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-semibold ring-1 ring-inset" :class="scheduleTherapyBadge(entry.therapy_type.code)"><span class="font-mono">{{ entry.therapy_type.code }}</span><span class="truncate font-normal">{{ entry.therapy_type.name }}</span></span>
+                            <span v-if="entry.agenda_type === 'therapy'" class="inline-flex max-w-full items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-semibold ring-1 ring-inset" :class="scheduleTherapyBadge(entry.therapy_type.code)"><span class="font-mono">{{ entry.therapy_type.code }}</span><span class="truncate font-normal">{{ entry.therapy_type.name }}</span></span>
+                            <span v-else class="rounded-full bg-clinic-50 px-2.5 py-1.5 text-xs font-semibold text-clinic-800">{{ entry.activity_name }}</span>
                             <span v-if="entry.package_session" class="rounded-full bg-clinic-50 px-2.5 py-1.5 text-xs font-semibold tabular-nums text-clinic-800">Pertemuan {{ entry.package_session.number }}/{{ entry.package_session.total }}</span>
+                            <span v-if="entry.agenda_type === 'assessment'" class="rounded-full bg-slate-100 px-2.5 py-1.5 text-xs font-semibold text-slate-700">{{ entry.package_label }}</span>
                         </div>
                         <dl class="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
-                            <div><dt class="text-slate-500">Jam terapi</dt><dd class="mt-0.5 font-medium tabular-nums text-slate-800">{{ time(entry.starts_at) }}</dd></div>
+                            <div><dt class="text-slate-500">Jam</dt><dd class="mt-0.5 font-medium tabular-nums text-slate-800">{{ time(entry.starts_at) }}</dd></div>
                             <div><dt class="text-slate-500">Nama Terapis</dt><dd class="mt-0.5 font-medium text-slate-800">{{ entry.therapist_name || '—' }}</dd></div>
-                            <div class="col-span-2"><dt class="text-slate-500">Paket Ke-</dt><dd class="mt-0.5 font-medium text-slate-800">{{ entry.package_session?.package_number ? `Paket ke-${entry.package_session.package_number} · ${entry.package_session.package_name}` : '—' }}</dd></div>
                         </dl>
                     </article>
                 </div>
 
-                <div v-if="!therapySchedule.length" class="flex min-h-52 flex-col items-center justify-center px-5 text-center">
+                <div v-if="!dailySchedule.length" class="flex min-h-52 flex-col items-center justify-center px-5 text-center">
                     <span class="grid size-11 place-items-center rounded-full bg-clinic-50 text-clinic-700"><CalendarDays :size="20" /></span>
-                    <p class="mt-3 text-sm font-semibold text-slate-700">Tidak ada sesi terapi pada tanggal ini</p>
+                    <p class="mt-3 text-sm font-semibold text-slate-700">Tidak ada jadwal pada tanggal ini</p>
                     <p class="mt-1 text-sm text-slate-500">Coba ubah tanggal atau filter jadwal.</p>
                 </div>
-            </div>
-
-            <div v-if="otherAgenda.length" class="overflow-hidden rounded-xl border border-[#e9e6de] bg-white shadow-sm">
-                    <div class="border-b border-[#efede6] px-5 py-4 sm:px-6">
-                        <h2 class="text-sm font-semibold text-clinic-900">Assessment dan evaluasi</h2>
-                        <p class="mt-1 text-xs text-slate-500">Agenda lain pada {{ selectedDateLabel }}</p>
-                    </div>
-                    <div class="divide-y divide-[#efede6]">
-                        <div v-for="entry in otherAgenda" :key="entry.id" class="flex items-center justify-between gap-3 px-5 py-3.5 sm:px-6">
-                            <div class="min-w-0"><p class="truncate text-sm font-semibold text-slate-800">{{ entry.patient_name }} <span class="ml-1 text-xs font-normal text-slate-500">{{ entry.patient_code }}</span></p><p class="mt-1 truncate text-xs text-slate-600">{{ entry.activity_name }} <span class="text-slate-400">· {{ time(entry.starts_at) }}</span></p><p class="mt-1 text-xs text-slate-500">Terapis: {{ entry.therapist_name || '—' }}</p></div>
-                            <span class="shrink-0 rounded-full bg-[#f4f3ed] px-2.5 py-1.5 text-[11px] font-medium capitalize text-slate-600">{{ entry.status.replace('_', ' ') }}</span>
-                        </div>
-                    </div>
             </div>
         </section>
 

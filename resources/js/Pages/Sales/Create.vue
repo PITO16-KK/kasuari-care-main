@@ -8,12 +8,12 @@ const props = defineProps({ patients: Array, therapists: Array, packages: Array,
 const form = useForm({ patient_id: '', therapist_profile_id: '', line_type: 'package', item_id: '', quantity: 1, discount_type: 'fixed', discount_value: 0, payment_method: 'cash', reference_number: '', bank_name: '', payment_proof: null });
 const paymentProofInput = ref(null);
 const items = computed(() => form.line_type === 'package'
-    ? props.packages
+    ? (props.packages ?? [])
     : form.line_type === 'product'
-        ? props.products
-        : props.services.filter((item) => item.service_type === form.line_type));
+        ? (props.products ?? [])
+        : (props.services ?? []).filter((item) => item.service_type === form.line_type));
 const selectedItem = computed(() => items.value.find((item) => item.id === Number(form.item_id)));
-const patientPackage = computed(() => props.patientPackages.find((item) => Number(item.patient_id) === Number(form.patient_id)));
+const patientPackage = computed(() => (props.patientPackages ?? []).find((item) => Number(item.patient_id) === Number(form.patient_id)));
 const remainingPackageSessions = computed(() => Number(patientPackage.value?.duration_remaining_sessions ?? 0) + Number(patientPackage.value?.legacy_remaining_sessions ?? 0));
 const packageExpiresAt = computed(() => patientPackage.value ? new Date(patientPackage.value.expires_at) : null);
 const packageHasRemainingTime = computed(() => packageExpiresAt.value && packageExpiresAt.value >= new Date());

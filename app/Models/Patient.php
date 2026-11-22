@@ -52,6 +52,7 @@ class Patient extends Model
     public function syncTherapistAssignments(array $assignments): void
     {
         $therapyTypeIds = TherapyType::query()
+            ->where('is_active', true)
             ->whereIn('code', array_keys($assignments))
             ->pluck('id', 'code');
         $therapists = [];

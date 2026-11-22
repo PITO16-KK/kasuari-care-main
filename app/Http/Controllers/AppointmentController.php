@@ -203,7 +203,7 @@ class AppointmentController extends Controller
             ])
             ->values();
 
-        $appointments = Appointment::with(['patient:id,patient_code,name,primary_whatsapp', 'therapyType:id,code,name', 'therapist.user:id,name', 'room:id,name', 'assessment:id,patient_id', 'sale:id,appointment_id,status'])
+        $appointments = Appointment::with(['patient:id,patient_code,name,primary_whatsapp', 'therapyType:id,code,name,default_duration_minutes', 'therapist.user:id,name', 'room:id,name', 'assessment:id,patient_id', 'sale:id,appointment_id,status'])
             ->where('starts_at', '>=', now()->startOfDay())->where('status', '!=', 'cancelled')
             ->orderBy('starts_at')->limit(60)->get();
         $appointments->each(function (Appointment $appointment) use ($coveredAppointmentIds): void {
@@ -256,7 +256,7 @@ class AppointmentController extends Controller
             'assessment_id' => ['required', Rule::exists('assessments', 'id')->where(fn ($query) => $query
                 ->where('patient_id', $request->input('patient_id'))
                 ->where('status', 'completed'))],
-            'therapy_type_id' => ['required', 'exists:therapy_types,id'],
+            'therapy_type_id' => ['required', Rule::exists('therapy_types', 'id')->where('is_active', true)],
             'therapist_profile_id' => ['required', 'integer', $this->therapistAssignmentRule($request)],
             'room_id' => ['required', 'exists:rooms,id'],
             'starts_at' => ['required', 'date', 'after_or_equal:now'],
@@ -307,7 +307,9 @@ class AppointmentController extends Controller
             'assessment_id' => ['required', Rule::exists('assessments', 'id')->where(fn ($query) => $query
                 ->where('patient_id', $request->input('patient_id'))
                 ->where('status', 'completed'))],
-            'therapy_type_id' => ['required', 'exists:therapy_types,id'],
+            'therapy_type_id' => ['required', Rule::exists('therapy_types', 'id')->where(fn (Builder $query) => $query
+                ->where('is_active', true)
+                ->orWhere('id', $appointment->therapy_type_id))],
             'therapist_profile_id' => ['required', 'integer', $this->therapistAssignmentRule($request)],
             'room_id' => ['required', 'exists:rooms,id'],
             'starts_at' => ['required', 'date', 'after_or_equal:now'],
@@ -358,6 +360,46 @@ class AppointmentController extends Controller
         }
 
         return redirect()->route('scheduling.index')->with('success', 'Jadwal terapi berhasil diperbarui.');
+    }
+
+    public function confirmAttendance(Request $request, Appointment $appointment): RedirectResponse
+    {
+        $data = $request->validate([
+            'attendance_status' => ['present', 'nullable', Rule::in(['present', 'absent'])],
+        ]);
+        $attendanceStatus = $data['attendance_status'] ?? null;
+
+        DB::transaction(function () use ($appointment, $attendanceStatus): void {
+            $lockedAppointment = Appointment::query()
+                ->whereKey($appointment->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+            $clinicNow = Carbon::now('Asia/Jakarta');
+            $appointmentStartsAt = $lockedAppointment->starts_at->copy()->setTimezone('Asia/Jakarta');
+
+            if ($clinicNow->hour < 18
+                || ! $appointmentStartsAt->isSameDay($clinicNow)
+                || $appointmentStartsAt->greaterThan($clinicNow)) {
+                throw ValidationException::withMessages([
+                    'attendance_status' => 'Konfirmasi kehadiran tersedia mulai pukul 18.00 WIB untuk jadwal yang sudah berlangsung hari ini.',
+                ]);
+            }
+
+            if (! in_array($lockedAppointment->status, ['scheduled', 'confirmed', 'in_progress'], true)
+                || $lockedAppointment->report()->where('status', 'submitted')->exists()) {
+                throw ValidationException::withMessages([
+                    'attendance_status' => 'Kehadiran sesi ini sudah tercatat atau jadwal tidak lagi aktif.',
+                ]);
+            }
+
+            $lockedAppointment->update(['attendance_status' => $attendanceStatus]);
+        });
+
+        return back()->with('success', match ($attendanceStatus) {
+            'present' => 'Kehadiran pasien berhasil dikonfirmasi.',
+            'absent' => 'Pasien ditandai tidak hadir.',
+            default => 'Konfirmasi kehadiran dibatalkan.',
+        });
     }
 
     public function cancel(Request $request, Appointment $appointment): RedirectResponse
@@ -416,7 +458,7 @@ class AppointmentController extends Controller
     {
         $therapyCode = TherapyType::query()->whereKey($request->input('therapy_type_id'))->value('code');
 
-        if (! in_array($therapyCode, ['TO', 'TW'], true)) {
+        if (! in_array($therapyCode, ['OT', 'TW', 'FT'], true)) {
             return Rule::exists('therapist_profiles', 'id');
         }
 

@@ -5,6 +5,7 @@ import { CalendarDays, ChevronLeft, ChevronRight, Clock3, Sparkles, UserRound } 
 import MainLayout from '../../Layouts/MainLayout.vue';
 
 const props = defineProps({ appointments: Array, scheduledAssessments: Array, patients: Array, assessments: Array, initialPatientId: Number, initialAssessmentId: Number, patientPackages: Array, patientEvaluationSessionCounts: Array, therapyTypes: Array, therapists: Array, patientTherapists: Array, rooms: Array });
+const patientSpecificTherapyCodes = ['OT', 'TW', 'FT'];
 const form = useForm({ patient_id: props.initialPatientId ?? '', assessment_id: props.initialAssessmentId ?? '', therapy_type_id: '', therapist_profile_id: '', room_id: '', starts_at: '' });
 const cancelForm = useForm({});
 const assessmentRescheduleForm = useForm({ scheduled_at: '', therapist_profile_id: '' });
@@ -21,13 +22,14 @@ const assessmentScheduleTime = ref('');
 const agendaView = ref('calendar');
 const whatsappNotice = ref('');
 const selectedWeekDate = ref(jakartaDateOf(new Date().toISOString()));
-const selectedType = computed(() => props.therapyTypes.find((type) => type.id === Number(form.therapy_type_id)));
+const selectedType = computed(() => props.therapyTypes.find((type) => type.id === Number(form.therapy_type_id))
+    ?? props.appointments.find((appointment) => Number(appointment.id) === Number(editingAppointmentId.value))?.therapy_type);
 const selectedPatientTherapists = computed(() => props.patientTherapists.filter((assignment) => {
     return Number(assignment.patient_id) === Number(form.patient_id)
         && Number(assignment.therapy_type_id) === Number(form.therapy_type_id);
 }));
 const scheduleTherapists = computed(() => {
-    if (['TO', 'TW'].includes(selectedType.value?.code)) {
+    if (patientSpecificTherapyCodes.includes(selectedType.value?.code)) {
         return selectedPatientTherapists.value.map((assignment) => ({
             id: assignment.therapist_profile_id,
             name: assignment.therapist_name,
@@ -43,6 +45,23 @@ const scheduleTherapists = computed(() => {
 });
 const selectedPatientAssessments = computed(() => props.assessments.filter((assessment) => Number(assessment.patient_id) === Number(form.patient_id)));
 const selectedAssessment = computed(() => selectedPatientAssessments.value.find((assessment) => Number(assessment.id) === Number(form.assessment_id)));
+if (!form.assessment_id && Number(form.patient_id)) {
+    form.assessment_id = selectedPatientAssessments.value[0]?.id ?? '';
+}
+const patientsWithCompletedAssessments = computed(() => new Set(props.assessments.map((assessment) => Number(assessment.patient_id))));
+const patientsWithScheduledAssessments = computed(() => new Set(props.scheduledAssessments.map((assessment) => Number(assessment.patient_id))));
+const selectedPatientScheduledAssessment = computed(() => patientsWithScheduledAssessments.value.has(Number(form.patient_id)));
+const patientAssessmentStatus = (patientId) => {
+    if (patientsWithCompletedAssessments.value.has(Number(patientId))) {
+        return 'Sudah melakukan assessment';
+    }
+
+    if (patientsWithScheduledAssessments.value.has(Number(patientId))) {
+        return 'Belum melakukan assessment · sudah dijadwalkan';
+    }
+
+    return 'Belum melakukan assessment';
+};
 const selectedPatientPackages = computed(() => props.patientPackages.filter((item) => Number(item.patient_id) === Number(form.patient_id)));
 const appointmentBeingEdited = computed(() => props.appointments.find((item) => item.id === editingAppointmentId.value));
 const assessmentBeingEdited = computed(() => props.scheduledAssessments.find((item) => Number(item.id) === Number(editingAssessmentId.value)));
@@ -304,6 +323,9 @@ function clearAssessmentSelection() {
 }
 function handlePatientSelectionChange() {
     clearAssessmentSelection();
+    if (!editingAppointmentId.value) {
+        form.assessment_id = selectedPatientAssessments.value[0]?.id ?? '';
+    }
     form.therapist_profile_id = '';
     form.clearErrors('patient_id', 'therapist_profile_id');
 }
@@ -591,12 +613,12 @@ function sendWhatsAppReminder(appointment) {
                             Pasien *
                             <select v-model="form.patient_id" class="field-input" required @change="handlePatientSelectionChange">
                                 <option value="">Pilih pasien</option>
-                                <option v-for="patient in patients" :key="patient.id" :value="patient.id">{{ patient.patient_code }} · {{ patient.name }}</option>
+                                <option v-for="patient in patients" :key="patient.id" :value="patient.id">{{ patient.patient_code }} · {{ patient.name }} · {{ patientAssessmentStatus(patient.id) }}</option>
                             </select>
                             <span v-if="form.errors.patient_id" class="field-error">{{ form.errors.patient_id }}</span>
                         </label>
 
-                        <label class="field-label">
+                        <label v-if="editingAppointmentId" class="field-label">
                             Assessment selesai *
                             <select v-model="form.assessment_id" class="field-input" :disabled="!form.patient_id" required>
                                 <option value="">Pilih assessment yang sudah selesai</option>
@@ -606,11 +628,14 @@ function sendWhatsAppReminder(appointment) {
                         </label>
 
                         <div v-if="form.patient_id && !selectedPatientAssessments.length" role="alert" class="rounded-md border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs leading-relaxed text-amber-900">
-                            Selesaikan assessment pasien sebelum membuat jadwal terapi.
-                            <Link :href="`/assessments/create?patient_id=${form.patient_id}`" class="ml-1 inline-flex min-h-11 items-center font-bold text-amber-950 underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-800">Jadwalkan assessment</Link>
+                            <template v-if="selectedPatientScheduledAssessment">Anak ini belum melakukan assessment dan sudah memiliki jadwal assessment.</template>
+                            <template v-else>
+                                Selesaikan assessment pasien sebelum membuat jadwal terapi.
+                                <Link :href="`/assessments/create?patient_id=${form.patient_id}`" class="ml-1 inline-flex min-h-11 items-center font-bold text-amber-950 underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-800">Jadwalkan assessment</Link>
+                            </template>
                         </div>
 
-                        <section v-if="selectedAssessment" class="rounded-md border border-clinic-100 bg-clinic-50 p-3" aria-live="polite">
+                        <section v-if="editingAppointmentId && selectedAssessment" class="rounded-md border border-clinic-100 bg-clinic-50 p-3" aria-live="polite">
                             <div class="flex flex-wrap items-center justify-between gap-2">
                                 <h3 class="text-xs font-bold text-clinic-900">Rekomendasi dari assessment</h3>
                                 <a :href="`/assessments/${selectedAssessment.id}/pdf`" target="_blank" rel="noopener" class="min-h-11 inline-flex items-center rounded-md px-2 text-[11px] font-semibold text-clinic-700 underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clinic-700">Lihat hasil lengkap</a>
@@ -671,6 +696,7 @@ function sendWhatsAppReminder(appointment) {
                             Jenis terapi *
                             <select v-model="form.therapy_type_id" class="field-input" required>
                                 <option value="">Pilih terapi</option>
+                                    <option v-if="appointmentBeingEdited?.therapy_type && !therapyTypes.some((type) => Number(type.id) === Number(appointmentBeingEdited.therapy_type_id))" :value="appointmentBeingEdited.therapy_type_id">{{ appointmentBeingEdited.therapy_type.code }} · {{ appointmentBeingEdited.therapy_type.name }} (jadwal lama)</option>
                                 <option v-for="type in therapyTypes" :key="type.id" :value="type.id">{{ type.code }} · {{ type.name }}</option>
                             </select>
                             <span v-if="form.errors.therapy_type_id" class="field-error">{{ form.errors.therapy_type_id }}</span>
@@ -689,7 +715,7 @@ function sendWhatsAppReminder(appointment) {
                                 <option v-for="therapist in scheduleTherapists" :key="therapist.id" :value="therapist.id" :disabled="isTherapistBusy(therapist.id)">{{ therapist.name }} · {{ therapist.specialty || 'Terapis' }}{{ isTherapistBusy(therapist.id) ? ' (sudah terjadwal)' : '' }}</option>
                             </select>
                             <span v-if="form.errors.therapist_profile_id" class="field-error">{{ form.errors.therapist_profile_id }}</span>
-                            <span v-if="form.patient_id && ['TO', 'TW'].includes(selectedType?.code) && !selectedPatientTherapists.length" class="mt-1 block text-xs font-normal text-amber-800">Belum ada terapis yang direkomendasikan untuk jenis terapi ini. Atur pada data pasien terlebih dahulu.</span>
+                            <span v-if="form.patient_id && patientSpecificTherapyCodes.includes(selectedType?.code) && !selectedPatientTherapists.length" class="mt-1 block text-xs font-normal text-amber-800">Belum ada terapis yang direkomendasikan untuk jenis terapi ini. Atur pada data pasien terlebih dahulu.</span>
                         </label>
 
                         <label class="field-label">
@@ -852,22 +878,44 @@ function sendWhatsAppReminder(appointment) {
                     </div>
 
                     <div v-else-if="agendaEntries.length" class="divide-y divide-slate-100">
-                        <article v-for="entry in agendaEntries" :key="`${entry.agendaType}-${entry.id}`" class="grid gap-3 px-5 py-4 sm:grid-cols-[140px_minmax(0,1fr)_auto] sm:items-center">
-                            <div class="text-xs font-bold text-clinic-700">{{ dateTime(entry.starts_at) }}</div>
-                            <div class="min-w-0">
-                                <div class="text-xs font-bold text-slate-800">{{ entry.patient.name }} <span class="font-mono text-[10px] font-normal text-slate-400">{{ entry.patient.patient_code }}</span></div>
-                                <div v-if="entry.agendaType === 'assessment'" class="mt-1 text-[11px] font-semibold text-clinic-700">Assessment · {{ entry.therapist?.user?.name || 'Terapis belum ditentukan' }}</div>
-                                <div v-else class="mt-1 text-[11px] text-slate-500">{{ entry.therapy_type.name }} · {{ sessionDuration(entry) }} · {{ entry.therapist?.user?.name || 'Belum ditentukan' }} · {{ entry.room?.name || 'Belum ditentukan' }}</div>
-                                <div v-if="entry.agendaType === 'therapy' && entry.payment_warning" class="mt-1 text-[11px] font-semibold text-amber-700">Belum ada pembayaran atau kuota paket untuk sesi ini.</div>
-                                <div v-if="entry.agendaType === 'therapy' && entry.assessment_id" class="mt-1 text-[10px] font-semibold text-clinic-700">Assessment tertaut</div>
+                        <article v-for="entry in agendaEntries" :key="`${entry.agendaType}-${entry.id}`" class="grid gap-4 px-4 py-4 transition-colors hover:bg-slate-50/70 sm:px-5 lg:grid-cols-[150px_minmax(0,1fr)_250px] lg:items-center">
+                            <div class="rounded-lg bg-clinic-50 px-3 py-2.5 text-sm font-semibold leading-5 text-clinic-800 lg:bg-transparent lg:px-0 lg:py-0">
+                                <span class="block text-[11px] font-medium uppercase tracking-wide text-slate-500">Tanggal &amp; waktu</span>
+                                <span class="mt-0.5 block">{{ dateTime(entry.starts_at) }}</span>
                             </div>
-                            <div class="flex flex-wrap items-center gap-2 sm:justify-end">
-                                <span class="rounded px-2 py-1 text-[10px] font-semibold capitalize" :class="entry.agendaType === 'assessment' ? 'bg-clinic-50 text-clinic-700' : 'bg-slate-100 text-slate-600'">{{ entry.agendaType === 'assessment' ? entry.status === 'awaiting_payment' ? 'Assessment · Belum dibayar' : 'Assessment terjadwal' : entry.status.replace('_', ' ') }}</span>
-                                <span v-if="entry.agendaType === 'therapy' && entry.payment_warning" class="rounded bg-amber-50 px-2 py-1 text-[10px] font-semibold text-amber-800">Belum dibayar</span>
-                                <button v-if="entry.agendaType === 'assessment'" type="button" class="min-h-9 rounded-md border border-clinic-200 px-3 text-xs font-semibold text-clinic-800 hover:bg-clinic-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clinic-700" @click="editAssessmentSchedule(entry)">Ubah jadwal</button>
-                                <button v-if="entry.agendaType === 'therapy' && ['scheduled', 'confirmed'].includes(entry.status)" type="button" class="min-h-9 rounded-md border border-slate-300 px-3 text-xs font-semibold text-slate-700 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clinic-700" @click="editAppointment(entry)">Ubah</button>
-                                <button v-if="entry.agendaType === 'therapy' && ['scheduled', 'confirmed'].includes(entry.status)" type="button" :disabled="cancelForm.processing" class="min-h-9 rounded-md border border-rose-200 px-3 text-xs font-semibold text-rose-700 hover:bg-rose-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700 disabled:opacity-60" @click="cancelAppointment(entry)">{{ cancelForm.processing ? 'Memproses...' : 'Batalkan' }}</button>
-                                <button v-if="entry.agendaType === 'therapy' && ['scheduled', 'confirmed'].includes(entry.status)" type="button" class="min-h-9 rounded-md border border-emerald-200 bg-emerald-50 px-3 text-xs font-semibold text-emerald-800 hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700" @click="sendWhatsAppReminder(entry)">Kirim WhatsApp</button>
+
+                            <div class="min-w-0">
+                                <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+                                    <h3 class="text-sm font-semibold leading-5 text-slate-900">{{ entry.patient.name }}</h3>
+                                    <span class="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] font-medium text-slate-600">{{ entry.patient.patient_code }}</span>
+                                </div>
+                                <div v-if="entry.agendaType === 'assessment'" class="mt-2 space-y-1 text-xs leading-5 text-slate-600">
+                                    <p><span class="font-semibold text-clinic-700">Assessment</span></p>
+                                    <p><span class="text-slate-500">Terapis:</span> {{ entry.therapist?.user?.name || 'Belum ditentukan' }}</p>
+                                </div>
+                                <div v-else class="mt-2 grid gap-x-4 gap-y-1 text-xs leading-5 text-slate-600 sm:grid-cols-2">
+                                    <p><span class="text-slate-500">Jenis terapi:</span> <span class="font-medium text-slate-800">{{ entry.therapy_type.name }}</span></p>
+                                    <p><span class="text-slate-500">Durasi:</span> {{ sessionDuration(entry) }}</p>
+                                    <p><span class="text-slate-500">Terapis:</span> {{ entry.therapist?.user?.name || 'Belum ditentukan' }}</p>
+                                    <p><span class="text-slate-500">Ruangan:</span> {{ entry.room?.name || 'Belum ditentukan' }}</p>
+                                </div>
+                                <div v-if="entry.agendaType === 'therapy' && entry.payment_warning" class="mt-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-medium leading-5 text-amber-800">Belum ada pembayaran atau kuota paket untuk sesi ini.</div>
+                                <div v-if="entry.agendaType === 'therapy' && entry.assessment_id" class="mt-2 inline-flex rounded-full bg-clinic-50 px-2.5 py-1 text-[11px] font-semibold text-clinic-700">Assessment tertaut</div>
+                            </div>
+
+                            <div class="flex flex-col gap-2 lg:items-stretch">
+                                <div class="flex flex-wrap gap-1.5">
+                                    <span class="rounded-full px-2.5 py-1 text-[11px] font-semibold capitalize" :class="entry.agendaType === 'assessment' ? 'bg-clinic-50 text-clinic-700' : 'bg-slate-100 text-slate-700'">{{ entry.agendaType === 'assessment' ? entry.status === 'awaiting_payment' ? 'Assessment · Belum dibayar' : 'Assessment terjadwal' : entry.status.replace('_', ' ') }}</span>
+                                    <span v-if="entry.agendaType === 'therapy' && entry.payment_warning" class="rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-800">Belum dibayar</span>
+                                </div>
+                                <div v-if="entry.agendaType === 'assessment'" class="grid grid-cols-2 gap-2">
+                                    <button type="button" class="col-span-2 min-h-10 rounded-lg border border-clinic-200 bg-white px-3 text-xs font-semibold text-clinic-800 transition-colors hover:bg-clinic-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clinic-700" @click="editAssessmentSchedule(entry)">Ubah jadwal assessment</button>
+                                </div>
+                                <div v-else-if="['scheduled', 'confirmed'].includes(entry.status)" class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-2">
+                                    <button type="button" class="min-h-10 rounded-lg border border-slate-300 bg-white px-2.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clinic-700" @click="editAppointment(entry)">Ubah jadwal</button>
+                                    <button type="button" :disabled="cancelForm.processing" class="min-h-10 rounded-lg border border-rose-200 bg-white px-2.5 text-xs font-semibold text-rose-700 transition-colors hover:bg-rose-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700 disabled:opacity-60" @click="cancelAppointment(entry)">{{ cancelForm.processing ? 'Memproses...' : 'Batalkan' }}</button>
+                                    <button type="button" class="col-span-2 min-h-10 rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 text-xs font-semibold text-emerald-800 transition-colors hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 sm:col-span-1 lg:col-span-2" @click="sendWhatsAppReminder(entry)">Kirim WhatsApp</button>
+                                </div>
                             </div>
                         </article>
                     </div>

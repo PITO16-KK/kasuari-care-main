@@ -48,10 +48,8 @@ class DatabaseSeeder extends Seeder
 
         $types = [
             ['TW', 'Terapi Wicara'],
-            ['TO', 'Terapi Okupasi'],
-            ['SI', 'Sensori Integrasi'],
+            ['OT', 'Terapi Okupasi'],
             ['FT', 'Fisioterapi'],
-            ['ABA', 'ABA / Perilaku'],
         ];
         foreach ($types as [$code, $name]) {
             DB::table('therapy_types')->updateOrInsert(['code' => $code], [
@@ -63,7 +61,7 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        foreach ([['TW', 'Ruang Wicara'], ['TO', 'Ruang Okupasi'], ['SI', 'Ruang Sensori'], ['FT', 'Ruang Fisioterapi']] as [$code, $name]) {
+        foreach ([['TW', 'Ruang Wicara'], ['OT', 'Ruang Okupasi'], ['FT', 'Ruang Fisioterapi']] as [$code, $name]) {
             DB::table('rooms')->updateOrInsert(['code' => $code], [
                 'name' => $name,
                 'is_active' => true,
@@ -88,7 +86,10 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        foreach (DB::table('therapy_types')->get() as $type) {
+        foreach (DB::table('therapy_types')
+            ->where('is_active', true)
+            ->whereIn('code', ['OT', 'TW', 'FT'])
+            ->get() as $type) {
             DB::table('service_catalog')->updateOrInsert(['code' => 'SESI-'.$type->code], [
                 'name' => 'Sesi 1 Jam - '.$type->name,
                 'service_type' => 'session',
@@ -145,5 +146,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Kartu aktivitas komunikasi', 'price' => 85000, 'stock_quantity' => 20,
             'is_active' => true, 'created_at' => now(), 'updated_at' => now(),
         ]);
+
+        $this->call(DummyPatientSeeder::class);
     }
 }

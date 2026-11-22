@@ -325,14 +325,14 @@ INSERT INTO `therapist_profiles` (`id`, `user_id`, `license_number`, `specialty`
 
 -- Data untuk tabel `therapy_types`
 INSERT INTO `therapy_types` (`id`, `code`, `name`, `default_duration_minutes`, `is_active`, `created_at`, `updated_at`) VALUES (1, 'TW', 'Terapi Wicara', 60, 1, '2026-11-03 10:52:04', '2026-11-03 10:52:04');
-INSERT INTO `therapy_types` (`id`, `code`, `name`, `default_duration_minutes`, `is_active`, `created_at`, `updated_at`) VALUES (2, 'TO', 'Terapi Okupasi', 60, 1, '2026-11-03 10:52:04', '2026-11-03 10:52:04');
-INSERT INTO `therapy_types` (`id`, `code`, `name`, `default_duration_minutes`, `is_active`, `created_at`, `updated_at`) VALUES (3, 'SI', 'Sensori Integrasi', 60, 1, '2026-11-03 10:52:04', '2026-11-03 10:52:04');
+INSERT INTO `therapy_types` (`id`, `code`, `name`, `default_duration_minutes`, `is_active`, `created_at`, `updated_at`) VALUES (2, 'OT', 'Terapi Okupasi', 60, 1, '2026-11-03 10:52:04', '2026-11-03 10:52:04');
+INSERT INTO `therapy_types` (`id`, `code`, `name`, `default_duration_minutes`, `is_active`, `created_at`, `updated_at`) VALUES (3, 'SI', 'Sensori Integrasi', 60, 0, '2026-11-03 10:52:04', '2026-11-03 10:52:04');
 INSERT INTO `therapy_types` (`id`, `code`, `name`, `default_duration_minutes`, `is_active`, `created_at`, `updated_at`) VALUES (4, 'FT', 'Fisioterapi', 60, 1, '2026-11-03 10:52:04', '2026-11-03 10:52:04');
-INSERT INTO `therapy_types` (`id`, `code`, `name`, `default_duration_minutes`, `is_active`, `created_at`, `updated_at`) VALUES (5, 'ABA', 'ABA / Perilaku', 60, 1, '2026-11-03 10:52:04', '2026-11-03 10:52:04');
+INSERT INTO `therapy_types` (`id`, `code`, `name`, `default_duration_minutes`, `is_active`, `created_at`, `updated_at`) VALUES (5, 'ABA', 'ABA / Perilaku', 60, 0, '2026-11-03 10:52:04', '2026-11-03 10:52:04');
 
 -- Data untuk tabel `rooms`
 INSERT INTO `rooms` (`id`, `code`, `name`, `is_active`, `created_at`, `updated_at`) VALUES (1, 'TW', 'Ruang Wicara', 1, '2026-11-03 10:52:04', '2026-11-03 10:52:04');
-INSERT INTO `rooms` (`id`, `code`, `name`, `is_active`, `created_at`, `updated_at`) VALUES (2, 'TO', 'Ruang Okupasi', 1, '2026-11-03 10:52:04', '2026-11-03 10:52:04');
+INSERT INTO `rooms` (`id`, `code`, `name`, `is_active`, `created_at`, `updated_at`) VALUES (2, 'OT', 'Ruang Okupasi', 1, '2026-11-03 10:52:04', '2026-11-03 10:52:04');
 INSERT INTO `rooms` (`id`, `code`, `name`, `is_active`, `created_at`, `updated_at`) VALUES (3, 'SI', 'Ruang Sensori', 1, '2026-11-03 10:52:04', '2026-11-03 10:52:04');
 INSERT INTO `rooms` (`id`, `code`, `name`, `is_active`, `created_at`, `updated_at`) VALUES (4, 'FT', 'Ruang Fisioterapi', 1, '2026-11-03 10:52:04', '2026-11-03 10:52:04');
 
@@ -340,10 +340,10 @@ INSERT INTO `rooms` (`id`, `code`, `name`, `is_active`, `created_at`, `updated_a
 INSERT INTO `service_catalog` (`id`, `code`, `name`, `service_type`, `therapy_type_id`, `price`, `is_active`, `created_at`, `updated_at`, `description`) VALUES (1, 'ASSESSMENT-AWAL', 'Assessment & Konsultasi', 'assessment', NULL, 300000, 1, '2026-11-03 10:52:04', '2026-11-03 10:52:04', 'Wajib dilakukan pada pertemuan awal sebelum sesi terapi.');
 INSERT INTO `service_catalog` (`id`, `code`, `name`, `service_type`, `therapy_type_id`, `price`, `is_active`, `created_at`, `updated_at`, `description`) VALUES (2, 'EVALUASI-24-SESI', 'Evaluasi', 'assessment', NULL, 250000, 1, '2026-11-03 10:52:04', '2026-11-03 10:52:04', 'Dilakukan setelah 24 sesi terapi.');
 INSERT INTO `service_catalog` (`id`, `code`, `name`, `service_type`, `therapy_type_id`, `price`, `is_active`, `created_at`, `updated_at`, `description`) VALUES (3, 'SESI-TW', 'Sesi 1 Jam - Terapi Wicara', 'session', 1, 160000, 1, '2026-11-03 10:52:04', '2026-11-03 10:52:04', 'Satu sesi terapi dengan durasi 1 jam.');
-INSERT INTO `service_catalog` (`id`, `code`, `name`, `service_type`, `therapy_type_id`, `price`, `is_active`, `created_at`, `updated_at`, `description`) VALUES (4, 'SESI-TO', 'Sesi 1 Jam - Terapi Okupasi', 'session', 2, 160000, 1, '2026-11-03 10:52:04', '2026-11-03 10:52:04', 'Satu sesi terapi dengan durasi 1 jam.');
-INSERT INTO `service_catalog` (`id`, `code`, `name`, `service_type`, `therapy_type_id`, `price`, `is_active`, `created_at`, `updated_at`, `description`) VALUES (5, 'SESI-SI', 'Sesi 1 Jam - Sensori Integrasi', 'session', 3, 160000, 1, '2026-11-03 10:52:04', '2026-11-03 10:52:04', 'Satu sesi terapi dengan durasi 1 jam.');
+INSERT INTO `service_catalog` (`id`, `code`, `name`, `service_type`, `therapy_type_id`, `price`, `is_active`, `created_at`, `updated_at`, `description`) VALUES (4, 'SESI-OT', 'Sesi 1 Jam - Terapi Okupasi', 'session', 2, 160000, 1, '2026-11-03 10:52:04', '2026-11-03 10:52:04', 'Satu sesi terapi dengan durasi 1 jam.');
+INSERT INTO `service_catalog` (`id`, `code`, `name`, `service_type`, `therapy_type_id`, `price`, `is_active`, `created_at`, `updated_at`, `description`) VALUES (5, 'SESI-SI', 'Sesi 1 Jam - Sensori Integrasi', 'session', 3, 160000, 0, '2026-11-03 10:52:04', '2026-11-03 10:52:04', 'Satu sesi terapi dengan durasi 1 jam.');
 INSERT INTO `service_catalog` (`id`, `code`, `name`, `service_type`, `therapy_type_id`, `price`, `is_active`, `created_at`, `updated_at`, `description`) VALUES (6, 'SESI-FT', 'Sesi 1 Jam - Fisioterapi', 'session', 4, 160000, 1, '2026-11-03 10:52:04', '2026-11-03 10:52:04', 'Satu sesi terapi dengan durasi 1 jam.');
-INSERT INTO `service_catalog` (`id`, `code`, `name`, `service_type`, `therapy_type_id`, `price`, `is_active`, `created_at`, `updated_at`, `description`) VALUES (7, 'SESI-ABA', 'Sesi 1 Jam - ABA / Perilaku', 'session', 5, 160000, 1, '2026-11-03 10:52:04', '2026-11-03 10:52:04', 'Satu sesi terapi dengan durasi 1 jam.');
+INSERT INTO `service_catalog` (`id`, `code`, `name`, `service_type`, `therapy_type_id`, `price`, `is_active`, `created_at`, `updated_at`, `description`) VALUES (7, 'SESI-ABA', 'Sesi 1 Jam - ABA / Perilaku', 'session', 5, 160000, 0, '2026-11-03 10:52:04', '2026-11-03 10:52:04', 'Satu sesi terapi dengan durasi 1 jam.');
 INSERT INTO `service_catalog` (`id`, `code`, `name`, `service_type`, `therapy_type_id`, `price`, `is_active`, `created_at`, `updated_at`, `description`) VALUES (8, 'SESI-30-MENIT', 'Sesi Terapi 30 Menit', 'session', NULL, 110000, 1, '2026-11-03 10:52:04', '2026-11-03 10:52:04', 'Satu sesi terapi dengan durasi 30 menit.');
 
 -- Data untuk tabel `package_catalog`

@@ -106,7 +106,7 @@ function applyFilters() {
                     Terapis
                     <select v-model="form.therapist_id" class="field-input">
                         <option value="">Semua terapis</option>
-                        <option v-for="therapist in therapists" :key="therapist.id" :value="String(therapist.id)">{{ therapist.user.name }}</option>
+                        <option v-for="therapist in (therapists ?? [])" :key="therapist.id" :value="String(therapist.id)">{{ therapist.user?.name ?? 'Terapis' }}</option>
                     </select>
                 </label>
                 <label class="field-label">
@@ -130,11 +130,11 @@ function applyFilters() {
         <section class="mt-5 grid gap-3 sm:grid-cols-2">
             <article class="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
                 <p class="text-xs font-medium text-slate-500">Total pembayaran terfilter</p>
-                <p class="mt-2 text-xl font-semibold text-clinic-900">{{ money(summary.amount) }}</p>
+                <p class="mt-2 text-xl font-semibold text-clinic-900">{{ money(summary?.amount) }}</p>
             </article>
             <article class="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
                 <p class="text-xs font-medium text-slate-500">Jumlah transaksi</p>
-                <p class="mt-2 text-xl font-semibold text-clinic-900">{{ summary.count }}</p>
+                <p class="mt-2 text-xl font-semibold text-clinic-900">{{ summary?.count ?? 0 }}</p>
             </article>
         </section>
 
@@ -142,10 +142,10 @@ function applyFilters() {
             <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 px-4 py-4 sm:px-5">
                 <div>
                     <h2 class="text-sm font-semibold text-clinic-900">Transaksi pembayaran</h2>
-                    <p class="mt-1 text-xs text-slate-500">{{ payments.total }} transaksi sesuai filter</p>
+                    <p class="mt-1 text-xs text-slate-500">{{ payments?.total ?? 0 }} transaksi sesuai filter</p>
                 </div>
             </div>
-            <div v-if="payments.data.length" class="overflow-x-auto">
+            <div v-if="payments?.data?.length" class="overflow-x-auto">
                 <table class="w-full min-w-[980px] text-left text-xs">
                     <thead class="bg-[#F9F7F5] text-[10px] uppercase tracking-wide text-slate-500">
                         <tr>
@@ -162,6 +162,7 @@ function applyFilters() {
                             <td class="whitespace-nowrap px-4 py-3">{{ paymentDate(payment.received_at) }}</td>
                             <td class="px-4 py-3">
                                 <Link
+                                    v-if="payment.sale"
                                     :href="`/sales/${payment.sale.id}/receipt`"
                                     :aria-label="`Lihat invoice ${payment.sale.invoice_number}`"
                                     class="inline-flex min-h-8 items-center gap-1 rounded-sm font-semibold text-clinic-700 underline decoration-clinic-200 underline-offset-2 hover:text-clinic-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clinic-700"
@@ -169,10 +170,11 @@ function applyFilters() {
                                     <FileText :size="13" aria-hidden="true" />
                                     {{ payment.sale.invoice_number }}
                                 </Link>
-                                <div class="mt-1">{{ payment.sale.patient.name }} <span class="font-mono text-[10px] text-slate-400">{{ payment.sale.patient.patient_code }}</span></div>
+                                <span v-else class="text-slate-400">-</span>
+                                <div class="mt-1">{{ payment.sale?.patient?.name ?? 'Pasien tidak ditemukan' }} <span class="font-mono text-[10px] text-slate-400">{{ payment.sale?.patient?.patient_code ?? '-' }}</span></div>
                             </td>
-                            <td class="max-w-[240px] px-4 py-3">{{ payment.sale.lines.map((line) => line.description).join(', ') }}</td>
-                            <td class="px-4 py-3">{{ payment.sale.therapist?.user?.name ?? 'Tanpa terapis' }}</td>
+                            <td class="max-w-[240px] px-4 py-3">{{ payment.sale?.lines?.map((line) => line.description).join(', ') ?? '-' }}</td>
+                            <td class="px-4 py-3">{{ payment.sale?.therapist?.user?.name ?? 'Tanpa terapis' }}</td>
                             <td class="px-4 py-3">
                                 <div class="font-medium text-slate-700">{{ paymentMethod(payment.method) }}</div>
                                 <div v-if="payment.bank_name" class="mt-1 text-[10px] text-slate-500">Bank: {{ payment.bank_name }}</div>
@@ -188,7 +190,7 @@ function applyFilters() {
                 <p class="text-sm font-semibold text-slate-700">Belum ada pembayaran pada filter ini</p>
                 <p class="mt-1 text-xs text-slate-500">Coba ubah periode, terapis, atau metode pembayaran.</p>
             </div>
-            <nav v-if="payments.links.length > 3" aria-label="Halaman riwayat pembayaran" class="flex flex-wrap justify-center gap-1 border-t border-slate-100 px-4 py-3">
+            <nav v-if="payments?.links?.length > 3" aria-label="Halaman riwayat pembayaran" class="flex flex-wrap justify-center gap-1 border-t border-slate-100 px-4 py-3">
                 <template v-for="link in payments.links" :key="link.label">
                     <Link v-if="link.url" :href="link.url" preserve-scroll class="rounded-md border px-3 py-2 text-xs" :class="link.active ? 'border-clinic-700 bg-clinic-700 text-white' : 'border-slate-200 text-slate-600 hover:bg-slate-50'" v-html="link.label" />
                     <span v-else class="rounded-md border border-slate-100 px-3 py-2 text-xs text-slate-300" v-html="link.label"></span>

@@ -21,7 +21,8 @@ class PatientController extends Controller
     public function index(Request $request): Response
     {
         $therapyTypes = TherapyType::query()
-            ->whereIn('code', ['TO', 'TW'])
+            ->where('is_active', true)
+            ->whereIn('code', ['OT', 'TW', 'FT'])
             ->orderBy('name')
             ->get(['id', 'code', 'name']);
         $therapyTypeCodes = $therapyTypes->pluck('code', 'id')->all();
@@ -126,9 +127,8 @@ class PatientController extends Controller
         });
 
         $sessions = $patient->appointments()
-            ->where('status', 'completed')
             ->where('attendance_status', 'present')
-            ->whereHas('report', fn ($query) => $query->where('status', 'submitted'))
+            ->where('status', '!=', 'cancelled')
             ->with([
                 'therapyType:id,name',
                 'therapist.user:id,name',
@@ -147,7 +147,7 @@ class PatientController extends Controller
                 'starts_at' => $appointment->starts_at?->toIso8601String(),
                 'therapy_name' => $appointment->therapyType?->name,
                 'therapist_name' => $appointment->therapist?->user?->name,
-                'report' => [
+                'report' => $appointment->report === null ? null : [
                     'activities' => $appointment->report?->activities,
                     'parent_notes' => $appointment->report?->parent_notes,
                     'homework' => $appointment->report?->homework,
@@ -234,7 +234,7 @@ class PatientController extends Controller
             'father_whatsapp' => ['nullable', 'string', 'max:30'],
             'mother_name' => ['nullable', 'string', 'max:160'],
             'mother_whatsapp' => ['nullable', 'string', 'max:30'],
-            'therapist_assignments' => ['nullable', 'array:TO,TW'],
+            'therapist_assignments' => ['nullable', 'array:OT,TW,FT'],
             'therapist_assignments.*' => ['nullable', 'integer', 'exists:therapist_profiles,id', $uniqueTherapist],
         ];
     }
@@ -247,7 +247,7 @@ class PatientController extends Controller
 
         foreach ($assignments as $code => $therapistProfileId) {
             if ($assignments->filter(fn (mixed $id): bool => (int) $id === (int) $therapistProfileId)->count() > 1) {
-                $errors["therapist_assignments.{$code}"] = 'Terapis okupasi dan wicara harus berbeda.';
+                $errors["therapist_assignments.{$code}"] = 'Terapis untuk setiap jenis terapi harus berbeda.';
             }
         }
 

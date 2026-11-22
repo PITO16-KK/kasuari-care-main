@@ -11,13 +11,15 @@ const form = useForm({
     summary: props.assessment.summary ?? '',
     referral_notes: props.assessment.referral_notes ?? '',
     therapist_assignments: {
-        TO: props.therapistAssignments?.TO ?? '',
+        OT: props.therapistAssignments?.OT ?? '',
         TW: props.therapistAssignments?.TW ?? '',
+        FT: props.therapistAssignments?.FT ?? '',
     },
 });
 const recommendedTherapies = [
-    { code: 'TO', fallbackName: 'Terapi Okupasi' },
+    { code: 'OT', fallbackName: 'Terapi Okupasi' },
     { code: 'TW', fallbackName: 'Terapi Wicara' },
+    { code: 'FT', fallbackName: 'Fisioterapi' },
 ];
 
 const money = (value) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value ?? 0);
@@ -89,9 +91,9 @@ function submit() {
                 <section class="rounded-xl border border-slate-200 bg-white p-5 sm:p-6">
                     <div>
                         <h2 class="text-sm font-semibold text-clinic-900">Rekomendasi terapis</h2>
-                        <p class="mt-1 text-xs leading-5 text-slate-500">Tetapkan terapis okupasi dan terapis wicara untuk pasien. Boleh mengisi salah satu terlebih dahulu; satu terapis hanya dapat ditugaskan kepada satu anak.</p>
+                        <p class="mt-1 text-xs leading-5 text-slate-500">Tetapkan terapis untuk jenis terapi yang direkomendasikan. Boleh mengisi sebagian terlebih dahulu; satu terapis hanya dapat ditugaskan kepada satu anak.</p>
                     </div>
-                    <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                    <div class="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                         <label v-for="therapy in recommendedTherapies" :key="therapy.code" class="field-label">
                             {{ therapyTypes.find((type) => type.code === therapy.code)?.name ?? therapy.fallbackName }}
                             <select v-model="form.therapist_assignments[therapy.code]" class="field-input">

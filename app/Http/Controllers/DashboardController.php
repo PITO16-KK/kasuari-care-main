@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -40,6 +41,8 @@ class DashboardController extends Controller
         $user = request()->user();
         $canSeeFinance = $user->hasAnyRole(['owner', 'finance', 'front_office']);
         $canHandleIntake = $user->hasAnyRole(['owner', 'front_office']);
+        $canConfirmAttendance = $canHandleIntake;
+        $clinicNow = Carbon::now('Asia/Jakarta');
         $canFilterTherapist = $user->hasAnyRole(['owner', 'finance', 'front_office']);
         $isTherapistDashboard = $user->hasRole('therapist')
             && ! $user->hasAnyRole(['owner', 'finance', 'front_office']);
@@ -123,6 +126,7 @@ class DashboardController extends Controller
         $therapySchedule = $selectedTherapyAppointments
             ->map(fn (Appointment $appointment): array => [
                 'id' => $appointment->id,
+                'agenda_type' => 'therapy',
                 'starts_at' => $appointment->starts_at->toIso8601String(),
                 'patient' => [
                     'id' => $appointment->patient->id,
@@ -157,18 +161,28 @@ class DashboardController extends Controller
                     ),
                 )
                 ->orderBy('scheduled_at')
-                ->get(['id', 'patient_id', 'sale_id', 'therapist_profile_id', 'scheduled_at', 'status'])
+                ->get(['id', 'patient_id', 'sale_id', 'therapist_profile_id', 'scheduled_at', 'status', 'attendance_status'])
                 ->map(fn (Assessment $assessment): array => [
                     'id' => $assessment->id,
+                    'agenda_type' => 'assessment',
                     'starts_at' => $assessment->scheduled_at->toIso8601String(),
-                    'patient_name' => $assessment->patient->name,
-                    'patient_code' => $assessment->patient->patient_code,
+                    'patient' => [
+                        'id' => $assessment->patient->id,
+                        'name' => $assessment->patient->name,
+                        'patient_code' => $assessment->patient->patient_code,
+                    ],
                     'activity_name' => $assessment->sale?->lines->first()?->description ?? 'Assessment',
+                    'package_label' => $this->assessmentPackageLabel($assessment),
+                    'therapy_type' => null,
+                    'package_session' => null,
                     'therapist_name' => $assessment->therapist?->user?->name,
-                    'status' => $assessment->status,
+                    'attendance_status' => $assessment->attendance_status === 'present' ? 'present' : 'waiting',
                 ])
                 ->values();
         }
+        $dailySchedule = $therapySchedule->concat($otherAgenda)
+            ->sortBy(fn (array $entry): int => Carbon::parse($entry['starts_at'])->getTimestamp())
+            ->values();
 
         $evaluationAlerts = collect();
 
@@ -337,10 +351,13 @@ class DashboardController extends Controller
             'stats' => $stats,
             'isTherapistDashboard' => $isTherapistDashboard,
             'canSeeFinance' => $canSeeFinance,
+            'canConfirmAttendance' => $canConfirmAttendance,
+            'attendanceConfirmationOpen' => $canConfirmAttendance
+                && $selectedDate === $clinicNow->toDateString()
+                && $clinicNow->hour >= 18,
             'canFilterTherapist' => $canFilterTherapist,
             'todaySchedule' => $todaySchedule,
-            'therapySchedule' => $therapySchedule,
-            'otherAgenda' => $otherAgenda,
+            'dailySchedule' => $dailySchedule,
             'scheduleFilters' => [
                 'date' => $selectedDate,
                 'therapist_id' => $canFilterTherapist ? ($filters['therapist_id'] ?? '') : '',
@@ -353,7 +370,7 @@ class DashboardController extends Controller
                         'name' => $therapist->user?->name,
                     ])
                 : collect(),
-            'scheduleTherapyTypes' => TherapyType::query()->orderBy('name')->get(['id', 'code', 'name']),
+            'scheduleTherapyTypes' => TherapyType::query()->where('is_active', true)->orderBy('name')->get(['id', 'code', 'name']),
             'evaluationAlerts' => $evaluationAlerts,
             'evaluationAlertCount' => $evaluationAlerts->count(),
             'unpaidSessionAlerts' => $unpaidSessionAlerts,
@@ -376,6 +393,13 @@ class DashboardController extends Controller
             'absent', 'no_show', 'not_present' => 'absent',
             default => 'waiting',
         };
+    }
+
+    private function assessmentPackageLabel(Assessment $assessment): string
+    {
+        $activityName = $assessment->sale?->lines->first()?->description ?? '';
+
+        return Str::contains(Str::lower($activityName), 'evaluasi') ? 'Evaluasi' : 'Assessment';
     }
 
     /**

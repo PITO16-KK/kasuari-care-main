@@ -50,6 +50,214 @@ class ClinicWorkflowTest extends TestCase
         $this->get('/dashboard')->assertRedirect('/login');
     }
 
+    public function test_owner_and_front_office_can_confirm_attendance_for_todays_past_appointments_after_six_pm_wib(): void
+    {
+        $this->travelTo('2026-10-25 11:00:00');
+        $patient = $this->patient();
+        $therapy = TherapyType::create(['code' => 'TW', 'name' => 'Terapi Wicara']);
+        $appointment = Appointment::create([
+            'patient_id' => $patient->id,
+            'therapy_type_id' => $therapy->id,
+            'starts_at' => now()->subHour(),
+            'ends_at' => now()->subMinutes(10),
+            'status' => 'scheduled',
+        ]);
+
+        $this->actingAs($this->userWithRole('front_office'))
+            ->patch("/scheduling/{$appointment->id}/attendance", ['attendance_status' => 'present'])
+            ->assertRedirect();
+        $this->assertDatabaseHas('appointments', ['id' => $appointment->id, 'attendance_status' => 'present']);
+
+        $this->actingAs($this->userWithRole('owner'))
+            ->patch("/scheduling/{$appointment->id}/attendance", ['attendance_status' => null])
+            ->assertRedirect();
+        $this->assertDatabaseHas('appointments', ['id' => $appointment->id, 'attendance_status' => null]);
+    }
+
+    public function test_confirmed_attendance_is_added_to_patient_history_without_waiting_for_the_therapist_report(): void
+    {
+        $this->travelTo('2026-10-25 11:00:00');
+        $frontOffice = $this->userWithRole('front_office');
+        $patient = $this->patient();
+        $therapy = TherapyType::create(['code' => 'TW', 'name' => 'Terapi Wicara']);
+        $presentAppointment = Appointment::create([
+            'patient_id' => $patient->id,
+            'therapy_type_id' => $therapy->id,
+            'starts_at' => now()->subHour(),
+            'ends_at' => now()->subMinutes(10),
+            'status' => 'scheduled',
+        ]);
+        $absentAppointment = Appointment::create([
+            'patient_id' => $patient->id,
+            'therapy_type_id' => $therapy->id,
+            'starts_at' => now()->subHours(2),
+            'ends_at' => now()->subHour()->subMinutes(10),
+            'status' => 'scheduled',
+        ]);
+
+        $this->actingAs($frontOffice)
+            ->patch("/scheduling/{$presentAppointment->id}/attendance", ['attendance_status' => 'present'])
+            ->assertRedirect();
+        $this->patch("/scheduling/{$absentAppointment->id}/attendance", ['attendance_status' => 'absent'])
+            ->assertRedirect();
+
+        $this->get("/patients/{$patient->id}/details")
+            ->assertOk()
+            ->assertJsonPath('sessions.total', 1)
+            ->assertJsonPath('sessions.data.0.id', $presentAppointment->id)
+            ->assertJsonPath('sessions.data.0.therapy_name', 'Terapi Wicara')
+            ->assertJsonPath('sessions.data.0.report', null);
+    }
+
+    public function test_attendance_confirmation_is_blocked_before_six_for_a_future_appointment_or_on_another_day(): void
+    {
+        $owner = $this->userWithRole('owner');
+        $patient = $this->patient();
+        $therapy = TherapyType::create(['code' => 'TW', 'name' => 'Terapi Wicara']);
+        $appointment = Appointment::create([
+            'patient_id' => $patient->id,
+            'therapy_type_id' => $therapy->id,
+            'starts_at' => Carbon::parse('2026-10-25 10:00:00'),
+            'ends_at' => Carbon::parse('2026-10-25 11:00:00'),
+            'status' => 'scheduled',
+        ]);
+
+        $this->travelTo('2026-10-25 10:59:00');
+        $this->actingAs($owner)
+            ->patch("/scheduling/{$appointment->id}/attendance", ['attendance_status' => 'present'])
+            ->assertSessionHasErrors('attendance_status');
+        $this->assertDatabaseHas('appointments', ['id' => $appointment->id, 'attendance_status' => null]);
+
+        $appointment->update([
+            'starts_at' => Carbon::parse('2026-10-24 10:00:00'),
+            'ends_at' => Carbon::parse('2026-10-24 11:00:00'),
+        ]);
+        $this->patch("/scheduling/{$appointment->id}/attendance", ['attendance_status' => 'present'])
+            ->assertSessionHasErrors('attendance_status');
+        $this->assertDatabaseHas('appointments', ['id' => $appointment->id, 'attendance_status' => null]);
+
+        $this->travelTo('2026-10-25 11:00:00');
+        $appointment->update([
+            'starts_at' => Carbon::parse('2026-10-25 11:30:00'),
+            'ends_at' => Carbon::parse('2026-10-25 12:30:00'),
+        ]);
+        $this->actingAs($owner)
+            ->patch("/scheduling/{$appointment->id}/attendance", ['attendance_status' => 'present'])
+            ->assertSessionHasErrors('attendance_status');
+        $this->assertDatabaseHas('appointments', ['id' => $appointment->id, 'attendance_status' => null]);
+    }
+
+    public function test_only_owner_and_front_office_can_access_attendance_confirmation(): void
+    {
+        $this->travelTo('2026-10-25 11:00:00');
+        $patient = $this->patient();
+        $therapy = TherapyType::create(['code' => 'TW', 'name' => 'Terapi Wicara']);
+        $appointment = Appointment::create([
+            'patient_id' => $patient->id,
+            'therapy_type_id' => $therapy->id,
+            'starts_at' => now()->subHour(),
+            'ends_at' => now()->subMinutes(10),
+            'status' => 'scheduled',
+        ]);
+
+        $this->actingAs($this->userWithRole('therapist'))
+            ->patch("/scheduling/{$appointment->id}/attendance", ['attendance_status' => 'present'])
+            ->assertForbidden();
+        $this->assertDatabaseHas('appointments', ['id' => $appointment->id, 'attendance_status' => null]);
+    }
+
+    public function test_dashboard_opens_attendance_confirmation_for_owner_and_front_office_at_six_pm_wib(): void
+    {
+        $this->travelTo('2026-10-25 10:59:00');
+        $owner = $this->userWithRole('owner');
+
+        $this->actingAs($owner)->get('/dashboard')
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('canConfirmAttendance', true)
+                ->where('attendanceConfirmationOpen', false));
+
+        $this->travelTo('2026-10-25 11:00:00');
+
+        $this->get('/dashboard')
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('canConfirmAttendance', true)
+                ->where('attendanceConfirmationOpen', true));
+
+        $frontOffice = $this->userWithRole('front_office');
+        $this->actingAs($frontOffice)->get('/dashboard')
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('canConfirmAttendance', true)
+                ->where('attendanceConfirmationOpen', true));
+    }
+
+    public function test_scheduling_offers_only_occupational_speech_and_physiotherapy_types(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+        TherapyType::create(['code' => 'SI', 'name' => 'Sensori Integrasi', 'is_active' => false]);
+        TherapyType::create(['code' => 'ABA', 'name' => 'ABA / Perilaku', 'is_active' => false]);
+        $this->actingAs($this->userWithRole('owner'));
+
+        $this->get('/scheduling')->assertOk()->assertInertia(fn (Assert $page) => $page
+            ->component('Scheduling/Index')
+            ->has('therapyTypes', 3)
+            ->where('therapyTypes.0.code', 'FT')
+            ->where('therapyTypes.1.code', 'OT')
+            ->where('therapyTypes.2.code', 'TW'));
+    }
+
+    public function test_inactive_therapy_type_cannot_be_used_for_a_new_schedule(): void
+    {
+        $this->actingAs($this->userWithRole('owner'));
+        $patient = $this->patient();
+        $inactiveTherapy = TherapyType::create(['code' => 'ABA', 'name' => 'ABA / Perilaku', 'is_active' => false]);
+        $assessment = Assessment::create(['patient_id' => $patient->id, 'status' => 'completed']);
+        $therapist = TherapistProfile::create(['user_id' => User::factory()->create()->id]);
+        $room = Room::create(['code' => 'ROOM-1', 'name' => 'Ruang Terapi']);
+
+        $this->post('/scheduling', [
+            'patient_id' => $patient->id,
+            'assessment_id' => $assessment->id,
+            'therapy_type_id' => $inactiveTherapy->id,
+            'therapist_profile_id' => $therapist->id,
+            'room_id' => $room->id,
+            'starts_at' => now()->addDay()->toDateTimeString(),
+        ])->assertSessionHasErrors('therapy_type_id');
+
+        $this->assertDatabaseMissing('appointments', [
+            'patient_id' => $patient->id,
+            'therapy_type_id' => $inactiveTherapy->id,
+        ]);
+    }
+
+    public function test_therapy_type_migration_updates_occupational_code_and_deactivates_removed_types(): void
+    {
+        $occupationalType = TherapyType::create(['code' => 'TO', 'name' => 'Terapi Okupasi']);
+        $sensoryType = TherapyType::create(['code' => 'SI', 'name' => 'Sensori Integrasi']);
+        $behavioralType = TherapyType::create(['code' => 'ABA', 'name' => 'ABA / Perilaku']);
+        DB::table('service_catalog')->insert([
+            ['code' => 'SESI-TO', 'name' => 'Sesi Terapi Okupasi', 'service_type' => 'session', 'therapy_type_id' => $occupationalType->id, 'price' => 160000, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['code' => 'SESI-SI', 'name' => 'Sesi Sensori Integrasi', 'service_type' => 'session', 'therapy_type_id' => $sensoryType->id, 'price' => 160000, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['code' => 'SESI-ABA', 'name' => 'Sesi ABA', 'service_type' => 'session', 'therapy_type_id' => $behavioralType->id, 'price' => 160000, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+        ]);
+        Room::create(['code' => 'TO', 'name' => 'Ruang Okupasi']);
+
+        $migration = require database_path('migrations/2026_11_18_134738_update_active_clinic_therapy_types.php');
+        $migration->up();
+
+        $this->assertDatabaseHas('therapy_types', ['id' => $occupationalType->id, 'code' => 'OT', 'is_active' => true]);
+        $this->assertDatabaseMissing('therapy_types', ['code' => 'TO']);
+        $this->assertDatabaseHas('therapy_types', ['id' => $sensoryType->id, 'is_active' => false]);
+        $this->assertDatabaseHas('therapy_types', ['id' => $behavioralType->id, 'is_active' => false]);
+        $this->assertDatabaseHas('therapy_types', ['code' => 'FT', 'name' => 'Fisioterapi', 'is_active' => true]);
+        $this->assertDatabaseHas('service_catalog', ['code' => 'SESI-OT', 'therapy_type_id' => $occupationalType->id]);
+        $this->assertDatabaseHas('service_catalog', ['code' => 'SESI-SI', 'is_active' => false]);
+        $this->assertDatabaseHas('service_catalog', ['code' => 'SESI-ABA', 'is_active' => false]);
+        $this->assertDatabaseHas('rooms', ['code' => 'OT', 'name' => 'Ruang Okupasi']);
+    }
+
     public function test_dashboard_today_schedule_includes_all_therapy_assessment_and_evaluation_agendas(): void
     {
         $this->travelTo('2026-10-25 07:00:00');
@@ -287,11 +495,89 @@ class ClinicWorkflowTest extends TestCase
             ->assertInertia(fn (Assert $page) => $page
                 ->component('Dashboard')
                 ->where('scheduleFilters.date', '2026-10-26')
-                ->has('therapySchedule', 1)
-                ->where('therapySchedule.0.patient.name', 'Pasien Uji')
-                ->where('therapySchedule.0.therapy_type.code', 'TW')
-                ->where('therapySchedule.0.therapist_name', 'Terapis Wati')
-                ->where('therapySchedule.0.attendance_status', 'completed'));
+                ->has('dailySchedule', 1)
+                ->where('dailySchedule.0.patient.name', 'Pasien Uji')
+                ->where('dailySchedule.0.therapy_type.code', 'TW')
+                ->where('dailySchedule.0.therapist_name', 'Terapis Wati')
+                ->where('dailySchedule.0.attendance_status', 'completed'));
+    }
+
+    public function test_dashboard_combines_assessments_and_therapy_in_the_selected_days_schedule(): void
+    {
+        $this->travelTo('2026-10-25 11:00:00');
+        $owner = $this->userWithRole('owner');
+        $patient = $this->patient();
+        $therapy = TherapyType::create(['code' => 'TW', 'name' => 'Terapi Wicara']);
+        $therapyStartsAt = Carbon::parse('2026-10-25 09:00:00');
+        $assessmentStartsAt = Carbon::parse('2026-10-25 10:00:00');
+
+        Appointment::create([
+            'patient_id' => $patient->id,
+            'therapy_type_id' => $therapy->id,
+            'starts_at' => $therapyStartsAt,
+            'ends_at' => $therapyStartsAt->copy()->addHour(),
+            'status' => 'scheduled',
+        ]);
+        Assessment::create([
+            'patient_id' => $patient->id,
+            'scheduled_at' => $assessmentStartsAt,
+            'status' => 'paid',
+            'attendance_status' => 'present',
+        ]);
+        $evaluationSale = Sale::create([
+            'invoice_number' => 'INV-EVALUASI-DASHBOARD',
+            'patient_id' => $patient->id,
+            'status' => 'paid',
+            'subtotal' => 250000,
+            'discount_total' => 0,
+            'grand_total' => 250000,
+            'paid_at' => now(),
+        ]);
+        $evaluationSale->lines()->create([
+            'line_type' => 'assessment',
+            'description' => 'Evaluasi Berkala',
+            'quantity' => 1,
+            'unit_price' => 250000,
+            'line_total' => 250000,
+        ]);
+        Assessment::create([
+            'patient_id' => $patient->id,
+            'sale_id' => $evaluationSale->id,
+            'scheduled_at' => Carbon::parse('2026-10-25 11:00:00'),
+            'status' => 'paid',
+        ]);
+
+        $this->actingAs($owner)->get('/dashboard')
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->has('dailySchedule', 3)
+                ->where('dailySchedule.0.agenda_type', 'therapy')
+                ->where('dailySchedule.1.agenda_type', 'assessment')
+                ->where('dailySchedule.1.activity_name', 'Assessment')
+                ->where('dailySchedule.1.package_label', 'Assessment')
+                ->where('dailySchedule.1.attendance_status', 'present')
+                ->where('dailySchedule.2.activity_name', 'Evaluasi Berkala')
+                ->where('dailySchedule.2.package_label', 'Evaluasi'));
+    }
+
+    public function test_owner_and_front_office_can_confirm_assessment_attendance_after_six_pm_wib(): void
+    {
+        $this->travelTo('2026-10-25 11:00:00');
+        $assessment = Assessment::create([
+            'patient_id' => $this->patient()->id,
+            'scheduled_at' => now()->subHour(),
+            'status' => 'paid',
+        ]);
+
+        $this->actingAs($this->userWithRole('front_office'))
+            ->patch("/assessments/{$assessment->id}/attendance", ['attendance_status' => 'present'])
+            ->assertRedirect();
+        $this->assertDatabaseHas('assessments', ['id' => $assessment->id, 'attendance_status' => 'present']);
+
+        $this->actingAs($this->userWithRole('owner'))
+            ->patch("/assessments/{$assessment->id}/attendance", ['attendance_status' => null])
+            ->assertRedirect();
+        $this->assertDatabaseHas('assessments', ['id' => $assessment->id, 'attendance_status' => null]);
     }
 
     public function test_scheduling_agenda_includes_the_patients_primary_whatsapp_number(): void
@@ -543,23 +829,25 @@ class ClinicWorkflowTest extends TestCase
         $this->assertDatabaseHas('patients', ['id' => $patient->id, 'is_active' => true]);
     }
 
-    public function test_patient_profile_saves_distinct_occupational_and_speech_therapists(): void
+    public function test_patient_profile_saves_distinct_occupational_speech_and_physiotherapy_therapists(): void
     {
         $this->actingAs($this->userWithRole('owner'));
         $patient = $this->patient();
-        $occupationalType = TherapyType::create(['code' => 'TO', 'name' => 'Terapi Okupasi']);
+        $occupationalType = TherapyType::create(['code' => 'OT', 'name' => 'Terapi Okupasi']);
         $speechType = TherapyType::create(['code' => 'TW', 'name' => 'Terapi Wicara']);
+        $physiotherapyType = TherapyType::firstOrCreate(['code' => 'FT'], ['name' => 'Fisioterapi']);
         $occupationalProfile = TherapistProfile::create(['user_id' => User::factory()->create()->id]);
         $speechProfile = TherapistProfile::create(['user_id' => User::factory()->create()->id]);
+        $physiotherapyProfile = TherapistProfile::create(['user_id' => User::factory()->create()->id]);
 
         $this->put("/patients/{$patient->id}", [
             'name' => $patient->name,
-            'therapist_assignments' => ['TO' => $occupationalProfile->id, 'TW' => $occupationalProfile->id],
+            'therapist_assignments' => ['OT' => $occupationalProfile->id, 'TW' => $occupationalProfile->id],
         ])->assertSessionHasErrors('therapist_assignments.TW');
 
         $this->put("/patients/{$patient->id}", [
             'name' => $patient->name,
-            'therapist_assignments' => ['TO' => $occupationalProfile->id, 'TW' => $speechProfile->id],
+            'therapist_assignments' => ['OT' => $occupationalProfile->id, 'TW' => $speechProfile->id, 'FT' => $physiotherapyProfile->id],
         ])->assertRedirect('/patients');
 
         $this->assertDatabaseHas('patient_therapists', [
@@ -572,20 +860,28 @@ class ClinicWorkflowTest extends TestCase
             'therapy_type_id' => $speechType->id,
             'therapist_profile_id' => $speechProfile->id,
         ]);
+        $this->assertDatabaseHas('patient_therapists', [
+            'patient_id' => $patient->id,
+            'therapy_type_id' => $physiotherapyType->id,
+            'therapist_profile_id' => $physiotherapyProfile->id,
+        ]);
 
         $this->get('/patients')->assertOk()->assertInertia(fn (Assert $page) => $page
             ->component('Patients/Index')
-            ->where('patients.data.0.therapist_assignments.TO', $occupationalProfile->id)
-            ->where('patients.data.0.therapist_assignments.TW', $speechProfile->id));
+            ->where('patients.data.0.therapist_assignments.OT', $occupationalProfile->id)
+            ->where('patients.data.0.therapist_assignments.TW', $speechProfile->id)
+            ->where('patients.data.0.therapist_assignments.FT', $physiotherapyProfile->id));
     }
 
-    public function test_assessment_completion_saves_a_single_optional_therapist_assignment(): void
+    public function test_assessment_completion_saves_optional_therapy_assignments(): void
     {
         $this->actingAs($this->userWithRole('owner'));
         $patient = $this->patient();
         $speechType = TherapyType::create(['code' => 'TW', 'name' => 'Terapi Wicara']);
-        TherapyType::create(['code' => 'TO', 'name' => 'Terapi Okupasi']);
+        TherapyType::create(['code' => 'OT', 'name' => 'Terapi Okupasi']);
+        $physiotherapyType = TherapyType::firstOrCreate(['code' => 'FT'], ['name' => 'Fisioterapi']);
         $speechProfile = TherapistProfile::create(['user_id' => User::factory()->create()->id]);
+        $physiotherapyProfile = TherapistProfile::create(['user_id' => User::factory()->create()->id]);
         $sale = Sale::create([
             'invoice_number' => 'INV-ASSESSMENT-THERAPIST',
             'patient_id' => $patient->id,
@@ -604,7 +900,7 @@ class ClinicWorkflowTest extends TestCase
 
         $this->put(route('assessments.complete', $assessment), [
             'chief_complaint' => 'Perlu pendampingan terapi wicara.',
-            'therapist_assignments' => ['TO' => '', 'TW' => $speechProfile->id],
+            'therapist_assignments' => ['OT' => '', 'TW' => $speechProfile->id, 'FT' => $physiotherapyProfile->id],
         ])->assertRedirect('/assessments');
 
         $this->assertDatabaseHas('assessments', ['id' => $assessment->id, 'status' => 'completed']);
@@ -613,11 +909,19 @@ class ClinicWorkflowTest extends TestCase
             'therapy_type_id' => $speechType->id,
             'therapist_profile_id' => $speechProfile->id,
         ]);
-        $this->assertDatabaseCount('patient_therapists', 1);
+        $this->assertDatabaseHas('patient_therapists', [
+            'patient_id' => $patient->id,
+            'therapy_type_id' => $physiotherapyType->id,
+            'therapist_profile_id' => $physiotherapyProfile->id,
+        ]);
+        $this->assertDatabaseCount('patient_therapists', 2);
         $this->get('/assessments')->assertOk()->assertInertia(fn (Assert $page) => $page
             ->component('Assessments/Index')
-            ->where('assessments.data.0.patient.recommended_therapists.0.therapy_name', 'Terapi Wicara')
-            ->where('assessments.data.0.patient.recommended_therapists.0.therapist_name', $speechProfile->user->name));
+            ->where('assessments.data.0.patient.recommended_therapists', fn ($assignments): bool => collect($assignments)
+                ->pluck('therapy_name')
+                ->sort()
+                ->values()
+                ->all() === ['Fisioterapi', 'Terapi Wicara']));
         $this->get(route('assessments.pdf', $assessment))->assertOk();
     }
 
@@ -737,7 +1041,7 @@ class ClinicWorkflowTest extends TestCase
         $thirdTherapist = User::factory()->create();
         $thirdProfile = TherapistProfile::create(['user_id' => $thirdTherapist->id, 'specialty' => 'Okupasi']);
         $therapy = TherapyType::create(['code' => 'TW', 'name' => 'Terapi Wicara', 'default_duration_minutes' => 30]);
-        $otherTherapy = TherapyType::create(['code' => 'TO', 'name' => 'Terapi Okupasi', 'default_duration_minutes' => 45]);
+        $otherTherapy = TherapyType::create(['code' => 'OT', 'name' => 'Terapi Okupasi', 'default_duration_minutes' => 45]);
         $this->sessionTariff($therapy);
         $this->sessionTariff($otherTherapy);
         $this->assignTherapist($patient, $therapy, $firstProfile);
@@ -809,7 +1113,7 @@ class ClinicWorkflowTest extends TestCase
         $profile = TherapistProfile::create(['user_id' => $therapist->id, 'specialty' => 'Wicara']);
         $room = Room::create(['code' => 'R1', 'name' => 'Ruang 1']);
         $legacyTherapy = TherapyType::create(['code' => 'TW', 'name' => 'Terapi Wicara', 'default_duration_minutes' => 60]);
-        $durationTherapy = TherapyType::create(['code' => 'TO', 'name' => 'Terapi Okupasi', 'default_duration_minutes' => 30]);
+        $durationTherapy = TherapyType::create(['code' => 'OT', 'name' => 'Terapi Okupasi', 'default_duration_minutes' => 30]);
         $catalog = PackageCatalog::create([
             'name' => 'Paket pemulihan uji',
             'validity_days' => 90,
@@ -912,7 +1216,7 @@ class ClinicWorkflowTest extends TestCase
 
         $this->put("/patients/{$otherPatient->id}", [
             'name' => $otherPatient->name,
-            'therapist_assignments' => ['TO' => '', 'TW' => $profile->id],
+            'therapist_assignments' => ['OT' => '', 'TW' => $profile->id],
         ])->assertSessionHasErrors('therapist_assignments.TW');
 
         $this->assertDatabaseHas('patient_therapists', [
@@ -1059,7 +1363,7 @@ class ClinicWorkflowTest extends TestCase
         $otherTherapist = $this->userWithRole('therapist');
         $therapistProfile = TherapistProfile::create(['user_id' => $therapist->id]);
         $otherTherapistProfile = TherapistProfile::create(['user_id' => $otherTherapist->id]);
-        $therapy = TherapyType::create(['code' => 'TO', 'name' => 'Terapi Okupasi', 'default_duration_minutes' => 60]);
+        $therapy = TherapyType::create(['code' => 'OT', 'name' => 'Terapi Okupasi', 'default_duration_minutes' => 60]);
         $assignedPatient = $this->patient();
         $otherPatient = Patient::create(['patient_code' => 'KL-2026-002', 'name' => 'Pasien Lain', 'is_active' => true]);
         $unassignedPatient = Patient::create(['patient_code' => 'KL-2026-003', 'name' => 'Pasien Belum Ditugaskan', 'is_active' => true]);
@@ -1103,7 +1407,7 @@ class ClinicWorkflowTest extends TestCase
         $secondTherapist = User::factory()->create();
         $firstProfile = TherapistProfile::create(['user_id' => $firstTherapist->id]);
         $secondProfile = TherapistProfile::create(['user_id' => $secondTherapist->id]);
-        $therapy = TherapyType::create(['code' => 'TO', 'name' => 'Terapi Okupasi', 'default_duration_minutes' => 60]);
+        $therapy = TherapyType::create(['code' => 'OT', 'name' => 'Terapi Okupasi', 'default_duration_minutes' => 60]);
 
         foreach ([[$firstProfile, $this->patient()], [$secondProfile, Patient::create([
             'patient_code' => 'KL-2026-002',
@@ -1133,7 +1437,7 @@ class ClinicWorkflowTest extends TestCase
         $assignedTherapist = User::factory()->create();
         $assignedProfile = TherapistProfile::create(['user_id' => $assignedTherapist->id]);
         $patient = $this->patient();
-        $therapy = TherapyType::create(['code' => 'TO', 'name' => 'Terapi Okupasi', 'default_duration_minutes' => 60]);
+        $therapy = TherapyType::create(['code' => 'OT', 'name' => 'Terapi Okupasi', 'default_duration_minutes' => 60]);
         $appointment = Appointment::create([
             'patient_id' => $patient->id,
             'therapy_type_id' => $therapy->id,
@@ -1155,8 +1459,8 @@ class ClinicWorkflowTest extends TestCase
         $therapist = $this->userWithRole('therapist');
         $this->actingAs($therapist);
         $patient = $this->patient();
-        $therapy = TherapyType::create(['code' => 'TO', 'name' => 'Terapi Okupasi', 'default_duration_minutes' => 60]);
-        $room = Room::create(['code' => 'TO-1', 'name' => 'Ruang Okupasi']);
+        $therapy = TherapyType::create(['code' => 'OT', 'name' => 'Terapi Okupasi', 'default_duration_minutes' => 60]);
+        $room = Room::create(['code' => 'OT-1', 'name' => 'Ruang Okupasi']);
         $profile = TherapistProfile::create(['user_id' => $therapist->id]);
         $packageCatalogId = DB::table('package_catalog')->insertGetId([
             'name' => 'Paket uji', 'validity_days' => 30, 'price' => 800000, 'is_active' => true,
@@ -1200,8 +1504,8 @@ class ClinicWorkflowTest extends TestCase
         $therapist = $this->userWithRole('therapist');
         $this->actingAs($therapist);
         $patient = $this->patient();
-        $therapy = TherapyType::create(['code' => 'TO', 'name' => 'Terapi Okupasi', 'default_duration_minutes' => 60]);
-        $room = Room::create(['code' => 'TO-1', 'name' => 'Ruang Okupasi']);
+        $therapy = TherapyType::create(['code' => 'OT', 'name' => 'Terapi Okupasi', 'default_duration_minutes' => 60]);
+        $room = Room::create(['code' => 'OT-1', 'name' => 'Ruang Okupasi']);
         $profile = TherapistProfile::create(['user_id' => $therapist->id]);
         $packageCatalogId = DB::table('package_catalog')->insertGetId([
             'name' => 'Paket durasi uji', 'validity_days' => 30, 'price' => 570000,

@@ -46,17 +46,18 @@ class AssessmentController extends Controller
             ->whereIn('id', $serviceIds)
             ->pluck('name', 'id');
         $therapyTypes = TherapyType::query()
-            ->whereIn('code', ['TO', 'TW'])
             ->get(['id', 'name'])
             ->keyBy('id');
 
         $assessments->getCollection()->each(function (Assessment $assessment) use ($serviceNames, $therapyTypes): void {
             $assessment->service_name = $serviceNames->get($assessment->sale?->lines->first()?->service_catalog_id);
-            $assessment->patient->setAttribute(
-                'recommended_therapists',
-                $this->recommendedTherapists($assessment->patient, $therapyTypes),
-            );
-            $assessment->patient->unsetRelation('therapists');
+            if ($assessment->patient) {
+                $assessment->patient->setAttribute(
+                    'recommended_therapists',
+                    $this->recommendedTherapists($assessment->patient, $therapyTypes),
+                );
+                $assessment->patient->unsetRelation('therapists');
+            }
         });
 
         return Inertia::render('Assessments/Index', [
@@ -189,6 +190,43 @@ class AssessmentController extends Controller
         return redirect()->route('scheduling.index')->with('success', 'Jadwal assessment berhasil diperbarui.');
     }
 
+    public function confirmAttendance(Request $request, Assessment $assessment): RedirectResponse
+    {
+        $data = $request->validate([
+            'attendance_status' => ['present', 'nullable', Rule::in(['present', 'absent'])],
+        ]);
+        $attendanceStatus = $data['attendance_status'] ?? null;
+
+        DB::transaction(function () use ($assessment, $attendanceStatus): void {
+            $lockedAssessment = Assessment::query()->whereKey($assessment->id)->lockForUpdate()->firstOrFail();
+            $clinicNow = Carbon::now('Asia/Jakarta');
+            $assessmentStartsAt = $lockedAssessment->scheduled_at?->copy()->setTimezone('Asia/Jakarta');
+
+            if ($clinicNow->hour < 18
+                || $assessmentStartsAt === null
+                || ! $assessmentStartsAt->isSameDay($clinicNow)
+                || $assessmentStartsAt->greaterThan($clinicNow)) {
+                throw ValidationException::withMessages([
+                    'attendance_status' => 'Konfirmasi kehadiran tersedia mulai pukul 18.00 WIB untuk jadwal yang sudah berlangsung hari ini.',
+                ]);
+            }
+
+            if (! in_array($lockedAssessment->status, ['awaiting_payment', 'paid', 'scheduled'], true)) {
+                throw ValidationException::withMessages([
+                    'attendance_status' => 'Assessment ini sudah selesai atau jadwalnya tidak lagi aktif.',
+                ]);
+            }
+
+            $lockedAssessment->update(['attendance_status' => $attendanceStatus]);
+        });
+
+        return back()->with('success', match ($attendanceStatus) {
+            'present' => 'Kehadiran assessment berhasil dikonfirmasi.',
+            'absent' => 'Pasien ditandai tidak hadir pada jadwal assessment.',
+            default => 'Konfirmasi kehadiran assessment dibatalkan.',
+        });
+    }
+
     public function complete(Assessment $assessment): Response
     {
         $assessment->load([
@@ -200,13 +238,15 @@ class AssessmentController extends Controller
         abort_unless($assessment->status === 'paid' && $assessment->sale?->status === 'paid', 403);
 
         $therapyTypes = TherapyType::query()
-            ->whereIn('code', ['TO', 'TW'])
+            ->where('is_active', true)
+            ->whereIn('code', ['OT', 'TW', 'FT'])
             ->orderBy('name')
             ->get(['id', 'code', 'name']);
         $therapistAssignments = DB::table('patient_therapists')
             ->join('therapy_types', 'therapy_types.id', '=', 'patient_therapists.therapy_type_id')
             ->where('patient_therapists.patient_id', $assessment->patient_id)
-            ->whereIn('therapy_types.code', ['TO', 'TW'])
+            ->where('therapy_types.is_active', true)
+            ->whereIn('therapy_types.code', ['OT', 'TW', 'FT'])
             ->pluck('patient_therapists.therapist_profile_id', 'therapy_types.code')
             ->map(fn (int $id): int => $id)
             ->all();
@@ -245,9 +285,9 @@ class AssessmentController extends Controller
             'summary' => ['nullable', 'string', 'max:5000'],
             'referral_notes' => ['nullable', 'string', 'max:3000'],
             'recommendations' => ['nullable', 'array'],
-            'recommendations.*.therapy_type_id' => ['required', 'exists:therapy_types,id'],
+            'recommendations.*.therapy_type_id' => ['required', Rule::exists('therapy_types', 'id')->where('is_active', true)],
             'recommendations.*.sessions_per_week' => ['required', 'integer', 'min:1', 'max:7'],
-            'therapist_assignments' => ['nullable', 'array:TO,TW'],
+            'therapist_assignments' => ['nullable', 'array:OT,TW,FT'],
             'therapist_assignments.*' => ['nullable', 'integer', 'exists:therapist_profiles,id', $uniqueTherapist],
         ]);
         $therapistAssignments = $data['therapist_assignments'] ?? [];
@@ -318,7 +358,6 @@ class AssessmentController extends Controller
 
         $assessment->load(['patient.parents', 'patient.therapists.user']);
         $therapyTypes = TherapyType::query()
-            ->whereIn('code', ['TO', 'TW'])
             ->get(['id', 'name'])
             ->keyBy('id');
         $assessment->patient->setAttribute(

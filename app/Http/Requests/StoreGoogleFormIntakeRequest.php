@@ -33,6 +33,10 @@ class StoreGoogleFormIntakeRequest extends FormRequest
             'source' => ['required', 'string', 'in:google_forms', 'max:100'],
             'response_id' => ['required', 'string', 'max:255'],
             'submitted_at' => ['nullable', 'date'],
+            'other_answers' => ['sometimes', 'nullable', 'array', 'max:100'],
+            'other_answers.*' => ['required', 'array:question,answer'],
+            'other_answers.*.question' => ['required', 'string', 'max:500'],
+            'other_answers.*.answer' => ['required', 'string', 'max:20000'],
         ];
 
         foreach ($answerGroups as $group => $keys) {

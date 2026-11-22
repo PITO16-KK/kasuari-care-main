@@ -1,0 +1,10 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+# Protect sensitive files
+<Files ~ "^(\.env|\.git|composer\.(json|lock)|package\.(json|lock)|artisan)">
+    Order allow,deny
+    Deny from all
+</Files>

@@ -211,7 +211,7 @@ const time = (value) => new Intl.DateTimeFormat('id-ID', {
                         Terapis yang ditugaskan
                         <select v-model="filtersForm.therapist_id" class="field-input">
                             <option value="">Semua terapis</option>
-                            <option v-for="therapist in therapists" :key="therapist.id" :value="String(therapist.id)">{{ therapist.user.name }}</option>
+                            <option v-for="therapist in therapists" :key="therapist.id" :value="String(therapist.id)">{{ therapist.user?.name || 'Terapis' }}</option>
                         </select>
                     </label>
                     <div class="flex flex-col gap-2 sm:flex-row sm:items-end">
@@ -239,12 +239,12 @@ const time = (value) => new Intl.DateTimeFormat('id-ID', {
                 <div class="flex items-start justify-between gap-3 border-b border-slate-100 px-4 py-4 sm:px-5">
                     <div>
                         <h2 class="text-sm font-bold text-clinic-900 sm:text-base">Sesi pada periode terpilih</h2>
-                        <p class="mt-1 text-xs leading-5 text-slate-600">{{ appointments.total }} sesi ditemukan. Laporan hanya dapat dikirim sesuai sisa kuota paket.</p>
+                        <p class="mt-1 text-xs leading-5 text-slate-600">{{ appointments?.total ?? 0 }} sesi ditemukan. Laporan hanya dapat dikirim sesuai sisa kuota paket.</p>
                     </div>
                     <Activity :size="20" class="mt-0.5 shrink-0 text-clinic-700" aria-hidden="true" />
                 </div>
 
-                <div v-if="appointments.data.length" class="divide-y divide-slate-100">
+                <div v-if="appointments?.data?.length" class="divide-y divide-slate-100">
                     <article v-for="appointment in appointments.data" :key="appointment.id" class="px-4 py-4 sm:px-5 sm:py-5">
                         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div class="flex min-w-0 items-start gap-3">
@@ -252,11 +252,11 @@ const time = (value) => new Intl.DateTimeFormat('id-ID', {
                                     <ClipboardCheck :size="19" />
                                 </span>
                                 <div class="min-w-0">
-                                    <h3 class="break-words text-sm font-semibold leading-5 text-slate-800">{{ appointment.patient.name }}</h3>
+                                    <h3 class="break-words text-sm font-semibold leading-5 text-slate-800">{{ appointment.patient?.name ?? 'Pasien tidak ditemukan' }}</h3>
                                     <div class="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs leading-5 text-slate-600">
-                                        <span class="font-mono text-slate-500">{{ appointment.patient.patient_code }}</span>
+                                        <span class="font-mono text-slate-500">{{ appointment.patient?.patient_code ?? '-' }}</span>
                                         <span aria-hidden="true">·</span>
-                                        <span>{{ appointment.therapy_type.name }}</span>
+                                        <span>{{ appointment.therapy_type?.name ?? '-' }}</span>
                                         <span aria-hidden="true">·</span>
                                         <span>{{ time(appointment.starts_at) }}</span>
                                         <span aria-hidden="true">·</span>
@@ -476,7 +476,7 @@ const time = (value) => new Intl.DateTimeFormat('id-ID', {
                     </div>
                 </div>
 
-                <nav v-if="appointments.links.length > 3" aria-label="Halaman laporan sesi" class="flex flex-wrap justify-center gap-1 border-t border-slate-100 px-4 py-3">
+                <nav v-if="appointments?.links?.length > 3" aria-label="Halaman laporan sesi" class="flex flex-wrap justify-center gap-1 border-t border-slate-100 px-4 py-3">
                     <template v-for="link in appointments.links" :key="link.label">
                         <Link
                             v-if="link.url"

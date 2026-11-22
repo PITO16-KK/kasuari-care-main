@@ -18,7 +18,7 @@ const form = useForm({
     father_whatsapp: '',
     mother_name: '',
     mother_whatsapp: '',
-    therapist_assignments: { TO: '', TW: '' },
+    therapist_assignments: { OT: '', TW: '', FT: '' },
 });
 
 const showingForm = ref(false);
@@ -73,8 +73,9 @@ function openEditForm(patient) {
         mother_name: mother?.name ?? '',
         mother_whatsapp: mother?.whatsapp ?? '',
         therapist_assignments: {
-            TO: patient.therapist_assignments?.TO ?? '',
+            OT: patient.therapist_assignments?.OT ?? '',
             TW: patient.therapist_assignments?.TW ?? '',
+            FT: patient.therapist_assignments?.FT ?? '',
         },
     });
     editingId.value = patient.id;
@@ -228,9 +229,9 @@ function packageStatus(packageData) {
 
 function sessionFields(session) {
     return [
-        { label: 'Aktivitas sesi', value: session.report.activities },
-        { label: 'Catatan untuk orang tua', value: session.report.parent_notes },
-        { label: 'Latihan di rumah', value: session.report.homework },
+        { label: 'Aktivitas sesi', value: session.report?.activities },
+        { label: 'Catatan untuk orang tua', value: session.report?.parent_notes },
+        { label: 'Latihan di rumah', value: session.report?.homework },
     ].filter((field) => field.value);
 }
 
@@ -280,10 +281,10 @@ const parentNames = (patient) => patient.parents.map((parent) => parent.name).jo
 
                 <section class="mt-5 rounded-lg border border-slate-200 bg-slate-50 p-4">
                     <h3 class="text-sm font-semibold text-clinic-900">Rekomendasi terapis</h3>
-                    <p class="mt-1 text-xs leading-5 text-slate-500">Setiap anak dapat memiliki satu terapis okupasi dan satu terapis wicara. Terapis yang sama hanya dapat ditugaskan kepada satu anak.</p>
-                    <div class="mt-3 grid gap-4 sm:grid-cols-2">
-                        <label v-for="code in ['TO', 'TW']" :key="code" class="field-label">
-                            {{ therapyTypes.find((type) => type.code === code)?.name ?? (code === 'TO' ? 'Terapi Okupasi' : 'Terapi Wicara') }}
+                    <p class="mt-1 text-xs leading-5 text-slate-500">Tentukan terapis untuk setiap jenis terapi yang direkomendasikan. Terapis yang sama hanya dapat ditugaskan kepada satu anak.</p>
+                    <div class="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                        <label v-for="code in ['OT', 'TW', 'FT']" :key="code" class="field-label">
+                            {{ therapyTypes.find((type) => type.code === code)?.name ?? ({ OT: 'Terapi Okupasi', TW: 'Terapi Wicara', FT: 'Fisioterapi' }[code]) }}
                             <select v-model="form.therapist_assignments[code]" class="field-input">
                                 <option value="">Belum ditentukan</option>
                                 <option v-for="therapist in therapists" :key="therapist.id" :value="therapist.id" :disabled="isTherapistUnavailable(therapist, code)">
@@ -408,7 +409,7 @@ const parentNames = (patient) => patient.parents.map((parent) => parent.name).jo
                             <h3 id="patient-session-history-heading" class="text-sm font-semibold text-clinic-900">Riwayat sesi terapi selesai</h3>
                             <p class="text-xs text-slate-500">{{ patientDetails.sessions.total }} sesi</p>
                         </div>
-                        <p v-if="!patientDetails.sessions.total" class="mt-3 text-sm text-slate-600">Belum ada sesi terapi selesai dengan laporan yang dikirim.</p>
+                        <p v-if="!patientDetails.sessions.total" class="mt-3 text-sm text-slate-600">Belum ada sesi terapi yang tercatat.</p>
                         <div v-else class="mt-3 space-y-3">
                             <article v-for="session in patientDetails.sessions.data" :key="session.id" class="rounded-lg border border-slate-200 p-3.5 sm:p-4">
                                 <header class="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
@@ -416,7 +417,7 @@ const parentNames = (patient) => patient.parents.map((parent) => parent.name).jo
                                         <h4 class="text-sm font-semibold text-slate-800">{{ session.therapy_name || 'Jenis terapi' }}</h4>
                                         <p class="mt-1 text-xs leading-5 text-slate-600">{{ formatDateTime(session.starts_at) }} · Terapis: {{ session.therapist_name || 'Belum ditentukan' }}</p>
                                     </div>
-                                    <p class="text-xs text-slate-500">Laporan: {{ formatDateTime(session.report.submitted_at) }}</p>
+                                    <p class="text-xs text-slate-500">Laporan: {{ session.report?.submitted_at ? formatDateTime(session.report.submitted_at) : 'Belum dikirim' }}</p>
                                 </header>
                                 <dl v-if="sessionFields(session).length" class="mt-3 space-y-2 border-t border-slate-100 pt-3">
                                     <div v-for="field in sessionFields(session)" :key="field.label">
@@ -424,6 +425,7 @@ const parentNames = (patient) => patient.parents.map((parent) => parent.name).jo
                                         <dd class="mt-1 whitespace-pre-line break-words text-sm leading-5 text-slate-700">{{ field.value }}</dd>
                                     </div>
                                 </dl>
+                                <p v-else-if="!session.report" class="mt-3 border-t border-slate-100 pt-3 text-xs text-slate-500">Kehadiran pasien sudah dikonfirmasi. Laporan terapis belum dikirim.</p>
                                 <p v-else class="mt-3 border-t border-slate-100 pt-3 text-xs text-slate-500">Laporan ini tidak berisi catatan tambahan.</p>
                             </article>
                         </div>

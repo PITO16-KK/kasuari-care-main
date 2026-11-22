@@ -11,7 +11,7 @@ class Assessment extends Model
     public const SCHEDULE_DURATION_MINUTES = 60;
 
     protected $fillable = [
-        'patient_id', 'sale_id', 'therapist_profile_id', 'status', 'scheduled_at', 'completed_at', 'chief_complaint',
+        'patient_id', 'sale_id', 'therapist_profile_id', 'status', 'attendance_status', 'scheduled_at', 'completed_at', 'chief_complaint',
         'development_history', 'learning_behavior', 'summary', 'referral_notes', 'created_by',
     ];
 

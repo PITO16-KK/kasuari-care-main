@@ -31,6 +31,7 @@ class GoogleFormIntakeWebhookController extends Controller
 
         foreach ([
             'child_data', 'father_data', 'mother_data', 'family_context', 'development_history', 'health_history',
+            'other_answers',
         ] as $group) {
             $attributes[$group] = $data[$group] ?? null;
         }

@@ -26,7 +26,7 @@ const expenseForm = useForm({
     proof: null,
 });
 const payrollForm = useForm({
-    therapist_profile_id: props.therapists[0]?.id ?? '',
+    therapist_profile_id: props.therapists?.[0]?.id ?? '',
     payroll_period: props.currentPayrollPeriod,
     amount: '',
     payment_date: props.today,
@@ -122,14 +122,14 @@ function submitPayroll() {
 
         <section class="mt-4 grid gap-3 sm:grid-cols-2" :class="payrollSummary ? 'xl:grid-cols-2' : 'xl:grid-cols-1'" aria-label="Ringkasan pengeluaran periode">
             <article class="rounded-xl border border-[#e9e6de] bg-white p-4 sm:p-5">
-                <p class="text-xs font-medium text-slate-500">Pengeluaran periode <span class="font-normal">({{ expenseSummary.count }} catatan)</span></p>
+                <p class="text-xs font-medium text-slate-500">Pengeluaran periode <span class="font-normal">({{ expenseSummary?.count ?? 0 }} catatan)</span></p>
                 <p class="mt-1 text-xs text-slate-500">{{ selectedAccountingPeriod }}</p>
-                <p class="mt-2 text-xl font-semibold text-clinic-900">{{ money(expenseSummary.amount) }}</p>
+                <p class="mt-2 text-xl font-semibold text-clinic-900">{{ money(expenseSummary?.amount) }}</p>
             </article>
             <article v-if="payrollSummary" class="rounded-xl border border-[#e9e6de] bg-white p-4 sm:p-5">
-                <p class="text-xs font-medium text-slate-500">Gaji dibayar periode <span class="font-normal">({{ payrollSummary.count }} pembayaran)</span></p>
+                <p class="text-xs font-medium text-slate-500">Gaji dibayar periode <span class="font-normal">({{ payrollSummary?.count ?? 0 }} pembayaran)</span></p>
                 <p class="mt-1 text-xs text-slate-500">{{ selectedAccountingPeriod }}</p>
-                <p class="mt-2 text-xl font-semibold text-clinic-900">{{ money(payrollSummary.amount) }}</p>
+                <p class="mt-2 text-xl font-semibold text-clinic-900">{{ money(payrollSummary?.amount) }}</p>
             </article>
         </section>
 
@@ -193,12 +193,12 @@ function submitPayroll() {
                 <form class="mt-5 space-y-4" @submit.prevent="submitPayroll">
                     <label class="block text-sm font-medium text-slate-700">
                         Terapis
-                        <select v-model="payrollForm.therapist_profile_id" required :disabled="!therapists.length" class="mt-1.5 min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-800 focus:border-clinic-700 focus:outline-none focus:ring-2 focus:ring-clinic-100 disabled:bg-slate-100" :aria-invalid="Boolean(payrollForm.errors.therapist_profile_id)">
+                        <select v-model="payrollForm.therapist_profile_id" required :disabled="!therapists?.length" class="mt-1.5 min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-800 focus:border-clinic-700 focus:outline-none focus:ring-2 focus:ring-clinic-100 disabled:bg-slate-100" :aria-invalid="Boolean(payrollForm.errors.therapist_profile_id)">
                             <option value="" disabled>Pilih terapis</option>
-                            <option v-for="therapist in therapists" :key="therapist.id" :value="String(therapist.id)">{{ therapist.name }}</option>
+                            <option v-for="therapist in (therapists ?? [])" :key="therapist.id" :value="String(therapist.id)">{{ therapist.name }}</option>
                         </select>
                         <span v-if="payrollForm.errors.therapist_profile_id" class="mt-1 block text-xs font-medium text-rose-700" role="alert">{{ payrollForm.errors.therapist_profile_id }}</span>
-                        <span v-else-if="!therapists.length" class="mt-1 block text-xs text-slate-500">Belum ada terapis aktif.</span>
+                        <span v-else-if="!therapists?.length" class="mt-1 block text-xs text-slate-500">Belum ada terapis aktif.</span>
                     </label>
 
                     <div class="grid gap-4 sm:grid-cols-2">
@@ -244,11 +244,11 @@ function submitPayroll() {
             <header class="flex flex-wrap items-center justify-between gap-2 border-b border-[#efede6] px-4 py-4 sm:px-5">
                 <div>
                     <h2 id="expense-history-title" class="text-base font-semibold text-clinic-900">Riwayat pengeluaran</h2>
-                    <p class="mt-1 text-sm text-slate-500">{{ expenses.total }} catatan pengeluaran</p>
+                    <p class="mt-1 text-sm text-slate-500">{{ expenses?.total ?? 0 }} catatan pengeluaran</p>
                 </div>
             </header>
 
-            <div v-if="expenses.data.length" class="divide-y divide-slate-100">
+            <div v-if="expenses?.data?.length" class="divide-y divide-slate-100">
                 <article v-for="expense in expenses.data" :key="expense.id" class="flex flex-col gap-2 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
                     <div class="min-w-0">
                         <h3 class="truncate text-sm font-semibold text-slate-800">{{ expense.name }}</h3>
@@ -267,7 +267,7 @@ function submitPayroll() {
                 <p class="mt-1 text-sm text-slate-500">Pengeluaran yang disimpan akan muncul di sini.</p>
             </div>
 
-            <nav v-if="expenses.links.length > 3" aria-label="Halaman riwayat pengeluaran" class="flex flex-wrap justify-center gap-1 border-t border-slate-100 px-4 py-3">
+            <nav v-if="expenses?.links?.length > 3" aria-label="Halaman riwayat pengeluaran" class="flex flex-wrap justify-center gap-1 border-t border-slate-100 px-4 py-3">
                 <template v-for="link in expenses.links" :key="link.label">
                     <Link v-if="link.url" :href="link.url" preserve-scroll class="rounded-md border px-3 py-2 text-xs" :class="link.active ? 'border-clinic-700 bg-clinic-700 text-white' : 'border-slate-200 text-slate-600 hover:bg-slate-50'" v-html="link.label" />
                     <span v-else class="rounded-md border border-slate-100 px-3 py-2 text-xs text-slate-300" v-html="link.label"></span>
@@ -279,11 +279,11 @@ function submitPayroll() {
             <header class="flex flex-wrap items-center justify-between gap-2 border-b border-[#efede6] px-4 py-4 sm:px-5">
                 <div>
                     <h2 id="payroll-history-title" class="text-base font-semibold text-clinic-900">Riwayat penggajian terapis</h2>
-                    <p class="mt-1 text-sm text-slate-500">{{ payrolls.total }} pembayaran tercatat</p>
+                    <p class="mt-1 text-sm text-slate-500">{{ payrolls?.total ?? 0 }} pembayaran tercatat</p>
                 </div>
             </header>
 
-            <div v-if="payrolls.data.length" class="divide-y divide-slate-100">
+            <div v-if="payrolls?.data?.length" class="divide-y divide-slate-100">
                 <article v-for="payroll in payrolls.data" :key="payroll.id" class="flex flex-col gap-2 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
                     <div class="min-w-0">
                         <h3 class="truncate text-sm font-semibold text-slate-800">{{ payroll.therapist_name }}</h3>
@@ -302,7 +302,7 @@ function submitPayroll() {
                 <p class="mt-1 text-sm text-slate-500">Pembayaran gaji yang disimpan akan muncul di sini.</p>
             </div>
 
-            <nav v-if="payrolls.links.length > 3" aria-label="Halaman riwayat penggajian" class="flex flex-wrap justify-center gap-1 border-t border-slate-100 px-4 py-3">
+            <nav v-if="payrolls?.links?.length > 3" aria-label="Halaman riwayat penggajian" class="flex flex-wrap justify-center gap-1 border-t border-slate-100 px-4 py-3">
                 <template v-for="link in payrolls.links" :key="link.label">
                     <Link v-if="link.url" :href="link.url" preserve-scroll class="rounded-md border px-3 py-2 text-xs" :class="link.active ? 'border-clinic-700 bg-clinic-700 text-white' : 'border-slate-200 text-slate-600 hover:bg-slate-50'" v-html="link.label" />
                     <span v-else class="rounded-md border border-slate-100 px-3 py-2 text-xs text-slate-300" v-html="link.label"></span>

@@ -14,6 +14,7 @@ use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SessionReportController;
 use App\Http\Controllers\TherapistController;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -47,7 +48,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/scheduling', [AppointmentController::class, 'index'])->name('scheduling.index');
         Route::post('/scheduling', [AppointmentController::class, 'store'])->name('scheduling.store');
         Route::put('/scheduling/{appointment}', [AppointmentController::class, 'update'])->name('scheduling.update');
+        Route::patch('/scheduling/{appointment}/attendance', [AppointmentController::class, 'confirmAttendance'])->name('scheduling.attendance.confirm');
         Route::patch('/scheduling/{appointment}/cancel', [AppointmentController::class, 'cancel'])->name('scheduling.cancel');
+        Route::patch('/assessments/{assessment}/attendance', [AssessmentController::class, 'confirmAttendance'])->name('assessments.attendance.confirm');
         Route::patch('/assessments/{assessment}/schedule', [AssessmentController::class, 'reschedule'])->name('assessments.schedule.update');
         Route::patch('/patient-intakes/{submission}/status', [PatientIntakeSubmissionController::class, 'updateVerificationStatus'])->name('patient-intakes.status.update');
         Route::post('/patient-intakes/{submission}/link', [PatientIntakeSubmissionController::class, 'linkPatient'])->name('patient-intakes.link');
@@ -99,7 +102,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/bersihkan-cache', function () {
-    \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+    Artisan::call('optimize:clear');
 
-    return '<pre>'.\Illuminate\Support\Facades\Artisan::output().'</pre><p style="color: green; font-weight: bold; font-family: sans-serif;">✓ Cache Laravel berhasil dibersihkan!</p>';
+    return '<pre>'.Artisan::output().'</pre><p style="color: green; font-weight: bold; font-family: sans-serif;">✓ Cache Laravel berhasil dibersihkan!</p>';
 });

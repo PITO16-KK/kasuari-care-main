@@ -15,11 +15,11 @@ const date = (value) => value
     ? new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Jakarta' }).format(new Date(value))
     : 'Belum dijadwalkan';
 const billType = (sale) => {
-    if (sale.lines.some((line) => line.line_type === 'assessment')) {
+    if (sale.lines?.some((line) => line.line_type === 'assessment')) {
         return 'Assessment';
     }
 
-    return sale.lines.some((line) => line.line_type === 'package') ? 'Paket terapi' : 'Sesi terapi';
+    return sale.lines?.some((line) => line.line_type === 'package') ? 'Paket terapi' : 'Sesi terapi';
 };
 const dateLabel = (sale) => sale.assessment?.scheduled_at ? 'Jadwal assessment' : sale.appointment?.starts_at ? 'Jadwal sesi' : 'Dibuat';
 const dateValue = (sale) => sale.assessment?.scheduled_at ?? sale.appointment?.starts_at ?? sale.created_at;
@@ -50,20 +50,20 @@ const emptyTitle = () => ({
                     :class="props.filters.type === filter.key ? 'border-clinic-700 bg-clinic-700 text-white' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'"
                 >
                     {{ filter.label }}
-                    <span class="rounded-full px-2 py-0.5 text-[10px]" :class="props.filters.type === filter.key ? 'bg-white/15' : 'bg-slate-100'">{{ counts[filter.key] }}</span>
+                    <span class="rounded-full px-2 py-0.5 text-[10px]" :class="props.filters.type === filter.key ? 'bg-white/15' : 'bg-slate-100'">{{ counts?.[filter.key] ?? 0 }}</span>
                 </Link>
             </nav>
 
-            <section v-if="sales.data.length" class="space-y-3">
+            <section v-if="sales?.data?.length" class="space-y-3">
                 <article v-for="sale in sales.data" :key="sale.id" class="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-5">
                     <div class="min-w-0">
                         <div class="flex flex-wrap items-center gap-2">
-                            <h2 class="text-sm font-bold text-clinic-900">{{ sale.patient.name }}</h2>
-                            <span class="font-mono text-[10px] text-slate-500">{{ sale.patient.patient_code }}</span>
+                            <h2 class="text-sm font-bold text-clinic-900">{{ sale.patient?.name ?? 'Pasien tidak ditemukan' }}</h2>
+                            <span class="font-mono text-[10px] text-slate-500">{{ sale.patient?.patient_code ?? '-' }}</span>
                             <span class="rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-semibold text-amber-800">Belum dibayar</span>
                             <span class="rounded-full bg-clinic-50 px-2.5 py-1 text-[10px] font-semibold text-clinic-800">{{ billType(sale) }}</span>
                         </div>
-                        <p class="mt-1 text-xs text-slate-600">{{ sale.lines.map((line) => line.description).join(', ') }} · {{ dateLabel(sale) }}: {{ date(dateValue(sale)) }}</p>
+                        <p class="mt-1 text-xs text-slate-600">{{ sale.lines?.map((line) => line.description).join(', ') ?? '-' }} · {{ dateLabel(sale) }}: {{ date(dateValue(sale)) }}</p>
                         <p class="mt-1 text-[11px] text-slate-500">Invoice {{ sale.invoice_number }}</p>
                     </div>
                     <div class="flex flex-col gap-2 sm:items-end">
@@ -81,7 +81,7 @@ const emptyTitle = () => ({
                 <p class="mt-1 text-xs text-slate-600">Invoice yang sudah lunas dapat dilihat di Riwayat pembayaran.</p>
             </section>
 
-            <nav v-if="sales.links.length > 3" aria-label="Halaman tagihan" class="flex flex-wrap justify-center gap-1">
+            <nav v-if="sales?.links?.length > 3" aria-label="Halaman tagihan" class="flex flex-wrap justify-center gap-1">
                 <template v-for="link in sales.links" :key="link.label">
                     <Link v-if="link.url" :href="link.url" preserve-scroll :aria-current="link.active ? 'page' : undefined" class="inline-flex min-h-11 items-center rounded-md border px-3 py-2 text-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clinic-700" :class="link.active ? 'border-clinic-700 bg-clinic-700 text-white' : 'border-slate-200 text-slate-600 hover:bg-slate-50'" v-html="link.label" />
                     <span v-else class="inline-flex min-h-11 items-center rounded-md border border-slate-100 px-3 py-2 text-xs text-slate-400" v-html="link.label"></span>
