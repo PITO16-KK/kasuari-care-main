@@ -26,6 +26,14 @@ class HandleInertiaRequests extends Middleware
                 'error' => fn () => $request->session()->get('error'),
                 'assessmentPdfUrl' => fn () => $request->session()->get('assessmentPdfUrl'),
             ],
+            'clinic' => [
+                'name' => config('clinic.name'),
+                'tagline' => config('clinic.tagline'),
+                'full_tagline' => config('clinic.full_tagline'),
+                'address' => config('clinic.address'),
+                'phone' => config('clinic.phone'),
+                'email' => config('clinic.email'),
+            ],
         ];
     }
 }

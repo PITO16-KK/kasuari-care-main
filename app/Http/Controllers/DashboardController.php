@@ -62,10 +62,10 @@ class DashboardController extends Controller
                 'agenda_type' => 'therapy',
                 'starts_at' => $appointment->starts_at->toIso8601String(),
                 'patient' => [
-                    'name' => $appointment->patient->name,
-                    'patient_code' => $appointment->patient->patient_code,
+                    'name' => $appointment->patient?->name ?? 'Pasien',
+                    'patient_code' => $appointment->patient?->patient_code ?? '—',
                 ],
-                'activity_name' => $appointment->therapyType->name,
+                'activity_name' => $appointment->therapyType?->name ?? 'Sesi terapi',
                 'therapist_name' => $appointment->therapist?->user?->name,
                 'room_name' => $appointment->room?->name,
                 'status' => $appointment->status,
@@ -82,14 +82,14 @@ class DashboardController extends Controller
                 ->whereDate('scheduled_at', $today)
                 ->whereIn('status', ['awaiting_payment', 'paid', 'scheduled'])
                 ->orderBy('scheduled_at')
-                ->get(['id', 'patient_id', 'sale_id', 'scheduled_at', 'status'])
+                ->get(['id', 'patient_id', 'sale_id', 'therapist_profile_id', 'scheduled_at', 'status'])
                 ->map(fn (Assessment $assessment): array => [
                     'id' => 'assessment-'.$assessment->id,
                     'agenda_type' => 'assessment',
                     'starts_at' => $assessment->scheduled_at->toIso8601String(),
                     'patient' => [
-                        'name' => $assessment->patient->name,
-                        'patient_code' => $assessment->patient->patient_code,
+                        'name' => $assessment->patient?->name ?? 'Pasien',
+                        'patient_code' => $assessment->patient?->patient_code ?? '—',
                     ],
                     'activity_name' => $assessment->sale?->lines->first()?->description ?? 'Assessment',
                     'therapist_name' => $assessment->therapist?->user?->name,
@@ -129,13 +129,13 @@ class DashboardController extends Controller
                 'agenda_type' => 'therapy',
                 'starts_at' => $appointment->starts_at->toIso8601String(),
                 'patient' => [
-                    'id' => $appointment->patient->id,
-                    'name' => $appointment->patient->name,
-                    'patient_code' => $appointment->patient->patient_code,
+                    'id' => $appointment->patient?->id,
+                    'name' => $appointment->patient?->name ?? 'Pasien',
+                    'patient_code' => $appointment->patient?->patient_code ?? '—',
                 ],
                 'therapy_type' => [
-                    'code' => $appointment->therapyType->code,
-                    'name' => $appointment->therapyType->name,
+                    'code' => $appointment->therapyType?->code ?? 'TW',
+                    'name' => $appointment->therapyType?->name ?? 'Terapi',
                 ],
                 'package_session' => $selectedPackageSessions[$appointment->id] ?? null,
                 'therapist_name' => $appointment->therapist?->user?->name,
@@ -155,10 +155,7 @@ class DashboardController extends Controller
                 ->whereIn('status', ['awaiting_payment', 'paid', 'scheduled'])
                 ->when(
                     $canFilterTherapist && ! empty($filters['therapist_id']),
-                    fn (EloquentBuilder $query) => $query->whereHas(
-                        'therapist',
-                        fn (EloquentBuilder $therapistQuery) => $therapistQuery->where('user_id', $user->id),
-                    ),
+                    fn (EloquentBuilder $query) => $query->where('therapist_profile_id', $filters['therapist_id']),
                 )
                 ->orderBy('scheduled_at')
                 ->get(['id', 'patient_id', 'sale_id', 'therapist_profile_id', 'scheduled_at', 'status', 'attendance_status'])
@@ -167,9 +164,9 @@ class DashboardController extends Controller
                     'agenda_type' => 'assessment',
                     'starts_at' => $assessment->scheduled_at->toIso8601String(),
                     'patient' => [
-                        'id' => $assessment->patient->id,
-                        'name' => $assessment->patient->name,
-                        'patient_code' => $assessment->patient->patient_code,
+                        'id' => $assessment->patient?->id,
+                        'name' => $assessment->patient?->name ?? 'Pasien',
+                        'patient_code' => $assessment->patient?->patient_code ?? '—',
                     ],
                     'activity_name' => $assessment->sale?->lines->first()?->description ?? 'Assessment',
                     'package_label' => $this->assessmentPackageLabel($assessment),

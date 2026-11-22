@@ -9,6 +9,7 @@ use App\Http\Controllers\PackageCatalogController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PatientIntakeSubmissionController;
 use App\Http\Controllers\PaymentHistoryController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PublicRegistrationController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\SaleController;
@@ -45,6 +46,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/packages', [PackageCatalogController::class, 'index'])->name('packages.index');
         Route::post('/packages', [PackageCatalogController::class, 'store'])->name('packages.store');
         Route::patch('/packages/{packageCatalog}/status', [PackageCatalogController::class, 'toggleStatus'])->name('packages.status');
+        Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+        Route::post('/products', [ProductController::class, 'store'])->name('products.store');
+        Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
+        Route::patch('/products/{product}/status', [ProductController::class, 'toggleStatus'])->name('products.status');
+        Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
         Route::get('/scheduling', [AppointmentController::class, 'index'])->name('scheduling.index');
         Route::post('/scheduling', [AppointmentController::class, 'store'])->name('scheduling.store');
         Route::put('/scheduling/{appointment}', [AppointmentController::class, 'update'])->name('scheduling.update');
@@ -73,6 +79,7 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('role:owner|finance|front_office')->group(function () {
         Route::get('/finance/records', [FinanceRecordController::class, 'index'])->name('finance.records');
+        Route::get('/finance/expenses/export', [FinanceRecordController::class, 'exportExpenses'])->name('finance.expenses.export');
         Route::post('/finance/expenses', [FinanceRecordController::class, 'storeExpense'])->name('finance.expenses.store');
         Route::get('/finance/expenses/{clinicExpense}/proof', [FinanceRecordController::class, 'expenseProof'])->name('finance.expenses.proof');
         Route::get('/bills', [SaleController::class, 'bills'])->name('bills.index');
@@ -88,6 +95,7 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::middleware('role:owner')->group(function () {
+        Route::get('/finance/payroll/export', [FinanceRecordController::class, 'exportPayroll'])->name('finance.payroll.export');
         Route::post('/finance/payroll', [FinanceRecordController::class, 'storePayroll'])->name('finance.payroll.store');
         Route::get('/finance/payroll/{therapistPayroll}/proof', [FinanceRecordController::class, 'payrollProof'])->name('finance.payroll.proof');
     });

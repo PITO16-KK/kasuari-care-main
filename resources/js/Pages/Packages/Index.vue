@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue';
-import { router, useForm } from '@inertiajs/vue3';
+import { Link, router, useForm } from '@inertiajs/vue3';
 import { Clock3, PackageCheck } from '@lucide/vue';
 import MainLayout from '../../Layouts/MainLayout.vue';
 
@@ -90,6 +90,16 @@ function toggleStatus(item) {
             <p class="text-xs font-semibold uppercase tracking-wide text-clinic-700">Pengaturan layanan</p>
             <h1 class="mt-1 text-2xl font-semibold text-clinic-900">Paket terapi</h1>
             <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600">Atur nama, durasi, jumlah sesi, harga, dan masa berlaku sesuai kebutuhan klinik.</p>
+
+            <!-- Tab Navigasi -->
+            <div class="mt-5 flex gap-2 border-b border-slate-200">
+                <Link href="/packages" class="border-b-2 border-clinic-700 px-4 py-2.5 text-xs font-bold text-clinic-900">
+                    Paket Terapi
+                </Link>
+                <Link href="/products" class="border-b-2 border-transparent px-4 py-2.5 text-xs font-medium text-slate-600 hover:text-clinic-900">
+                    Produk & Buku (Item Kasir)
+                </Link>
+            </div>
         </header>
 
         <section class="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white" aria-labelledby="add-package-heading">

@@ -4,12 +4,58 @@ import { Link, useForm } from '@inertiajs/vue3';
 import { CalendarClock } from '@lucide/vue';
 import MainLayout from '../../Layouts/MainLayout.vue';
 
-const props = defineProps({ patients: Array, services: Array, therapists: Array, initialPatientId: Number });
+const props = defineProps({ patients: Array, services: Array, therapists: Array, initialPatientId: Number, appointments: Array, scheduledAssessments: Array });
 const form = useForm({ patient_id: props.initialPatientId ?? '', scheduled_at: '', service_catalog_id: '', therapist_profile_id: '' });
 const scheduleDate = ref('');
 const scheduleTime = ref('');
 const selectedService = computed(() => props.services.find((service) => service.id === Number(form.service_catalog_id)));
 const money = (value) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value ?? 0);
+
+const busyTherapistIds = computed(() => {
+    if (!form.scheduled_at) {
+        return new Set();
+    }
+
+    const intervalStart = Date.parse(form.scheduled_at);
+    const intervalEnd = intervalStart + 60 * 60000;
+
+    if (!Number.isFinite(intervalStart)) {
+        return new Set();
+    }
+
+    const conflictingTherapistIds = new Set();
+
+    (props.appointments || []).forEach((appointment) => {
+        if (!appointment.therapist_profile_id || appointment.status === 'cancelled') {
+            return;
+        }
+
+        const appointmentStart = Date.parse(appointment.starts_at);
+        const appointmentEnd = Date.parse(appointment.ends_at);
+
+        if (appointmentStart < intervalEnd && appointmentEnd > intervalStart) {
+            conflictingTherapistIds.add(Number(appointment.therapist_profile_id));
+        }
+    });
+
+    (props.scheduledAssessments || []).forEach((assessment) => {
+        if (!assessment.therapist_profile_id) {
+            return;
+        }
+
+        const assessmentStart = Date.parse(assessment.scheduled_at);
+        const assessmentEnd = assessmentStart + 60 * 60000;
+
+        if (assessmentStart < intervalEnd && assessmentEnd > intervalStart) {
+            conflictingTherapistIds.add(Number(assessment.therapist_profile_id));
+        }
+    });
+
+    return conflictingTherapistIds;
+});
+
+const isTherapistBusy = (id) => busyTherapistIds.value.has(Number(id));
+const selectedTherapistHasConflict = computed(() => isTherapistBusy(form.therapist_profile_id));
 
 watch([scheduleDate, scheduleTime], ([date, time]) => {
     form.scheduled_at = date && isWibTime(time) ? jakartaDateTimeAsUtcIso(date, time) : '';
@@ -21,6 +67,11 @@ watch([scheduleDate, scheduleTime], ([date, time]) => {
 function submit() {
     if (!scheduleDate.value || !isWibTime(scheduleTime.value)) {
         form.setError('scheduled_at', 'Isi tanggal dan jam format 24 jam, contoh 14:05 WIB.');
+        return;
+    }
+
+    if (selectedTherapistHasConflict.value) {
+        form.setError('therapist_profile_id', 'Terapis ini sudah memiliki jadwal pada waktu tersebut.');
         return;
     }
 
@@ -89,10 +140,11 @@ function jakartaDateTimeAsUtcIso(date, time) {
                     Terapis sesi assessment *
                     <select v-model="form.therapist_profile_id" class="field-input" required :disabled="!therapists.length">
                         <option value="">Pilih terapis</option>
-                        <option v-for="therapist in therapists" :key="therapist.id" :value="therapist.id">{{ therapist.user.name }} Â· {{ therapist.specialty || 'Terapis' }}</option>
+                        <option v-for="therapist in therapists" :key="therapist.id" :value="therapist.id" :disabled="isTherapistBusy(therapist.id)">{{ therapist.user.name }} · {{ therapist.specialty || 'Terapis' }}{{ isTherapistBusy(therapist.id) ? ' (sudah terjadwal)' : '' }}</option>
                     </select>
                     <span v-if="form.errors.therapist_profile_id" class="field-error">{{ form.errors.therapist_profile_id }}</span>
                 </label>
+                <div v-if="selectedTherapistHasConflict" role="alert" class="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700">Terapis ini sudah memiliki jadwal terapi atau assessment lain pada waktu tersebut. Silakan pilih waktu atau terapis lain.</div>
                 <p class="-mt-3 text-xs leading-5 text-slate-500">Sesi assessment dialokasikan selama 60 menit. Sistem akan menolak pilihan terapis yang bentrok dengan jadwal terapi atau assessment lain.</p>
 
                 <div v-if="selectedService" class="rounded-lg border border-clinic-100 bg-clinic-50 px-4 py-3">
@@ -115,7 +167,7 @@ function jakartaDateTimeAsUtcIso(date, time) {
                 </div>
 
                 <div class="flex justify-end">
-                    <button :disabled="form.processing || !services.length || !therapists.length" class="inline-flex min-h-11 items-center justify-center rounded-lg bg-clinic-700 px-5 text-sm font-semibold text-white hover:bg-clinic-900 disabled:cursor-not-allowed disabled:opacity-60">
+                    <button :disabled="form.processing || !services.length || !therapists.length || selectedTherapistHasConflict" class="inline-flex min-h-11 items-center justify-center rounded-lg bg-clinic-700 px-5 text-sm font-semibold text-white hover:bg-clinic-900 disabled:cursor-not-allowed disabled:opacity-60">
                         {{ form.processing ? 'Membuat tagihan...' : 'Buat jadwal dan tagihan' }}
                     </button>
                 </div>

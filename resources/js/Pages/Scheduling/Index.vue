@@ -1,12 +1,27 @@
 <script setup>
 import { computed, nextTick, ref, watch } from 'vue';
 import { Link, useForm } from '@inertiajs/vue3';
-import { CalendarDays, ChevronLeft, ChevronRight, Clock3, Sparkles, UserRound } from '@lucide/vue';
+import { CalendarDays, ChevronLeft, ChevronRight, Clock3, Sparkles, UserRound, X } from '@lucide/vue';
 import MainLayout from '../../Layouts/MainLayout.vue';
 
 const props = defineProps({ appointments: Array, scheduledAssessments: Array, patients: Array, assessments: Array, initialPatientId: Number, initialAssessmentId: Number, patientPackages: Array, patientEvaluationSessionCounts: Array, therapyTypes: Array, therapists: Array, patientTherapists: Array, rooms: Array });
+function patientLabel(patient) {
+    return `${patient.patient_code} ${patient.name}`;
+}
+function matchingPatients(query) {
+    const normalizedQuery = (query || '').trim().toLocaleLowerCase('id-ID');
+
+    return (props.patients || [])
+        .filter((patient) => !normalizedQuery || `${patient.patient_code} ${patient.name}`.toLocaleLowerCase('id-ID').includes(normalizedQuery))
+        .slice(0, 50);
+}
+
 const patientSpecificTherapyCodes = ['OT', 'TW', 'FT'];
 const form = useForm({ patient_id: props.initialPatientId ?? '', assessment_id: props.initialAssessmentId ?? '', therapy_type_id: '', therapist_profile_id: '', room_id: '', starts_at: '' });
+const initialPatient = props.patients.find((patient) => Number(patient.id) === Number(props.initialPatientId));
+const patientSearch = ref(initialPatient ? patientLabel(initialPatient) : '');
+const patientOptionsOpen = ref(false);
+const activePatientIndex = ref(-1);
 const cancelForm = useForm({});
 const assessmentRescheduleForm = useForm({ scheduled_at: '', therapist_profile_id: '' });
 const agendaEntries = computed(() => [
@@ -44,6 +59,14 @@ const scheduleTherapists = computed(() => {
     }));
 });
 const selectedPatientAssessments = computed(() => props.assessments.filter((assessment) => Number(assessment.patient_id) === Number(form.patient_id)));
+const filteredPatients = ref(matchingPatients(patientSearch.value));
+const activePatientOptionId = computed(() => {
+    const patient = filteredPatients.value[activePatientIndex.value];
+
+    return activePatientIndex.value >= 0 && patient
+        ? `schedule-patient-option-${patient.id}`
+        : undefined;
+});
 const selectedAssessment = computed(() => selectedPatientAssessments.value.find((assessment) => Number(assessment.id) === Number(form.assessment_id)));
 if (!form.assessment_id && Number(form.patient_id)) {
     form.assessment_id = selectedPatientAssessments.value[0]?.id ?? '';
@@ -137,6 +160,33 @@ const busyTherapistIds = computed(() => {
     return therapistConflictsForInterval(form.starts_at, effectiveDuration.value, editingAppointmentId.value);
 });
 const selectedTherapistHasConflict = computed(() => busyTherapistIds.value.has(Number(form.therapist_profile_id)));
+const therapistSearch = ref('');
+const therapistOptionsOpen = ref(false);
+const activeTherapistIndex = ref(-1);
+function therapistLabel(therapist) {
+    return therapist.name + (therapist.specialty ? ' · ' + therapist.specialty : '');
+}
+function matchingTherapists(query) {
+    const q = query.trim().toLocaleLowerCase('id-ID');
+    return scheduleTherapists.value.filter(t => !q || therapistLabel(t).toLocaleLowerCase('id-ID').includes(q)).slice(0, 15);
+}
+const filteredTherapists = computed(() => matchingTherapists(therapistSearch.value));
+function chooseTherapist(therapist) {
+    form.therapist_profile_id = therapist.id;
+    therapistSearch.value = therapistLabel(therapist);
+    therapistOptionsOpen.value = false;
+    activeTherapistIndex.value = -1;
+    form.clearErrors('therapist_profile_id');
+}
+function handleTherapistSearch(event) {
+    therapistSearch.value = event.target.value;
+    therapistOptionsOpen.value = true;
+    if (form.therapist_profile_id) {
+        form.therapist_profile_id = '';
+    }
+}
+function openTherapistOptions() { therapistOptionsOpen.value = true; }
+function closeTherapistOptions() { therapistOptionsOpen.value = false; activeTherapistIndex.value = -1; }
 const busyAssessmentTherapistIds = computed(() => {
     if (!assessmentRescheduleForm.scheduled_at) {
         return new Set();
@@ -301,6 +351,8 @@ watch([() => form.patient_id, () => form.therapy_type_id], () => {
     })) {
         form.therapist_profile_id = '';
     }
+    therapistSearch.value = '';
+    therapistOptionsOpen.value = false;
 });
 watch([assessmentScheduleDate, assessmentScheduleTime], ([date, time]) => {
     assessmentRescheduleForm.scheduled_at = date && isWibTime(time) ? jakartaDateTimeAsUtcIso(date, time) : '';
@@ -314,6 +366,12 @@ function resetForm() {
     form.patient_id = '';
     form.assessment_id = '';
     form.clearErrors();
+    patientSearch.value = '';
+    filteredPatients.value = matchingPatients('');
+    patientOptionsOpen.value = false;
+    activePatientIndex.value = -1;
+    therapistSearch.value = '';
+    therapistOptionsOpen.value = false;
     scheduleDate.value = '';
     scheduleTime.value = '';
     editingAppointmentId.value = null;
@@ -321,7 +379,11 @@ function resetForm() {
 function clearAssessmentSelection() {
     form.assessment_id = '';
 }
-function handlePatientSelectionChange() {
+function handlePatientSelectionChange(clearSearch = true) {
+    if (clearSearch) {
+        patientSearch.value = '';
+    }
+
     clearAssessmentSelection();
     if (!editingAppointmentId.value) {
         form.assessment_id = selectedPatientAssessments.value[0]?.id ?? '';
@@ -329,11 +391,110 @@ function handlePatientSelectionChange() {
     form.therapist_profile_id = '';
     form.clearErrors('patient_id', 'therapist_profile_id');
 }
+let patientBlurTimeout = null;
+function handlePatientSearch(event) {
+    patientSearch.value = event.target.value;
+    filteredPatients.value = matchingPatients(patientSearch.value);
+    patientOptionsOpen.value = true;
+    activePatientIndex.value = -1;
+
+    if (form.patient_id) {
+        form.patient_id = '';
+        handlePatientSelectionChange(false);
+    } else {
+        form.clearErrors('patient_id', 'therapist_profile_id');
+    }
+}
+function openPatientOptions(event) {
+    if (patientBlurTimeout) {
+        clearTimeout(patientBlurTimeout);
+        patientBlurTimeout = null;
+    }
+    filteredPatients.value = matchingPatients(form.patient_id ? '' : patientSearch.value);
+    patientOptionsOpen.value = true;
+    activePatientIndex.value = -1;
+    if (event?.target?.select) {
+        event.target.select();
+    }
+}
+function closePatientOptions() {
+    if (patientBlurTimeout) {
+        clearTimeout(patientBlurTimeout);
+    }
+    patientBlurTimeout = setTimeout(() => {
+        patientOptionsOpen.value = false;
+        activePatientIndex.value = -1;
+    }, 200);
+}
+function clearPatientSearch() {
+    if (patientBlurTimeout) {
+        clearTimeout(patientBlurTimeout);
+    }
+    patientSearch.value = '';
+    form.patient_id = '';
+    filteredPatients.value = matchingPatients('');
+    handlePatientSelectionChange(true);
+    patientOptionsOpen.value = true;
+}
+function moveActivePatientOption(direction) {
+    const count = filteredPatients.value.length;
+
+    if (!count) {
+        return;
+    }
+
+    patientOptionsOpen.value = true;
+    activePatientIndex.value = activePatientIndex.value === -1
+        ? direction > 0 ? 0 : count - 1
+        : (activePatientIndex.value + direction + count) % count;
+
+    nextTick(() => document.getElementById(activePatientOptionId.value)?.scrollIntoView({ block: 'nearest' }));
+}
+function handlePatientSearchKeydown(event) {
+    if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        moveActivePatientOption(1);
+    } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        moveActivePatientOption(-1);
+    } else if (event.key === 'Enter' && patientOptionsOpen.value) {
+        event.preventDefault();
+        const patient = activePatientIndex.value >= 0
+            ? filteredPatients.value[activePatientIndex.value]
+            : (filteredPatients.value.length > 0 ? filteredPatients.value[0] : null);
+
+        if (patient) {
+            choosePatient(patient);
+        }
+    } else if (event.key === 'Escape') {
+        patientOptionsOpen.value = false;
+        activePatientIndex.value = -1;
+    }
+}
+function choosePatient(patient) {
+    if (patientBlurTimeout) {
+        clearTimeout(patientBlurTimeout);
+        patientBlurTimeout = null;
+    }
+    const changed = Number(form.patient_id) !== Number(patient.id);
+    patientSearch.value = patientLabel(patient);
+    filteredPatients.value = matchingPatients(patientSearch.value);
+    patientOptionsOpen.value = false;
+    activePatientIndex.value = -1;
+
+    if (changed) {
+        form.patient_id = patient.id;
+        handlePatientSelectionChange(false);
+    }
+}
 function useRecommendation(recommendation) {
     form.therapy_type_id = recommendation.therapy_type_id;
 }
 function editAppointment(appointment) {
     resetAssessmentRescheduleForm();
+    const patient = props.patients.find((item) => Number(item.id) === Number(appointment.patient_id));
+    patientSearch.value = patient ? patientLabel(patient) : appointment.patient ? patientLabel(appointment.patient) : '';
+    filteredPatients.value = matchingPatients(patientSearch.value);
     const parts = jakartaDateTimeParts(appointment.starts_at);
     editingAppointmentId.value = appointment.id;
     form.clearErrors();
@@ -374,6 +535,12 @@ function submitAssessmentReschedule() {
     });
 }
 function submit() {
+    if (!Number(form.patient_id)) {
+        form.setError('patient_id', 'Pilih pasien dari daftar hasil pencarian.');
+        patientOptionsOpen.value = true;
+        return;
+    }
+
     if (!scheduleDate.value || !isWibTime(scheduleTime.value)) {
         form.setError('starts_at', 'Isi tanggal dan jam format 24 jam, contoh 14:05 WIB.');
         return;
@@ -609,14 +776,24 @@ function sendWhatsAppReminder(appointment) {
                     <p class="mt-2 text-xs leading-relaxed text-slate-500">Jadwal ditolak jika terapis atau ruangan memiliki sesi yang waktunya bertumpang tindih.</p>
 
                     <div class="mt-5 space-y-4">
-                        <label class="field-label">
-                            Pasien *
-                            <select v-model="form.patient_id" class="field-input" required @change="handlePatientSelectionChange">
-                                <option value="">Pilih pasien</option>
-                                <option v-for="patient in patients" :key="patient.id" :value="patient.id">{{ patient.patient_code }} · {{ patient.name }} · {{ patientAssessmentStatus(patient.id) }}</option>
-                            </select>
-                            <span v-if="form.errors.patient_id" class="field-error">{{ form.errors.patient_id }}</span>
-                        </label>
+                        <div class="space-y-1.5">
+                            <label for="schedule-patient-search" class="field-label">Pasien *</label>
+                            <div class="relative">
+                                <input id="schedule-patient-search" v-model="patientSearch" type="text" role="combobox" aria-autocomplete="list" aria-controls="schedule-patient-options" :aria-expanded="patientOptionsOpen" :aria-activedescendant="activePatientOptionId" :aria-invalid="Boolean(form.errors.patient_id)" aria-describedby="schedule-patient-search-help" autocomplete="off" required placeholder="Ketik nama atau kode pasien" class="field-input pr-8" @focus="openPatientOptions" @blur="closePatientOptions" @input="handlePatientSearch" @keydown="handlePatientSearchKeydown">
+                                <button v-if="patientSearch" type="button" aria-label="Hapus pencarian pasien" class="absolute right-2.5 top-1/2 -translate-y-1/2 grid size-6 place-items-center text-slate-400 hover:text-slate-600" @click="clearPatientSearch">
+                                    <X :size="14" />
+                                </button>
+                                <ul v-if="patientOptionsOpen && filteredPatients.length" id="schedule-patient-options" role="listbox" class="absolute z-20 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-slate-200 bg-white py-1 shadow-lg">
+                                    <li v-for="(patient, index) in filteredPatients" :id="`schedule-patient-option-${patient.id}`" :key="patient.id" role="option" :aria-selected="Number(form.patient_id) === Number(patient.id)" class="cursor-pointer px-3 py-2 text-sm text-slate-800 transition-colors" :class="index === activePatientIndex ? 'bg-clinic-50 font-semibold text-clinic-900' : 'hover:bg-slate-50'" @pointerdown.prevent="choosePatient(patient)">
+                                        <span class="block font-medium">{{ patient.patient_code }} · {{ patient.name }}</span>
+                                        <span class="mt-0.5 block text-xs text-slate-500">{{ patientAssessmentStatus(patient.id) }}</span>
+                                    </li>
+                                </ul>
+                                <p v-else-if="patientOptionsOpen" role="status" class="absolute z-20 mt-1 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 shadow-lg">Pasien tidak ditemukan.</p>
+                            </div>
+                            <p id="schedule-patient-search-help" class="text-[11px] leading-relaxed text-slate-500">Ketik untuk mencari, lalu pilih pasien dari daftar.</p>
+                            <span v-if="form.errors.patient_id" class="field-error" role="alert">{{ form.errors.patient_id }}</span>
+                        </div>
 
                         <label v-if="editingAppointmentId" class="field-label">
                             Assessment selesai *

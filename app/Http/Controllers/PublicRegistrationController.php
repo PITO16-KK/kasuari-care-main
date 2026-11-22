@@ -10,8 +10,13 @@ use Inertia\Response;
 
 class PublicRegistrationController extends Controller
 {
-    public function create(): Response
+    public function create(): RedirectResponse|Response
     {
+        $gformUrl = config('services.google_forms.url', 'https://forms.gle/RVYZWH2Mwjoi4z688');
+        if (filled($gformUrl)) {
+            return redirect()->away($gformUrl);
+        }
+
         return Inertia::render('Public/Registration');
     }
 

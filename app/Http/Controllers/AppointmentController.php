@@ -561,17 +561,9 @@ class AppointmentController extends Controller
             return;
         }
 
-        $hasOtherActivePackage = DB::table('patient_packages')
-            ->where('patient_id', $patientPackage->patient_id)
-            ->where('status', 'active')
-            ->where('id', '!=', $patientPackageId)
-            ->exists();
-
-        if (! $hasOtherActivePackage) {
-            DB::table('patient_packages')
-                ->where('id', $patientPackageId)
-                ->update(['status' => 'active', 'updated_at' => now()]);
-        }
+        DB::table('patient_packages')
+            ->where('id', $patientPackageId)
+            ->update(['status' => 'active', 'updated_at' => now()]);
     }
 
     private function syncPendingTherapyInvoices(int $patientId): void

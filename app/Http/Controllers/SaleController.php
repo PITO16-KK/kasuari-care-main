@@ -10,7 +10,6 @@ use App\Models\Patient;
 use App\Models\PatientPackage;
 use App\Models\Payment;
 use App\Models\Sale;
-use App\Models\TherapistProfile;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -72,9 +71,6 @@ class SaleController extends Controller
     {
         return Inertia::render('Sales/Create', [
             'patients' => Patient::where('is_active', true)->orderBy('name')->get(['id', 'patient_code', 'name']),
-            'therapists' => TherapistProfile::query()->with('user:id,name')
-                ->whereHas('user', fn ($query) => $query->where('is_active', true))
-                ->get(['id', 'user_id']),
             'packages' => DB::table('package_catalog')->where('is_active', true)
                 ->orderBy('session_duration_minutes')->orderBy('session_quantity')->orderBy('price')->get(),
             'patientPackages' => DB::table('patient_packages')
@@ -108,9 +104,10 @@ class SaleController extends Controller
         $data = $request->validate([
             'patient_id' => ['required', 'exists:patients,id'],
             'therapist_profile_id' => ['nullable', 'exists:therapist_profiles,id'],
-            'line_type' => ['required', 'in:package,session,product'],
-            'item_id' => ['required', 'integer', 'min:1'],
-            'quantity' => ['required', 'integer', 'min:1', 'max:50'],
+            'items' => ['required', 'array', 'min:1', 'max:20'],
+            'items.*.line_type' => ['required', 'in:assessment,package,session,product'],
+            'items.*.item_id' => ['required', 'integer', 'min:1'],
+            'items.*.quantity' => ['required', 'integer', 'min:1', 'max:50'],
             'discount_type' => ['required', 'in:fixed,percent'],
             'discount_value' => ['required', 'numeric', 'min:0'],
             'payment_method' => ['required', 'in:cash,bank_transfer,qris'],
@@ -118,6 +115,38 @@ class SaleController extends Controller
             'bank_name' => ['nullable', 'string', 'max:100', 'required_if:payment_method,bank_transfer'],
             'payment_proof' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,pdf', 'max:5120'],
         ]);
+        $cartItems = collect($data['items'])
+            ->groupBy(fn (array $item): string => $item['line_type'].':'.$item['item_id'])
+            ->map(function ($items): array {
+                $item = $items->first();
+
+                return [
+                    'line_type' => $item['line_type'],
+                    'item_id' => (int) $item['item_id'],
+                    'quantity' => (int) $items->sum('quantity'),
+                ];
+            })
+            ->values();
+
+        foreach ($cartItems as $index => $item) {
+            if ($item['quantity'] > 50) {
+                throw ValidationException::withMessages([
+                    "items.{$index}.quantity" => 'Jumlah untuk item yang sama maksimal 50.',
+                ]);
+            }
+
+            if ($item['line_type'] === 'assessment' && $item['quantity'] !== 1) {
+                throw ValidationException::withMessages([
+                    "items.{$index}.quantity" => 'Assessment hanya dapat dimasukkan satu kali per transaksi.',
+                ]);
+            }
+        }
+
+        if ($cartItems->where('line_type', 'assessment')->count() > 1) {
+            throw ValidationException::withMessages([
+                'items' => 'Satu transaksi hanya dapat memuat satu assessment yang menunggu pembayaran.',
+            ]);
+        }
 
         $proofPath = $request->file('payment_proof')?->store('payment-proofs', 'local');
 
@@ -126,41 +155,98 @@ class SaleController extends Controller
         }
 
         try {
-            $sale = DB::transaction(function () use ($data, $request, $proofPath) {
+            $sale = DB::transaction(function () use ($data, $request, $proofPath, $cartItems) {
                 $patient = Patient::whereKey($data['patient_id'])->lockForUpdate()->firstOrFail();
-                $catalog = match ($data['line_type']) {
-                    'package' => DB::table('package_catalog')->where('is_active', true)->where('id', $data['item_id'])->first(),
-                    'assessment', 'session' => DB::table('service_catalog')->where('is_active', true)->where('service_type', $data['line_type'])->where('id', $data['item_id'])->first(),
-                    'product' => DB::table('products')->where('is_active', true)->where('id', $data['item_id'])->lockForUpdate()->first(),
-                };
+                $resolvedLines = [];
+                $subtotal = 0;
+                $assessmentForCheckout = null;
+                $assessmentSaleForCheckout = null;
 
-                if (! $catalog) {
-                    throw ValidationException::withMessages(['item_id' => 'Item yang dipilih tidak tersedia.']);
+                foreach ($cartItems as $index => $item) {
+                    $assessment = null;
+                    $assessmentSale = null;
+
+                    if ($item['line_type'] === 'assessment') {
+                        $assessment = Assessment::query()
+                            ->whereKey($item['item_id'])
+                            ->where('patient_id', $patient->id)
+                            ->lockForUpdate()
+                            ->first();
+
+                        if ($assessment === null || $assessment->status !== 'awaiting_payment' || $assessment->sale_id === null) {
+                            throw ValidationException::withMessages([
+                                "items.{$index}.item_id" => 'Assessment ini tidak lagi menunggu pembayaran.',
+                            ]);
+                        }
+
+                        $assessmentSale = Sale::query()
+                            ->whereKey($assessment->sale_id)
+                            ->where('patient_id', $patient->id)
+                            ->where('status', 'pending')
+                            ->lockForUpdate()
+                            ->first();
+
+                        if ($assessmentSale === null || $assessmentSale->payment()->exists()) {
+                            throw ValidationException::withMessages([
+                                "items.{$index}.item_id" => 'Tagihan assessment tidak lagi tersedia untuk digabungkan.',
+                            ]);
+                        }
+
+                        $assessmentLines = $assessmentSale->lines()->lockForUpdate()->get();
+                        $assessmentLine = $assessmentLines->firstWhere('line_type', 'assessment');
+
+                        if ($assessmentLine === null || $assessmentLines->count() !== 1) {
+                            throw ValidationException::withMessages([
+                                "items.{$index}.item_id" => 'Tagihan assessment ini sudah terhubung dengan transaksi lain.',
+                            ]);
+                        }
+
+                        $catalog = (object) [
+                            'name' => $assessmentLine->description,
+                            'price' => $assessmentLine->unit_price,
+                        ];
+                        $assessmentForCheckout = $assessment;
+                        $assessmentSaleForCheckout = $assessmentSale;
+                    } else {
+                        $catalog = match ($item['line_type']) {
+                            'package' => DB::table('package_catalog')->where('is_active', true)->where('id', $item['item_id'])->first(),
+                            'session' => DB::table('service_catalog')->where('is_active', true)->where('service_type', 'session')->where('id', $item['item_id'])->first(),
+                            'product' => DB::table('products')->where('is_active', true)->where('id', $item['item_id'])->lockForUpdate()->first(),
+                        };
+                    }
+
+                    if (! $catalog) {
+                        throw ValidationException::withMessages(["items.{$index}.item_id" => 'Item yang dipilih tidak tersedia.']);
+                    }
+
+                    if ($item['line_type'] === 'product' && $catalog->stock_quantity < $item['quantity']) {
+                        throw ValidationException::withMessages(["items.{$index}.quantity" => 'Stok produk tidak mencukupi.']);
+                    }
+
+                    $unitPrice = (int) $catalog->price;
+                    $lineTotal = $unitPrice * $item['quantity'];
+                    $subtotal += $lineTotal;
+                    $resolvedLines[] = [
+                        ...$item,
+                        'catalog' => $catalog,
+                        'assessment' => $assessment,
+                        'assessment_sale' => $assessmentSale,
+                        'unit_price' => $unitPrice,
+                        'line_total' => $lineTotal,
+                    ];
                 }
 
-                if ($data['line_type'] === 'package') {
+                if (collect($resolvedLines)->contains(fn (array $item): bool => $item['line_type'] === 'package')) {
                     $activePackages = PatientPackage::where('patient_id', $patient->id)
                         ->where('status', 'active')
                         ->lockForUpdate()
                         ->get();
 
                     foreach ($activePackages as $activePackage) {
-                        if (! $this->hasUsablePackageSessions($activePackage)) {
-                            continue;
-                        }
-
-                        throw ValidationException::withMessages([
-                            'item_id' => "Pasien masih memiliki paket {$activePackage->catalog->name} dengan kuota aktif. Paket baru bisa dibeli setelah kuota habis atau masa berlaku berakhir.",
-                        ]);
+                        $this->hasUsablePackageSessions($activePackage);
                     }
                 }
 
-                if ($data['line_type'] === 'product' && $catalog->stock_quantity < $data['quantity']) {
-                    throw ValidationException::withMessages(['quantity' => 'Stok produk tidak mencukupi.']);
-                }
-
-                $unitPrice = (int) $catalog->price;
-                $subtotal = $unitPrice * $data['quantity'];
                 $discount = $data['discount_type'] === 'percent'
                     ? (int) round($subtotal * min(100, (float) $data['discount_value']) / 100)
                     : (int) min($subtotal, (float) $data['discount_value']);
@@ -170,31 +256,102 @@ class SaleController extends Controller
                     throw ValidationException::withMessages(['discount_value' => 'Total transaksi harus lebih dari nol.']);
                 }
 
-                $sale = Sale::create([
-                    'invoice_number' => 'INV-'.now()->format('Ymd').'-'.Str::upper(Str::random(6)),
-                    'patient_id' => $patient->id,
-                    'cashier_id' => $request->user()->id,
-                    'therapist_profile_id' => $data['therapist_profile_id'] ?? null,
-                    'status' => 'paid',
-                    'subtotal' => $subtotal,
-                    'discount_total' => $discount,
-                    'grand_total' => $grandTotal,
-                    'paid_at' => now(),
-                ]);
+                if ($assessmentSaleForCheckout !== null) {
+                    $sale = $assessmentSaleForCheckout;
+                    $sale->update([
+                        'cashier_id' => $request->user()->id,
+                        'status' => 'paid',
+                        'subtotal' => $subtotal,
+                        'discount_total' => $discount,
+                        'grand_total' => $grandTotal,
+                        'paid_at' => now(),
+                    ]);
+                } else {
+                    $sale = Sale::create([
+                        'invoice_number' => 'INV-'.now()->format('Ymd').'-'.Str::upper(Str::random(6)),
+                        'patient_id' => $patient->id,
+                        'cashier_id' => $request->user()->id,
+                        'therapist_profile_id' => $data['therapist_profile_id'] ?? null,
+                        'status' => 'paid',
+                        'subtotal' => $subtotal,
+                        'discount_total' => $discount,
+                        'grand_total' => $grandTotal,
+                        'paid_at' => now(),
+                    ]);
+                }
 
-                $packageId = $data['line_type'] === 'package' ? $catalog->id : null;
-                $serviceId = in_array($data['line_type'], ['assessment', 'session'], true) ? $catalog->id : null;
-                $productId = $data['line_type'] === 'product' ? $catalog->id : null;
-                $sale->lines()->create([
-                    'line_type' => $data['line_type'],
-                    'package_catalog_id' => $packageId,
-                    'service_catalog_id' => $serviceId,
-                    'product_id' => $productId,
-                    'description' => $catalog->name,
-                    'quantity' => $data['quantity'],
-                    'unit_price' => $unitPrice,
-                    'line_total' => $subtotal,
-                ]);
+                foreach ($resolvedLines as $item) {
+                    if ($item['line_type'] === 'assessment') {
+                        continue;
+                    }
+
+                    $catalog = $item['catalog'];
+                    $sale->lines()->create([
+                        'line_type' => $item['line_type'],
+                        'package_catalog_id' => $item['line_type'] === 'package' ? $catalog->id : null,
+                        'service_catalog_id' => $item['line_type'] === 'session' ? $catalog->id : null,
+                        'product_id' => $item['line_type'] === 'product' ? $catalog->id : null,
+                        'description' => $catalog->name,
+                        'quantity' => $item['quantity'],
+                        'unit_price' => $item['unit_price'],
+                        'line_total' => $item['line_total'],
+                    ]);
+
+                    if ($item['line_type'] === 'package') {
+                        $patientPackage = PatientPackage::create([
+                            'patient_id' => $patient->id,
+                            'package_catalog_id' => $catalog->id,
+                            'sale_id' => $sale->id,
+                            'status' => 'active',
+                            'starts_at' => now(),
+                            'expires_at' => Carbon::now()->addDays($catalog->validity_days),
+                        ]);
+
+                        $packageItems = DB::table('package_catalog_items')->where('package_catalog_id', $catalog->id)->get();
+                        if ($catalog->session_duration_minutes && $catalog->session_quantity) {
+                            $grantedSessions = $catalog->session_quantity * $item['quantity'];
+                            $entitlementId = DB::table('duration_package_entitlements')->insertGetId([
+                                'patient_package_id' => $patientPackage->id,
+                                'duration_minutes' => $catalog->session_duration_minutes,
+                                'granted_sessions' => $grantedSessions,
+                                'remaining_sessions' => $grantedSessions,
+                            ]);
+
+                            DB::table('duration_package_ledger')->insert([
+                                'duration_package_entitlement_id' => $entitlementId,
+                                'quantity_delta' => $grantedSessions,
+                                'reason' => 'package_purchase',
+                                'created_by' => $request->user()->id,
+                                'created_at' => now(),
+                            ]);
+                        } else {
+                            if ($packageItems->isEmpty()) {
+                                throw ValidationException::withMessages(['items' => 'Paket belum memiliki jenis terapi dan kuota yang dikonfigurasi.']);
+                            }
+
+                            foreach ($packageItems as $packageItem) {
+                                $grantedSessions = $packageItem->session_quantity * $item['quantity'];
+                                $entitlement = PackageEntitlement::create([
+                                    'patient_package_id' => $patientPackage->id,
+                                    'therapy_type_id' => $packageItem->therapy_type_id,
+                                    'granted_sessions' => $grantedSessions,
+                                    'remaining_sessions' => $grantedSessions,
+                                ]);
+                                DB::table('package_ledger')->insert([
+                                    'package_entitlement_id' => $entitlement->id,
+                                    'quantity_delta' => $grantedSessions,
+                                    'reason' => 'package_purchase',
+                                    'created_by' => $request->user()->id,
+                                    'created_at' => now(),
+                                ]);
+                            }
+                        }
+                    }
+
+                    if ($item['line_type'] === 'product') {
+                        DB::table('products')->where('id', $catalog->id)->decrement('stock_quantity', $item['quantity']);
+                    }
+                }
 
                 $sale->payment()->create([
                     'method' => $data['payment_method'],
@@ -206,60 +363,7 @@ class SaleController extends Controller
                     'received_at' => now(),
                 ]);
 
-                if ($data['line_type'] === 'package') {
-                    $patientPackage = PatientPackage::create([
-                        'patient_id' => $patient->id,
-                        'package_catalog_id' => $catalog->id,
-                        'sale_id' => $sale->id,
-                        'status' => 'active',
-                        'starts_at' => now(),
-                        'expires_at' => Carbon::now()->addDays($catalog->validity_days),
-                    ]);
-
-                    $items = DB::table('package_catalog_items')->where('package_catalog_id', $catalog->id)->get();
-                    if ($catalog->session_duration_minutes && $catalog->session_quantity) {
-                        $grantedSessions = $catalog->session_quantity * $data['quantity'];
-                        $entitlementId = DB::table('duration_package_entitlements')->insertGetId([
-                            'patient_package_id' => $patientPackage->id,
-                            'duration_minutes' => $catalog->session_duration_minutes,
-                            'granted_sessions' => $grantedSessions,
-                            'remaining_sessions' => $grantedSessions,
-                        ]);
-
-                        DB::table('duration_package_ledger')->insert([
-                            'duration_package_entitlement_id' => $entitlementId,
-                            'quantity_delta' => $grantedSessions,
-                            'reason' => 'package_purchase',
-                            'created_by' => $request->user()->id,
-                            'created_at' => now(),
-                        ]);
-                    } else {
-                        if ($items->isEmpty()) {
-                            throw ValidationException::withMessages(['item_id' => 'Paket belum memiliki jenis terapi dan kuota yang dikonfigurasi.']);
-                        }
-
-                        foreach ($items as $item) {
-                            $grantedSessions = $item->session_quantity * $data['quantity'];
-                            $entitlement = PackageEntitlement::create([
-                                'patient_package_id' => $patientPackage->id,
-                                'therapy_type_id' => $item->therapy_type_id,
-                                'granted_sessions' => $grantedSessions,
-                                'remaining_sessions' => $grantedSessions,
-                            ]);
-                            DB::table('package_ledger')->insert([
-                                'package_entitlement_id' => $entitlement->id,
-                                'quantity_delta' => $grantedSessions,
-                                'reason' => 'package_purchase',
-                                'created_by' => $request->user()->id,
-                                'created_at' => now(),
-                            ]);
-                        }
-                    }
-                }
-
-                if ($data['line_type'] === 'product') {
-                    DB::table('products')->where('id', $catalog->id)->decrement('stock_quantity', $data['quantity']);
-                }
+                $assessmentForCheckout?->update(['status' => 'paid']);
 
                 return $sale;
             });
@@ -271,7 +375,7 @@ class SaleController extends Controller
             throw $exception;
         }
 
-        if ($data['line_type'] === 'package') {
+        if ($cartItems->contains(fn (array $item): bool => $item['line_type'] === 'package')) {
             DB::transaction(function () use ($sale): void {
                 Sale::query()
                     ->where('patient_id', $sale->patient_id)
@@ -316,7 +420,8 @@ class SaleController extends Controller
         abort_unless($payment->proof_path !== null && $disk->exists($payment->proof_path), 404);
 
         $response = response()->file($disk->path($payment->proof_path), [
-            'Content-Type' => $disk->mimeType($payment->proof_path) ?: 'application/octet-stream',
+            'Content-Type' => $this->proofMimeType($disk, $payment->proof_path),
+            'Content-Disposition' => 'inline',
             'X-Content-Type-Options' => 'nosniff',
             'Cache-Control' => 'private, no-store, max-age=0',
         ]);
@@ -324,6 +429,17 @@ class SaleController extends Controller
         $response->headers->set('Cache-Control', 'private, no-store, max-age=0');
 
         return $response;
+    }
+
+    private function proofMimeType($disk, string $proofPath): string
+    {
+        return match (strtolower(pathinfo($proofPath, PATHINFO_EXTENSION))) {
+            'jpg', 'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'webp' => 'image/webp',
+            'pdf' => 'application/pdf',
+            default => $disk->mimeType($proofPath) ?: 'application/octet-stream',
+        };
     }
 
     public function pay(Request $request, Sale $sale): RedirectResponse

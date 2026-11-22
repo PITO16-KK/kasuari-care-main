@@ -67,7 +67,10 @@ if ($action === 'fix_all') {
             DELETE FROM patients WHERE id IN (101, 102, 103, 104, 105, 106, 107, 108);
         ');
 
-        // Eksekusi dummy_patients_mysql.sql jika file ada
+        // 1. Jalankan migrasi jika ada struktur tabel / kolom baru
+        Artisan::call('migrate', ['--force' => true]);
+
+        // 2. Eksekusi dummy_patients_mysql.sql jika file ada
         $sqlPath = __DIR__.'/../database/dummy_patients_mysql.sql';
         if (file_exists($sqlPath)) {
             $sqlContent = file_get_contents($sqlPath);

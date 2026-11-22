@@ -41,6 +41,8 @@ return [
     ],
 
     'google_forms' => [
+        'url' => env('GOOGLE_FORMS_URL', 'https://forms.gle/RVYZWH2Mwjoi4z688'),
+        'token' => env('GOOGLE_FORMS_TOKEN', 'kasuari-care-gform-2026'),
         'webhook_secret' => env('GOOGLE_FORMS_WEBHOOK_SECRET'),
     ],
 

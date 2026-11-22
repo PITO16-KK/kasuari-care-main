@@ -1,10 +1,13 @@
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { Link, router, useForm, useHttp } from '@inertiajs/vue3';
 import { Eye, Pencil, Plus, Search, UserRoundPlus, X } from '@lucide/vue';
 import MainLayout from '../../Layouts/MainLayout.vue';
 
 const props = defineProps({ patients: Object, filters: Object, therapyTypes: Array, therapists: Array });
+const showingForm = ref(false);
+const editingId = ref(null);
+
 const form = useForm({
     name: '',
     birth_date: '',
@@ -19,10 +22,16 @@ const form = useForm({
     mother_name: '',
     mother_whatsapp: '',
     therapist_assignments: { OT: '', TW: '', FT: '' },
+    allow_duplicate: false,
 });
 
-const showingForm = ref(false);
-const editingId = ref(null);
+const duplicateMatch = computed(() => {
+    if (editingId.value || !form.name || form.name.trim().length < 3) {
+        return null;
+    }
+    const normalized = form.name.trim().toLowerCase();
+    return (props.patients?.data || []).find((p) => (p.name || '').trim().toLowerCase() === normalized);
+});
 const viewingPatient = ref(null);
 const patientDetails = ref(null);
 const patientDetailsError = ref('');
@@ -154,12 +163,6 @@ function submit() {
 }
 
 function isTherapistUnavailable(therapist, code) {
-    const assignedPatientId = Number(therapist.assigned_patient_id ?? 0);
-
-    if (assignedPatientId && assignedPatientId !== Number(editingId.value ?? 0)) {
-        return true;
-    }
-
     return Object.entries(form.therapist_assignments).some(([otherCode, profileId]) => {
         return otherCode !== code && Number(profileId) === Number(therapist.id);
     });
@@ -264,24 +267,57 @@ const parentNames = (patient) => patient.parents.map((parent) => parent.name).jo
             </div>
 
             <form class="mt-5" @submit.prevent="submit">
-                <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                    <label class="field-label xl:col-span-2">Nama anak *<input v-model="form.name" class="field-input" maxlength="160" required autocomplete="name"><span v-if="form.errors.name" class="field-error">{{ form.errors.name }}</span></label>
-                    <label class="field-label">Tanggal lahir<input v-model="form.birth_date" type="date" class="field-input"><span v-if="form.errors.birth_date" class="field-error">{{ form.errors.birth_date }}</span></label>
-                    <label class="field-label">Jenis kelamin<select v-model="form.gender" class="field-input"><option value="">Belum diisi</option><option value="male">Laki-laki</option><option value="female">Perempuan</option></select><span v-if="form.errors.gender" class="field-error">{{ form.errors.gender }}</span></label>
-                    <label class="field-label">WhatsApp utama<input v-model="form.primary_whatsapp" type="tel" class="field-input" maxlength="30" autocomplete="tel"><span v-if="form.errors.primary_whatsapp" class="field-error">{{ form.errors.primary_whatsapp }}</span></label>
-                    <label class="field-label">Sekolah / TK<input v-model="form.school_name" class="field-input" maxlength="160"><span v-if="form.errors.school_name" class="field-error">{{ form.errors.school_name }}</span></label>
-                    <label class="field-label">Nama ayah<input v-model="form.father_name" class="field-input" maxlength="160"><span v-if="form.errors.father_name" class="field-error">{{ form.errors.father_name }}</span></label>
-                    <label class="field-label">WhatsApp ayah<input v-model="form.father_whatsapp" type="tel" class="field-input" maxlength="30"><span v-if="form.errors.father_whatsapp" class="field-error">{{ form.errors.father_whatsapp }}</span></label>
-                    <label class="field-label">Nama ibu<input v-model="form.mother_name" class="field-input" maxlength="160"><span v-if="form.errors.mother_name" class="field-error">{{ form.errors.mother_name }}</span></label>
-                    <label class="field-label">WhatsApp ibu<input v-model="form.mother_whatsapp" type="tel" class="field-input" maxlength="30"><span v-if="form.errors.mother_whatsapp" class="field-error">{{ form.errors.mother_whatsapp }}</span></label>
-                    <label class="field-label sm:col-span-2 xl:col-span-3">Alamat<textarea v-model="form.address" rows="2" class="field-input" maxlength="2000"></textarea><span v-if="form.errors.address" class="field-error">{{ form.errors.address }}</span></label>
-                    <label class="field-label sm:col-span-2 xl:col-span-3">Keluhan utama<textarea v-model="form.main_complaint" rows="3" class="field-input" maxlength="3000"></textarea><span v-if="form.errors.main_complaint" class="field-error">{{ form.errors.main_complaint }}</span></label>
-                    <label class="field-label sm:col-span-2 xl:col-span-3">Riwayat kesehatan<textarea v-model="form.medical_history" rows="3" class="field-input" maxlength="3000"></textarea><span v-if="form.errors.medical_history" class="field-error">{{ form.errors.medical_history }}</span></label>
+                <!-- Bagian 1: Data Anak -->
+                <div>
+                    <h3 class="text-xs font-bold uppercase tracking-wide text-clinic-700 border-b border-slate-100 pb-2 mb-4">Data Anak</h3>
+                    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                        <label class="field-label sm:col-span-2 xl:col-span-2">
+                            Nama anak *
+                            <input v-model="form.name" class="field-input" maxlength="160" required autocomplete="name">
+                            <span v-if="form.errors.name" class="field-error">{{ form.errors.name }}</span>
+                            <div v-if="duplicateMatch" class="mt-2 rounded-md border border-amber-200 bg-amber-50 p-2.5 text-xs text-amber-900">
+                                <div class="font-bold flex items-center gap-1.5">
+                                    <span>⚠️ Perhatian: Nama serupa sudah terdaftar</span>
+                                </div>
+                                <div class="mt-0.5">
+                                    Pasien dengan nama <strong>"{{ duplicateMatch.name }}"</strong> sudah ada (Kode: <strong>{{ duplicateMatch.patient_code }}</strong>). Periksa kembali agar tidak terjadi perulangan data.
+                                </div>
+                            </div>
+                            <div v-if="form.errors.name && form.errors.name.includes('perulangan data')" class="mt-2 flex items-center gap-2 rounded-md bg-amber-50 p-2 text-xs text-amber-900 border border-amber-200">
+                                <input id="allow-duplicate" v-model="form.allow_duplicate" type="checkbox" class="rounded border-slate-300">
+                                <label for="allow-duplicate" class="font-semibold cursor-pointer">Tetap simpan sebagai pasien baru (anak berbeda dengan nama yang sama)</label>
+                            </div>
+                        </label>
+                        <label class="field-label">Tanggal lahir<input v-model="form.birth_date" type="date" class="field-input"><span v-if="form.errors.birth_date" class="field-error">{{ form.errors.birth_date }}</span></label>
+                        <label class="field-label">Jenis kelamin<select v-model="form.gender" class="field-input"><option value="">Belum diisi</option><option value="male">Laki-laki</option><option value="female">Perempuan</option></select><span v-if="form.errors.gender" class="field-error">{{ form.errors.gender }}</span></label>
+                        <label class="field-label sm:col-span-2 xl:col-span-2">Sekolah / TK<input v-model="form.school_name" class="field-input" maxlength="160"><span v-if="form.errors.school_name" class="field-error">{{ form.errors.school_name }}</span></label>
+                        <label class="field-label sm:col-span-2 xl:col-span-3">Keluhan utama<textarea v-model="form.main_complaint" rows="3" class="field-input" maxlength="3000"></textarea><span v-if="form.errors.main_complaint" class="field-error">{{ form.errors.main_complaint }}</span></label>
+                        <label class="field-label sm:col-span-2 xl:col-span-3">Riwayat kesehatan<textarea v-model="form.medical_history" rows="3" class="field-input" maxlength="3000"></textarea><span v-if="form.errors.medical_history" class="field-error">{{ form.errors.medical_history }}</span></label>
+                    </div>
                 </div>
 
-                <section class="mt-5 rounded-lg border border-slate-200 bg-slate-50 p-4">
+                <!-- Bagian 2: Kontak & Orang Tua -->
+                <div class="mt-6">
+                    <h3 class="text-xs font-bold uppercase tracking-wide text-clinic-700 border-b border-slate-100 pb-2 mb-4">Kontak & Orang Tua</h3>
+                    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                        <label class="field-label sm:col-span-2 xl:col-span-3">
+                            WhatsApp utama
+                            <input v-model="form.primary_whatsapp" type="tel" class="field-input" maxlength="30" autocomplete="tel">
+                            <span class="mt-1 block text-[11px] font-normal text-slate-500">Nomor ini digunakan untuk pengiriman pengingat jadwal via WhatsApp. Contoh: 081234567890</span>
+                            <span v-if="form.errors.primary_whatsapp" class="field-error">{{ form.errors.primary_whatsapp }}</span>
+                        </label>
+                        <label class="field-label">Nama ayah<input v-model="form.father_name" class="field-input" maxlength="160"><span v-if="form.errors.father_name" class="field-error">{{ form.errors.father_name }}</span></label>
+                        <label class="field-label">WhatsApp ayah<input v-model="form.father_whatsapp" type="tel" class="field-input" maxlength="30"><span v-if="form.errors.father_whatsapp" class="field-error">{{ form.errors.father_whatsapp }}</span></label>
+                        <label class="field-label">Nama ibu<input v-model="form.mother_name" class="field-input" maxlength="160"><span v-if="form.errors.mother_name" class="field-error">{{ form.errors.mother_name }}</span></label>
+                        <label class="field-label">WhatsApp ibu<input v-model="form.mother_whatsapp" type="tel" class="field-input" maxlength="30"><span v-if="form.errors.mother_whatsapp" class="field-error">{{ form.errors.mother_whatsapp }}</span></label>
+                        <label class="field-label sm:col-span-2 xl:col-span-3">Alamat<textarea v-model="form.address" rows="2" class="field-input" maxlength="2000"></textarea><span v-if="form.errors.address" class="field-error">{{ form.errors.address }}</span></label>
+                    </div>
+                </div>
+
+                <!-- Bagian 3: Rekomendasi Terapis -->
+                <section class="mt-6 rounded-lg border border-slate-200 bg-slate-50 p-4">
                     <h3 class="text-sm font-semibold text-clinic-900">Rekomendasi terapis</h3>
-                    <p class="mt-1 text-xs leading-5 text-slate-500">Tentukan terapis untuk setiap jenis terapi yang direkomendasikan. Terapis yang sama hanya dapat ditugaskan kepada satu anak.</p>
+                    <p class="mt-1 text-xs leading-5 text-slate-500">Tentukan terapis untuk setiap jenis terapi yang direkomendasikan. Terapis dapat menangani banyak pasien; sesi yang waktunya bertumpang tindih akan ditolak.</p>
                     <div class="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                         <label v-for="code in ['OT', 'TW', 'FT']" :key="code" class="field-label">
                             {{ therapyTypes.find((type) => type.code === code)?.name ?? ({ OT: 'Terapi Okupasi', TW: 'Terapi Wicara', FT: 'Fisioterapi' }[code]) }}

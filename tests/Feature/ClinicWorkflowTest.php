@@ -1203,7 +1203,7 @@ class ClinicWorkflowTest extends TestCase
         $this->assertDatabaseCount('duration_package_ledger', 2);
     }
 
-    public function test_a_therapist_cannot_be_assigned_to_multiple_children(): void
+    public function test_a_therapist_can_be_assigned_to_multiple_children(): void
     {
         $owner = $this->userWithRole('owner');
         $this->actingAs($owner);
@@ -1217,14 +1217,19 @@ class ClinicWorkflowTest extends TestCase
         $this->put("/patients/{$otherPatient->id}", [
             'name' => $otherPatient->name,
             'therapist_assignments' => ['OT' => '', 'TW' => $profile->id],
-        ])->assertSessionHasErrors('therapist_assignments.TW');
+        ])->assertSessionHasNoErrors();
 
         $this->assertDatabaseHas('patient_therapists', [
             'patient_id' => $patient->id,
             'therapy_type_id' => $therapy->id,
             'therapist_profile_id' => $profile->id,
         ]);
-        $this->assertDatabaseCount('patient_therapists', 1);
+        $this->assertDatabaseHas('patient_therapists', [
+            'patient_id' => $otherPatient->id,
+            'therapy_type_id' => $therapy->id,
+            'therapist_profile_id' => $profile->id,
+        ]);
+        $this->assertDatabaseCount('patient_therapists', 2);
     }
 
     public function test_scheduling_uses_the_selected_session_duration(): void

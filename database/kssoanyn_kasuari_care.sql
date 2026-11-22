@@ -280,6 +280,7 @@ INSERT INTO `migrations` (`migration`, `batch`) VALUES ('2026_10_25_044828_creat
 -- Migration: 2026_10_25_123733_add_therapist_profile_id_to_assessments_table
 alter table `assessments` add `therapist_profile_id` bigint unsigned null;
 alter table `assessments` add constraint `assessments_therapist_profile_id_foreign` foreign key (`therapist_profile_id`) references `therapist_profiles` (`id`) on delete set null;
+alter table `assessments` add `attendance_status` varchar(20) null;
 INSERT INTO `migrations` (`migration`, `batch`) VALUES ('2026_10_25_123733_add_therapist_profile_id_to_assessments_table', 1);
 
 -- Migration: 2026_10_28_141153_create_patient_therapists_table
@@ -288,7 +289,7 @@ alter table `patient_therapists` add constraint `patient_therapists_patient_id_f
 alter table `patient_therapists` add constraint `patient_therapists_therapy_type_id_foreign` foreign key (`therapy_type_id`) references `therapy_types` (`id`) on delete restrict;
 alter table `patient_therapists` add constraint `patient_therapists_therapist_profile_id_foreign` foreign key (`therapist_profile_id`) references `therapist_profiles` (`id`) on delete cascade;
 alter table `patient_therapists` add unique `patient_therapists_patient_id_therapy_type_id_unique`(`patient_id`, `therapy_type_id`);
-alter table `patient_therapists` add unique `patient_therapists_therapist_profile_id_unique`(`therapist_profile_id`);
+-- alter table `patient_therapists` add unique `patient_therapists_therapist_profile_id_unique`(`therapist_profile_id`);
 INSERT INTO `migrations` (`migration`, `batch`) VALUES ('2026_10_28_141153_create_patient_therapists_table', 1);
 
 -- Migration: 2026_11_03_084807_create_patient_intake_submissions_table

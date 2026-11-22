@@ -84,9 +84,13 @@ class AdminCashierIntegrationTest extends TestCase
 
         $response = $this->post('/sales', [
             'patient_id' => $patient->id,
-            'line_type' => 'product',
-            'item_id' => $productId,
-            'quantity' => 1,
+            'items' => [
+                [
+                    'line_type' => 'product',
+                    'item_id' => $productId,
+                    'quantity' => 1,
+                ],
+            ],
             'discount_type' => 'fixed',
             'discount_value' => 0,
             'payment_method' => 'cash',

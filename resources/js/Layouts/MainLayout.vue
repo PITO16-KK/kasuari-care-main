@@ -2,7 +2,7 @@
 import { computed, ref, watch } from 'vue';
 import { Link, useForm, usePage } from '@inertiajs/vue3';
 import {
-    Activity, CalendarDays, ChevronDown, ClipboardList, CreditCard, FilePlus2,
+    Activity, BookOpen, CalendarDays, ChevronDown, ClipboardList, CreditCard, FilePlus2,
     LayoutDashboard, LogOut, Menu, PackageCheck, Receipt, UserRoundPlus, UsersRound, X,
 } from '@lucide/vue';
 
@@ -18,6 +18,7 @@ const pageTitle = computed(() => ({
     'PatientIntakes/Show': 'Jawaban form rekam medis',
     'Therapists/Index': 'Terapis',
     'Packages/Index': 'Paket terapi',
+    'Products/Index': 'Produk & buku',
     'Assessments/Create': 'Assessment',
     'Assessments/Index': 'Riwayat assessment',
     'Assessments/Complete': 'Isi hasil assessment',
@@ -42,6 +43,7 @@ const navGroups = computed(() => {
                 { label: 'Data pasien', href: '/patients', icon: UsersRound },
                 { label: 'Terapis', href: '/therapists', icon: UserRoundPlus },
                 { label: 'Paket terapi', href: '/packages', icon: PackageCheck },
+                { label: 'Produk & buku', href: '/products', icon: BookOpen },
                 { label: 'Assessment', href: '/assessments', icon: FilePlus2 },
             ],
         });

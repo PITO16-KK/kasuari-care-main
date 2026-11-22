@@ -29,7 +29,12 @@ class Patient extends Model
         );
 
         $counter = DB::table('patient_code_counters')->where('year', $year)->lockForUpdate()->first();
-        $next = $counter->last_number + 1;
+        $next = (int) $counter->last_number + 1;
+
+        while (static::query()->where('patient_code', sprintf('KL-%d-%03d', $year, $next))->exists()) {
+            $next++;
+        }
+
         DB::table('patient_code_counters')->where('year', $year)->update(['last_number' => $next]);
 
         return sprintf('KL-%d-%03d', $year, $next);
@@ -52,7 +57,6 @@ class Patient extends Model
     public function syncTherapistAssignments(array $assignments): void
     {
         $therapyTypeIds = TherapyType::query()
-            ->where('is_active', true)
             ->whereIn('code', array_keys($assignments))
             ->pluck('id', 'code');
         $therapists = [];

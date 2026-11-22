@@ -6,12 +6,10 @@ use App\Models\ParentContact;
 use App\Models\Patient;
 use App\Models\TherapistProfile;
 use App\Models\TherapyType;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -48,7 +46,6 @@ class PatientController extends Controller
             $patient->setAttribute('therapist_assignments', $assignments);
             $patient->unsetRelation('therapists');
         });
-        $assignedPatientIds = DB::table('patient_therapists')->pluck('patient_id', 'therapist_profile_id');
         $therapists = TherapistProfile::query()
             ->with('user:id,name')
             ->orderBy('id')
@@ -57,9 +54,6 @@ class PatientController extends Controller
                 'id' => (int) $therapist->id,
                 'name' => $therapist->user?->name,
                 'specialty' => $therapist->specialty,
-                'assigned_patient_id' => $assignedPatientIds->get($therapist->id) === null
-                    ? null
-                    : (int) $assignedPatientIds->get($therapist->id),
             ]);
 
         return Inertia::render('Patients/Index', [
@@ -163,8 +157,34 @@ class PatientController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $data = $request->validate($this->patientRules());
+        $rules = $this->patientRules();
+        $rules['allow_duplicate'] = ['nullable', 'boolean'];
+        $data = $request->validate($rules);
         $this->validateDistinctTherapistAssignments($data);
+
+        $trimmedName = trim($data['name']);
+        $existingPatient = Patient::query()
+            ->where('is_active', true)
+            ->whereRaw('LOWER(TRIM(name)) = ?', [mb_strtolower($trimmedName)])
+            ->where(function ($query) use ($data): void {
+                if (filled($data['birth_date'] ?? null)) {
+                    $query->whereDate('birth_date', $data['birth_date']);
+                }
+                if (filled($data['primary_whatsapp'] ?? null)) {
+                    $phone = preg_replace('/\D/', '', $data['primary_whatsapp']);
+                    if (strlen($phone) >= 8) {
+                        $query->orWhere('primary_whatsapp', 'like', "%{$phone}%");
+                    }
+                }
+            })
+            ->first();
+
+        if ($existingPatient !== null && ! $request->boolean('allow_duplicate')) {
+            $birth = $existingPatient->birth_date ? ' (Tgl lahir: '.$existingPatient->birth_date->format('d/m/Y').')' : '';
+            throw ValidationException::withMessages([
+                'name' => "Pasien dengan nama '{$existingPatient->name}' sudah terdaftar dengan kode {$existingPatient->patient_code}{$birth}. Periksa kembali data untuk mencegah perulangan data, atau centang konfirmasi jika ini adalah anak yang berbeda.",
+            ]);
+        }
 
         DB::transaction(function () use ($data, $request): void {
             $patient = Patient::create([
@@ -182,7 +202,7 @@ class PatientController extends Controller
 
     public function update(Request $request, Patient $patient): RedirectResponse
     {
-        $data = $request->validate($this->patientRules($patient));
+        $data = $request->validate($this->patientRules());
         $this->validateDistinctTherapistAssignments($data);
 
         DB::transaction(function () use ($data, $patient): void {
@@ -213,14 +233,8 @@ class PatientController extends Controller
     }
 
     /** @return array<string, list<string>> */
-    private function patientRules(?Patient $patient = null): array
+    private function patientRules(): array
     {
-        $uniqueTherapist = Rule::unique('patient_therapists', 'therapist_profile_id');
-
-        if ($patient !== null) {
-            $uniqueTherapist->where(fn (Builder $query) => $query->where('patient_id', '!=', $patient->id));
-        }
-
         return [
             'name' => ['required', 'string', 'max:160'],
             'birth_date' => ['nullable', 'date', 'before_or_equal:today'],
@@ -235,7 +249,7 @@ class PatientController extends Controller
             'mother_name' => ['nullable', 'string', 'max:160'],
             'mother_whatsapp' => ['nullable', 'string', 'max:30'],
             'therapist_assignments' => ['nullable', 'array:OT,TW,FT'],
-            'therapist_assignments.*' => ['nullable', 'integer', 'exists:therapist_profiles,id', $uniqueTherapist],
+            'therapist_assignments.*' => ['nullable', 'integer', 'exists:therapist_profiles,id'],
         ];
     }
 

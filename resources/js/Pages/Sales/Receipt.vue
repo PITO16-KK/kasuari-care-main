@@ -45,11 +45,20 @@ function printReceipt() {
 <template>
     <MainLayout>
         <a href="/sales/create" class="inline-flex min-h-11 items-center gap-2 text-xs font-bold text-clinic-700"><ArrowLeft :size="15" /> Kembali ke kasir</a>
-        <section class="receipt-print-area mx-auto mt-5 max-w-[640px] overflow-hidden rounded-lg border border-slate-200 bg-white">
-            <div class="receipt-header border-b border-slate-100 px-6 py-6 text-center">
-                <div class="text-xs font-bold uppercase text-clinic-700">Kasuari Care</div>
-                <h1 class="mt-1 text-lg font-bold text-clinic-900">{{ sale.status === 'paid' ? 'Bukti pembayaran' : 'Tagihan' }}</h1>
-                <p class="mt-1 text-xs text-slate-500">{{ sale.invoice_number }}</p>
+        <section class="receipt-print-area relative mx-auto mt-5 max-w-[640px] overflow-hidden rounded-lg border border-slate-200 bg-white">
+            <div class="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.05]">
+                <img :src="'/logo-klinik.png'" alt="Watermark" class="w-72 object-contain">
+            </div>
+            <div class="receipt-header relative border-b border-slate-200 px-6 py-6 text-center">
+                <img :src="'/logo-klinik.png'" alt="Kasuari Care" class="mx-auto mb-2 h-14 w-auto object-contain">
+                <div class="text-sm font-bold uppercase tracking-wider text-slate-900">RUMAH TERAPI ANAK KASUARI CARE</div>
+                <div class="mt-1 text-[11px] text-slate-600">
+                    {{ $page.props.clinic?.address || 'Perumnas Bumi Telukjambe, Karawang' }} &bull; WA: {{ $page.props.clinic?.phone || '0852-8016-1277' }}
+                </div>
+                <div class="mt-3 border-t border-slate-200 pt-3">
+                    <h1 class="text-lg font-bold text-slate-900">{{ sale.status === 'paid' ? 'Bukti Pembayaran' : 'Tagihan' }}</h1>
+                    <p class="mt-0.5 font-mono text-xs text-slate-600">{{ sale.invoice_number }}</p>
+                </div>
             </div>
 
             <div class="receipt-content space-y-5 px-6 py-5">
@@ -74,7 +83,7 @@ function printReceipt() {
                     <div class="flex justify-between border-t border-slate-100 pt-3 text-sm font-bold text-clinic-900"><span>{{ sale.status === 'paid' ? 'Total lunas' : 'Total tagihan' }}</span><span>{{ money(sale.grand_total) }}</span></div>
                     <div v-if="sale.payment" class="flex justify-between text-slate-500"><span>Metode</span><span class="capitalize">{{ sale.payment.method.replace('_', ' ') }}</span></div>
                     <div v-if="sale.payment?.bank_name" class="flex justify-between text-slate-500"><span>Bank pengirim</span><span>{{ sale.payment.bank_name }}</span></div>
-                    <div v-if="sale.payment?.has_proof" class="flex justify-between text-slate-500 print:hidden"><span>Bukti</span><a :href="`/payments/${sale.payment.id}/proof`" target="_blank" rel="noopener" class="font-semibold text-clinic-700 underline underline-offset-2">Lihat bukti pembayaran</a></div>
+                    <div v-if="sale.payment?.has_proof" class="flex justify-between text-slate-500 print:hidden"><span>Bukti</span><a :href="sale.payment.proof_url" target="_blank" rel="noopener" class="font-semibold text-clinic-700 underline underline-offset-2">Lihat bukti pembayaran</a></div>
                 </div>
 
                 <form v-if="sale.status !== 'paid'" class="border-t border-slate-100 pt-4" @submit.prevent="recordPayment">
@@ -138,6 +147,10 @@ function printReceipt() {
     .receipt-print-area,
     .receipt-print-area * {
         visibility: visible !important;
+    }
+
+    .receipt-print-area img {
+        display: block !important;
     }
 
     .receipt-print-area {

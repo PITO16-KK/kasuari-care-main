@@ -9,7 +9,6 @@ use App\Models\Sale;
 use App\Models\TherapistProfile;
 use App\Models\TherapyType;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -71,6 +70,15 @@ class AssessmentController extends Controller
             'patient_id' => ['nullable', 'integer', Rule::exists('patients', 'id')->where('is_active', true)],
         ]);
 
+        $appointments = Appointment::query()
+            ->where('status', '!=', 'cancelled')
+            ->where('starts_at', '>=', now()->startOfDay())
+            ->get(['id', 'therapist_profile_id', 'starts_at', 'ends_at']);
+        $scheduledAssessments = Assessment::query()
+            ->whereIn('status', ['awaiting_payment', 'paid', 'scheduled'])
+            ->where('scheduled_at', '>=', now()->startOfDay())
+            ->get(['id', 'therapist_profile_id', 'scheduled_at']);
+
         return Inertia::render('Assessments/Create', [
             'patients' => Patient::where('is_active', true)->orderBy('name')->get(['id', 'patient_code', 'name']),
             'initialPatientId' => isset($validated['patient_id']) ? (int) $validated['patient_id'] : null,
@@ -82,6 +90,8 @@ class AssessmentController extends Controller
             'therapists' => TherapistProfile::with('user:id,name')
                 ->orderBy('id')
                 ->get(['id', 'user_id', 'specialty']),
+            'appointments' => $appointments,
+            'scheduledAssessments' => $scheduledAssessments,
         ]);
     }
 
@@ -250,7 +260,6 @@ class AssessmentController extends Controller
             ->pluck('patient_therapists.therapist_profile_id', 'therapy_types.code')
             ->map(fn (int $id): int => $id)
             ->all();
-        $assignedPatientIds = DB::table('patient_therapists')->pluck('patient_id', 'therapist_profile_id');
         $therapists = TherapistProfile::query()
             ->with('user:id,name')
             ->orderBy('id')
@@ -259,9 +268,6 @@ class AssessmentController extends Controller
                 'id' => (int) $therapist->id,
                 'name' => $therapist->user?->name,
                 'specialty' => $therapist->specialty,
-                'assigned_patient_id' => $assignedPatientIds->get($therapist->id) === null
-                    ? null
-                    : (int) $assignedPatientIds->get($therapist->id),
             ]);
 
         return Inertia::render('Assessments/Complete', [
@@ -274,8 +280,6 @@ class AssessmentController extends Controller
 
     public function update(Request $request, Assessment $assessment): RedirectResponse
     {
-        $uniqueTherapist = Rule::unique('patient_therapists', 'therapist_profile_id')
-            ->where(fn (Builder $query) => $query->where('patient_id', '!=', $assessment->patient_id));
         $data = $request->validate([
             'chief_complaint' => ['required', 'string', 'max:3000'],
             'development_history' => ['nullable', 'array'],
@@ -288,7 +292,7 @@ class AssessmentController extends Controller
             'recommendations.*.therapy_type_id' => ['required', Rule::exists('therapy_types', 'id')->where('is_active', true)],
             'recommendations.*.sessions_per_week' => ['required', 'integer', 'min:1', 'max:7'],
             'therapist_assignments' => ['nullable', 'array:OT,TW,FT'],
-            'therapist_assignments.*' => ['nullable', 'integer', 'exists:therapist_profiles,id', $uniqueTherapist],
+            'therapist_assignments.*' => ['nullable', 'integer', 'exists:therapist_profiles,id'],
         ]);
         $therapistAssignments = $data['therapist_assignments'] ?? [];
         $this->validateDistinctTherapistAssignments($therapistAssignments);
@@ -306,15 +310,6 @@ class AssessmentController extends Controller
 
             if ($therapistIds->isNotEmpty()) {
                 TherapistProfile::query()->whereKey($therapistIds)->orderBy('id')->lockForUpdate()->get();
-
-                if (DB::table('patient_therapists')
-                    ->whereIn('therapist_profile_id', $therapistIds)
-                    ->where('patient_id', '!=', $patient->id)
-                    ->exists()) {
-                    throw ValidationException::withMessages([
-                        'therapist_assignments' => 'Terapis yang dipilih sudah ditugaskan kepada anak lain.',
-                    ]);
-                }
             }
 
             $lockedAssessment->update([
@@ -366,9 +361,14 @@ class AssessmentController extends Controller
         );
         $assessment->patient->unsetRelation('therapists');
 
-        return Pdf::loadView('pdf.assessment', compact('assessment'))
-            ->setPaper('a4')
-            ->stream("assessment-{$assessment->patient->patient_code}.pdf");
+        $pdf = Pdf::loadView('pdf.assessment', compact('assessment'))->setPaper('a4');
+        $pdf->render();
+
+        $dompdf = $pdf->getDomPDF();
+        $font = $dompdf->getFontMetrics()->getFont('Helvetica', 'normal');
+        $dompdf->getCanvas()->page_text(468, 817, 'Halaman {PAGE_NUM} dari {PAGE_COUNT}', $font, 8, [0.45, 0.51, 0.57]);
+
+        return $pdf->stream("assessment-{$assessment->patient->patient_code}.pdf");
     }
 
     /** @return list<array{therapy_name: string|null, therapist_name: string|null}> */
