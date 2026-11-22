@@ -108,7 +108,11 @@ function purgeAllOrphans(): void {
         DELETE FROM patient_intake_submissions WHERE patient_id IS NOT NULL AND patient_id NOT IN (SELECT id FROM patients);
         DELETE FROM patient_therapists WHERE patient_id NOT IN (SELECT id FROM patients) OR therapist_profile_id NOT IN (SELECT id FROM therapist_profiles);
         DELETE FROM patient_parents WHERE patient_id NOT IN (SELECT id FROM patients);
+        DELETE FROM therapist_profiles WHERE user_id IS NULL;
         DELETE FROM therapist_profiles WHERE user_id NOT IN (SELECT id FROM users);
+        UPDATE appointments SET therapist_profile_id = NULL WHERE therapist_profile_id IS NOT NULL AND therapist_profile_id NOT IN (SELECT id FROM therapist_profiles);
+        UPDATE assessments SET therapist_profile_id = NULL WHERE therapist_profile_id IS NOT NULL AND therapist_profile_id NOT IN (SELECT id FROM therapist_profiles);
+        DELETE FROM therapist_payrolls WHERE therapist_profile_id IS NOT NULL AND therapist_profile_id NOT IN (SELECT id FROM therapist_profiles);
         DELETE FROM appointments WHERE therapist_profile_id IS NOT NULL AND therapist_profile_id NOT IN (SELECT id FROM therapist_profiles);
         DELETE FROM assessments WHERE therapist_profile_id IS NOT NULL AND therapist_profile_id NOT IN (SELECT id FROM therapist_profiles);
     ");
@@ -209,7 +213,8 @@ try {
         ->count();
 
     $orphanTherapists = DB::table('therapist_profiles')
-        ->whereNotIn('user_id', DB::table('users')->select('id'))
+        ->whereNull('user_id')
+        ->orWhereNotIn('user_id', DB::table('users')->select('id'))
         ->count();
 
     $dummyPatientsCount = DB::table('patients')
