@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panduan Alur Penggunaan Sistem - Kasuari Care</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #059669;
+            --primary-dark: #047857;
+            --primary-light: #ecfdf5;
+            --accent: #2563eb;
+            --accent-light: #eff6ff;
+            --purple: #7c3aed;
+            --purple-light: #f5f3ff;
+            --dark: #0f172a;
+            --slate-800: #1e293b;
+            --slate-700: #334155;
+            --slate-600: #475569;
+            --slate-400: #94a3b8;
+            --slate-200: #e2e8f0;
+            --slate-100: #f1f5f9;
+            --slate-50: #f8fafc;
+            --card-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
+            --card-hover: 0 12px 24px -4px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.04);
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8fafc;
+            color: var(--slate-800);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Top Banner */
+        .top-nav {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .top-nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            background: linear-gradient(135deg, #10b981, #059669);
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            font-size: 22px;
+            font-weight: 800;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .brand-text h1 {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .brand-text p {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-link {
+            background: rgba(255,255,255,0.08);
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.15);
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-link:hover {
+            background: rgba(255,255,255,0.18);
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        /* Hero */
+        .hero {
+            background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            padding: 56px 24px 72px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(15, 23, 42, 0) 70%);
+            top: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+            pointer-events: none;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #34d399;
+            padding: 6px 16px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+        }
+
+        .hero h2 {
+            font-size: 38px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            max-width: 800px;
+            margin: 0 auto 16px;
+            line-height: 1.25;
+        }
+
+        .hero p {
+            color: #94a3b8;
+            font-size: 17px;
+            max-width: 640px;
+            margin: 0 auto 28px;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1140px;
+            margin: -36px auto 60px;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Role Switcher Tabs */
+        .role-switcher-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 32px;
+            border: 1px solid var(--slate-200);
+        }
+
+        @media (max-width: 768px) {
+            .role-switcher-card {
+                grid-template-columns: 1fr;
+            }
+            .hero h2 {
+                font-size: 28px;
+            }
+        }
+
+        .role-btn {
+            background: white;
+            border: 1px solid transparent;
+            padding: 16px 20px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .role-btn:hover {
+            background: var(--slate-50);
+            border-color: var(--slate-200);
+        }
+
+        .role-btn.active {
+            background: var(--slate-50);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        .role-btn.owner.active {
+            border-color: #8b5cf6;
+            background: linear-gradient(135deg, #faf5ff 0%, #f5f3ff 100%);
+        }
+
+        .role-btn.admin.active {
+            border-color: #059669;
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+        }
+
+        .role-btn.therapist.active {
+            border-color: #2563eb;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        }
+
+        .role-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .role-btn.owner .role-icon { background: #ede9fe; color: #7c3aed; }
+        .role-btn.admin .role-icon { background: #d1fae5; color: #059669; }
+        .role-btn.therapist .role-icon { background: #dbeafe; color: #2563eb; }
+
+        .role-info h4 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 2px;
+        }
+
+        .role-info p {
+            font-size: 12px;
+            color: var(--slate-600);
+        }
+
+        /* Search Filter */
+        .search-bar {
+            background: white;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--slate-200);
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 28px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .search-bar input {
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--slate-800);
+        }
+
+        /* Credentials Box */
+        .cred-card {
+            background: white;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--slate-200);
+            padding: 20px 24px;
+            margin-bottom: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cred-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 5px;
+        }
+
+        .cred-card.owner::before { background: #8b5cf6; }
+        .cred-card.admin::before { background: #059669; }
+        .cred-card.therapist::before { background: #2563eb; }
+
+        .cred-details {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .cred-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .cred-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--slate-400);
+        }
+
+        .cred-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark);
+            background: var(--slate-100);
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--slate-200);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-copy {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--slate-600);
+            font-size: 14px;
+            transition: color 0.15s;
+        }
+
+        .btn-copy:hover {
+            color: var(--primary);
+        }
+
+        /* Workflow Steps */
+        .role-section {
+            display: none;
+        }
+
+        .role-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header {
+            margin-bottom: 24px;
+        }
+
+        .section-header h3 {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--dark);
+            letter-spacing: -0.5px;
+        }
+
+        .section-header p {
+            color: var(--slate-600);
+            font-size: 15px;
+            margin-top: 4px;
+        }
+
+        /* Timeline Card */
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .step-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--slate-200);
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            transition: all 0.25s ease;
+        }
+
+        .step-card:hover {
+            box-shadow: var(--card-hover);
+            border-color: #cbd5e1;
+        }
+
+        .step-header {
+            padding: 20px 24px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .step-badge-wrap {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .step-number {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--dark);
+            color: white;
+            display: grid;
+            place-items: center;
+            font-size: 14px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .step-header-text h4 {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .step-route {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--primary);
+            background: var(--primary-light);
+            padding: 2px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        .step-toggle-icon {
+            font-size: 20px;
+            color: var(--slate-400);
+            transition: transform 0.2s;
+        }
+
+        .step-card.open .step-toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .step-body {
+            padding: 0 24px 24px;
+            border-top: 1px solid var(--slate-100);
+            display: none;
+        }
+
+        .step-card.open .step-body {
+            display: block;
+            padding-top: 20px;
+        }
+
+        .step-instruction {
+            font-size: 15px;
+            color: var(--slate-700);
+            margin-bottom: 16px;
+        }
+
+        .instruction-list {
+            margin: 12px 0 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .instruction-list li {
+            font-size: 14px;
+            color: var(--slate-700);
+        }
+
+        .instruction-list strong {
+            color: var(--dark);
+        }
+
+        /* Callouts */
+        .callout {
+            border-radius: var(--radius-sm);
+            padding: 14px 18px;
+            margin-top: 16px;
+            font-size: 13px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .callout-tip {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+        }
+
+        .callout-warn {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            color: #92400e;
+        }
+
+        .callout-info {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+        }
+
+        .callout-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+            line-height: 1;
+        }
+
+        /* Interactive Process Flow */
+        .workflow-overview {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            border: 1px solid var(--slate-200);
+            box-shadow: var(--card-shadow);
+            margin-bottom: 40px;
+        }
+
+        .workflow-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .workflow-desc {
+            font-size: 14px;
+            color: var(--slate-600);
+            margin-bottom: 24px;
+        }
+
+        .flow-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            position: relative;
+        }
+
+        .flow-node {
+            background: var(--slate-50);
+            border: 1px solid var(--slate-200);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            text-align: center;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .flow-node:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.1);
+        }
+
+        .flow-step-num {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            margin: 0 auto 8px;
+            display: grid;
+            place-items: center;
+        }
+
+        .flow-node h5 {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .flow-node p {
+            font-size: 11px;
+            color: var(--slate-600);
+        }
+
+        .flow-role-badge {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-top: 8px;
+        }
+
+        .badge-fo { background: #d1fae5; color: #047857; }
+        .badge-therapist { background: #dbeafe; color: #1d4ed8; }
+        .badge-owner { background: #ede9fe; color: #6d28d9; }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--slate-200);
+            padding: 32px 24px;
+            text-align: center;
+            color: var(--slate-400);
+            font-size: 13px;
+            background: white;
+        }
+
+        /* Print styles */
+        @media print {
+            .top-nav, .role-switcher-card, .search-bar, .hero { display: none !important; }
+            .role-section { display: block !important; margin-bottom: 40px; page-break-after: always; }
+            .step-body { display: block !important; }
+            .container { margin: 0; max-width: 100%; }
+            body { background: white; color: black; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header class="top-nav">
+        <div class="top-nav-inner">
+            <div class="brand">
+                <div class="brand-logo">🏥</div>
+                <div class="brand-text">
+                    <h1>Kasuari Care</h1>
+                    <p>Buku Panduan &amp; Standard Operating Procedure (SOP) Digital</p>
+                </div>
+            </div>
+            <div class="nav-actions">
+                <a href="/dashboard" class="btn-link" target="_blank">🌐 Buka Dashboard Kasuari</a>
+                <button onclick="window.print()" class="btn-link">🖨️ Cetak / Simpan PDF</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-badge">Panduan Terintegrasi Multi-Peran</div>
+        <h2>Kupas Tuntas Alur Operasional Klinik</h2>
+        <p>Pelajari langkah demi langkah pengoperasian sistem Kasuari Care untuk Pimpinan (Owner), Admin Front Office / Kasir, dan Terapis Spesialis.</p>
+    </section>
+
+    <div class="container">
+
+        <!-- Role Switcher -->
+        <div class="role-switcher-card">
+            <button class="role-btn owner active" onclick="switchRole('owner')">
+                <div class="role-icon">👑</div>
+                <div class="role-info">
+                    <h4>Pimpinan (Owner)</h4>
+                    <p>Kendalikan KPI, keuangan, master data &amp; payroll</p>
+                </div>
+            </button>
+            <button class="role-btn admin" onclick="switchRole('admin')">
+                <div class="role-icon">💼</div>
+                <div class="role-info">
+                    <h4>Admin Front Office / Kasir</h4>
+                    <p>Daftarkan pasien, kasir multi-item &amp; jadwal</p>
+                </div>
+            </button>
+            <button class="role-btn therapist" onclick="switchRole('therapist')">
+                <div class="role-icon">🩺</div>
+                <div class="role-info">
+                    <h4>Terapis Spesialis</h4>
+                    <p>Asesmen tumbuh kembang &amp; laporan SOAP</p>
+                </div>
+            </button>
+        </div>
+
+        <!-- Global Search -->
+        <div class="search-bar">
+            <span>🔍</span>
+            <input type="text" id="searchInput" placeholder="Cari langkah atau fitur (misal: kasir, struk, resep, jadwal, payroll, asesmen)..." oninput="filterSteps()">
+        </div>
+
+        <!-- Interactive Process Flow Summary -->
+        <div class="workflow-overview">
+            <div class="workflow-title">
+                <span>🔄</span> Alur Perjalanan Pasien dari Pendaftaran Hingga Selesai Terapi
+            </div>
+            <p class="workflow-desc">Siklus lengkap interaksi antara Orang Tua, Admin Front Office, Kasir, Terapis, dan Pimpinan Klinik:</p>
+            <div class="flow-grid">
+                <div class="flow-node">
+                    <div class="flow-step-num">1</div>
+                    <h5>Pendaftaran Awal</h5>
+                    <p>Formulir intake online / registrasi baru</p>
+                    <span class="flow-role-badge badge-fo">Front Office</span>
+                </div>
+                <div class="flow-node">
+                    <div class="flow-step-num">2</div>
+                    <h5>Bayar Asesmen</h5>
+                    <p>Kasir bayar assessment awal Rp300rb</p>
+                    <span class="flow-role-badge badge-fo">Kasir</span>
+                </div>
+                <div class="flow-node">
+                    <div class="flow-step-num">3</div>
+                    <h5>Pelaksanaan Asesmen</h5>
+                    <p>Terapis periksa tumbuh kembang &amp; cetak PDF</p>
+                    <span class="flow-role-badge badge-therapist">Terapis</span>
+                </div>
+                <div class="flow-node">
+                    <div class="flow-step-num">4</div>
+                    <h5>Beli Paket Terapi</h5>
+                    <p>Beli paket 4x/8x/12x sesi di modul Kasir</p>
+                    <span class="flow-role-badge badge-fo">Kasir</span>
+                </div>
+                <div class="flow-node">
+                    <div class="flow-step-num">5</div>
+                    <h5>Penjadwalan Rutin</h5>
+                    <p>Pilih jam &amp; ruangan tanpa bentrok</p>
+                    <span class="flow-role-badge badge-fo">Front Office</span>
+                </div>
+                <div class="flow-node">
+                    <div class="flow-step-num">6</div>
+                    <h5>Sesi &amp; Laporan SOAP</h5>
+                    <p>Terapis catat kegiatan &amp; foto di ruangan</p>
+                    <span class="flow-role-badge badge-therapist">Terapis</span>
+                </div>
+                <div class="flow-node">
+                    <div class="flow-step-num">7</div>
+                    <h5>Rekap &amp; Payroll</h5>
+                    <p>Pantau omzet, laba rugi &amp; gaji sesi</p>
+                    <span class="flow-role-badge badge-owner">Owner</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================================= -->
+        <!-- ROLE 1: OWNER / PIMPINAN KLINIK                                           -->
+        <!-- ========================================================================= -->
+        <div id="section-owner" class="role-section active">
+            
+            <div class="cred-card owner">
+                <div class="cred-details">
+                    <div class="cred-item">
+                        <span class="cred-label">Akun Login Owner</span>
+                        <span class="cred-value">owner@rumahterapi.test <button class="btn-copy" onclick="copyText('owner@rumahterapi.test')">📋</button></span>
+                    </div>
+                    <div class="cred-item">
+                        <span class="cred-label">Password Default</span>
+                        <span class="cred-value">password <button class="btn-copy" onclick="copyText('password')">📋</button></span>
+                    </div>
+                </div>
+                <a href="/login" class="btn-link" target="_blank" style="background: #7c3aed; border-color: #8b5cf6;">🚀 Masuk sebagai Owner</a>
+            </div>
+
+            <div class="section-header">
+                <h3>Panduan Lengkap: Pimpinan Klinik (Owner)</h3>
+                <p>Owner memiliki kewenangan tertinggi (Super Admin) untuk memantau performa klinik secara real-time, mengaudit operasional, mengelola tim, dan mengeksekusi payroll.</p>
+            </div>
+
+            <div class="timeline">
+                
+                <!-- Step 1 -->
+                <div class="step-card open">
+                    <div class="step-header" onclick="toggleStep(this)">
+                        <div class="step-badge-wrap">
+                            <div class="step-number">1</div>
+                            <div class="step-header-text">
+                                <h4>Membaca Dashboard Ringkasan &amp; KPI Eksekutif</h4>
+                                <span class="step-route">GET /dashboard</span>
+                            </div>
+                        </div>
+                        <span class="step-toggle-icon">▼</span>
+                    </div>
+                    <div class="step-body">
+                        <p class="step-instruction">Saat pertama kali login, Owner akan langsung diarahkan ke Dashboard Ringkasan Utama:</p>
+                        <ul class="instruction-list">
+                            <li><strong>Kartu Metrik Finansial:</strong> Menampilkan total pendapatan kotor bulan ini, total sesi yang terlaksana, pasien aktif, serta jumlah assessment yang belum terselesaikan.</li>
+                            <li><strong>Jadwal Hari Ini:</strong> Menampilkan seluruh sesi terapi dan assessment yang berjalan pada hari ini secara kronologis beserta status kehadirannya.</li>
+                            <li><strong>Filter Interaktif:</strong> Gunakan dropdown terapis dan filter tanggal di pojok kanan atas untuk memfilter jadwal terapis tertentu.</li>
+                            <li><strong>Shortcut Cepat:</strong> Akses tombol cepat untuk tambah pasien baru, buat jadwal, atau buka kasir.</li>
+                        </ul>
+                        <div class="callout callout-tip">
+                            <span class="callout-icon">💡</span>
+                            <div><strong>Tips Owner:</strong> Periksa badge kehadiran di jadwal hari ini. Jika ada sesi yang belum dikonfirmasi kehadirannya, ingatkan Admin Front Office untuk melakukan check-in pasien.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="step-card open">
+                    <div class="step-header" onclick="toggleStep(this)">
+                        <div class="step-badge-wrap">
+                            <div class="step-number">2</div>
+                            <div class="step-header-text">
+                                <h4>Manajemen Tim Terapis &amp; Akun Karyawan</h4>
+                                <span class="step-route">GET /therapists</span>
+                            </div>
+                        </div>
+                        <span class="step-toggle-icon">▼</span>
+                    </div>
+                    <div class="step-body">
+                        <p class="step-instruction">Owner berwenang menambahkan dan memperbarui akun terapis klinik:</p>
+                        <ul class="instruction-list">
+                            <li>Klik menu <strong>Terapis</strong> pada bilah navigasi atas.</li>
+                            <li><strong>Menambah Terapis Baru:</strong> Isi formulir di sisi kiri layar: Nama Lengkap (beserta gelar, misal: <em>Nurul Fadilah, S.Tr.Kes</em>), Email, Nomor WhatsApp, Nomor STR/Lisensi, dan Spesialisasi (Wicara / Okupasi / Fisioterapi).</li>
+                            <li>Tentukan kata sandi akun login untuk terapis tersebut, lalu klik <strong>Simpan Akun Terapis</strong>.</li>
+                            <li><strong>Mengedit atau Menonaktifkan:</strong> Klik tombol <strong>Edit</strong> pada kartu terapis untuk memperbarui profil atau menonaktifkan akun jika terapis sudah tidak bertugas.</li>
+                        </ul>
+                        <div class="callout callout-info">
+                            <span class="callout-icon">ℹ️</span>
+                            <div><strong>Keunggulan Versi Terbaru:</strong> Satu akun terapis kini dapat ditugaskan ke banyak anak sekaligus tanpa batasan sistem, mempermudah rotasi pasien.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="step-card open">
+                    <div class="step-header" onclick="toggleStep(this)">
+                        <div class="step-badge-wrap">
+                            <div class="step-number">3</div>
+                            <div class="step-header-text">
+                                <h4>Pengelolaan Master Paket Terapi &amp; Layanan Klinik</h4>
+                                <span class="step-route">GET /packages &bull; GET /products</span>
+                            </div>
+                        </div>
+                        <span class="step-toggle-icon">▼</span>
+                    </div>
+                    <div class="step-body">
+                        <p class="step-instruction">Kelola paket sesi dan produk fisik yang dijual di klinik:</p>
+                        <ul class="instruction-list">
+                            <li>Buka menu <strong>Paket</strong> untuk melihat paket durasi 1 Jam (60 menit) dan Paket 30 Menit.</li>
+                            <li>Owner dapat menonaktifkan paket lama atau menambahkan paket promo baru dengan masa berlaku hari tertentu.</li>
+                            <li>Buka tab <strong>Produk &amp; Buku</strong> untuk mengelola stok barang fisik (kartu stimulasi wicara, sensori toys, buku panduan orang tua).</li>
+                            <li>Saat transaksi kasir menjual produk fisik, stok barang akan otomatis berkurang secara real-time.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="step-card open">
+                    <div class="step-header" onclick="toggleStep(this)">
+                        <div class="step-badge-wrap">
+                            <div class="step-number">4</div>
+                            <div class="step-header-text">
+                                <h4>Audit Keuangan Klinik &amp; Ekspor Pembayaran</h4>
+                                <span class="step-route">GET /payment-history &bull; GET /finance/records</span>
+                            </div>
+                        </div>
+                        <span class="step-toggle-icon">▼</span>
+                    </div>
+                    <div class="step-body">
+                        <p class="step-instruction">Pantau arus kas masuk dan kas keluar klinik:</p>
+                        <ul class="instruction-list">
+                            <li><strong>Riwayat Pembayaran (/payment-history):</strong> Tinjau seluruh transaksi kasir lengkap dengan nomor struk/invoice, metode bayar (Tunai, Transfer Bank, QRIS), dan nama kasir yang melayani.</li>
+                            <li>Klik tombol <strong>Ekspor Excel / CSV</strong> untuk mengunduh laporan penjualan ke spreadsheet akuntansi Anda.</li>
+                            <li><strong>Catatan Keuangan &amp; Biaya Operasional (/finance/records):</strong> Catat pengeluaran klinik (sewa, listrik, konsumsi, pembelian alat terapi) beserta bukti upload kuitansi.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Step 5 -->
+                <div class="step-card open">
+                    <div class="step-header" onclick="toggleStep(this)">
+                        <div class="step-badge-wrap">
+                            <div class="step-number">5</div>
+                            <div class="step-header-text">
+                                <h4>Penggajian &amp; Payroll Terapis (Fitur Eksklusif Owner)</h4>
+                                <span class="step-route">POST /finance/payroll &bull; GET /finance/payroll/export</span>
+                            </div>
+                        </div>
+                        <span class="step-toggle-icon">▼</span>
+                    </div>
+                    <div class="step-body">
+                        <p class="step-instruction">Kalkulasi dan dokumentasi gaji terapis berdasarkan jumlah sesi terapi yang telah selesai dijalankan:</p>
+                        <ul class="instruction-list">
+                            <li>Buka menu <strong>Rekap Keuangan</strong> lalu pilih tab <strong>Payroll Terapis</strong>.</li>
+                            <li>Pilih profil terapis yang akan digaji, tentukan periode penggajian, nominal gaji bersih, tanggal transfer, serta unggah bukti struk transfer bank.</li>
+                            <li>Klik tombol <strong>Ekspor Rekap Payroll</strong> untuk arsip kompensasi bulanan terapis.</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ========================================================================= -->
+        <!-- ROLE 2: ADMIN FRONT OFFICE & KASIR                                        -->
+        <!-- ========================================================================= -->
+        <div id="section-admin" class="role-section">
+            
+            <div class="cred-card admin">
+                <div class="cred-details">
+                    <div class="cred-item">
+                        <span class="cred-label">Akun Admin Front Office</span>
+                        <span class="cred-value">admin@rumahterapi.test <button class="btn-copy" onclick="copyText('admin@rumahterapi.test')">📋</button></span>
+                    </div>
+                    <div class="cred-item">
+                        <span class="cred-label">Akun Kasir Keuangan</span>
+                        <span class="cred-value">kasir@rumahterapi.test <button class="btn-copy" onclick="copyText('kasir@rumahterapi.test')">📋</button></span>
+                    </div>
+                    <div class="cred-item">
+                        <span class="cred-label">Password Default</span>
+                        <span class="cred-value">password <button class="btn-copy" onclick="copyText('password')">📋</button></span>
+                    </div>
+                </div>
+                <a href="/login" class="btn-link" target="_blank" style="background: #059669; border-color: #10b981;">🚀 Masuk sebagai Admin FO</a>
+            </div>
+
+            <div class="section-header">
+                <h3>Panduan Lengkap: Admin Front Office &amp; Kasir</h3>
+                <p>Front Office adalah jantung operasional harian: melayani pendaftaran anak, konversi formulir intake, kasir multi-item, dan penjadwalan terapi tanpa bentrok.</p>
+            </div>
+
+            <div class="timeline">
+                
+                <!-- Step 1 -->
+                <div class="step-card open">
+                    <div class="step-header" onclick="toggleStep(this)">
+                        <div class="step-badge-wrap">
+                            <div class="step-number">1</div>
+                            <div class="step-header-text">
+                                <h4>Menerima Pasien Baru &amp; Pencegahan Duplikasi Rekam Medis</h4>
+                                <span class="step-route">GET /patients &bull; GET /registrations</span>
+                            </div>
+                        </div>
+                        <span class="step-toggle-icon">▼</span>
+                    </div>
+                    <div class="step-body">
+                        <p class="step-instruction">Ada dua cara pasien baru masuk ke sistem:</p>
+                        <ul class="instruction-list">
+                            <li><strong>Jalur 1 (Pendaftaran Langsung di Meja FO):</strong>
+                                <br>Buka menu <strong>Pasien</strong> > Klik tombol <strong>+ Tambah Pasien Baru</strong>. Isi nama anak, tanggal lahir, jenis kelamin, nama orang tua, nomor WhatsApp, dan keluhan utama.
+                                <br><em>Sistem secara otomatis akan mendeteksi kemiripan nama dan nomor WhatsApp untuk mencegah terbuatnya rekam medis ganda secara tidak sengaja.</em>
+                            </li>
+                            <li><strong>Jalur 2 (Formulir Online Orang Tua):</strong>
+                                <br>Buka menu <strong>Registrasi Masuk</strong>. Anda akan melihat data kiriman dari formulir online publik. Cukup klik tombol <strong>Konversi ke Pasien Baru</strong> atau <strong>Tautkan ke Pasien Lama</strong>.
+                            </li>
+                            <li>Nomor Rekam Medis unik berformat <code>KL-YYYY-XXX</code> (contoh: <code>KL-2026-001</code>) akan terbuat secara otomatis dan aman dari bentrok nomor.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="step-card open">
+                    <div class="step-header" onclick="toggleStep(this)">
+                        <div class="step-badge-wrap">
+                            <div class="step-number">2</div>
+                            <div class="step-header-text">
+                                <h4>Pendaftaran Assessment Awal</h4>
+                                <span class="step-route">GET /assessments/create</span>
+                            </div>
+                        </div>
+                        <span class="step-toggle-icon">▼</span>
+                    </div>
+                    <div class="step-body">
+                        <p class="step-instruction">Setiap pasien baru wajib menjalani assessment awal sebelum sesi terapi rutin dimulai:</p>
+                        <ul class="instruction-list">
+                            <li>Buka menu <strong>Assessment</strong> > Klik <strong>+ Jadwalkan Assessment</strong>.</li>
+                            <li>Pilih nama pasien anak dari daftar autocomplete responsif.</li>
+                            <li>Pilih terapis penilai dan tentukan tanggal serta jam pertemuan assessment.</li>
+                            <li>Sistem secara otomatis akan membuatkan tagihan assessment (senilai Rp300.000) yang menunggu pembayaran di Kasir.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="step-card open">
+                    <div class="step-header" onclick="toggleStep(this)">
+                        <div class="step-badge-wrap">
+                            <div class="step-number">3</div>
+                            <div class="step-header-text">
+                                <h4>Transaksi Kasir Multi-Item &amp; Cetak Struk Resmi</h4>
+                                <span class="step-route">GET /sales/create &bull; GET /sales/{id}/receipt</span>
+                            </div>
+                        </div>
+                        <span class="step-toggle-icon">▼</span>
+                    </div>
+                    <div class="step-body">
+                        <p class="step-instruction">Modul kasir terbaru mendukung transaksi multi-item dalam 1 struk pembayaran:</p>
+                        <ul class="instruction-list">
+                            <li>Buka menu <strong>Kasir</strong> > Klik <strong>+ Transaksi Baru</strong>.</li>
+                            <li>Pilih nama pasien. Anda dapat memasukkan berbagai item sekaligus:
+                                <br>&bull; <em>Tagihan Assessment yang tertunda</em>
+                                <br>&bull; <em>Paket Terapi Durasi 1 Jam atau 30 Menit (kuota sesi otomatis masuk ke saldo anak)</em>
+                                <br>&bull; <em>Sesi Lepas (Single Session)</em>
+                                <br>&bull; <em>Produk fisik (buku / mainan edukasi dengan pengecekan stok otomatis)</em>
+                            </li>
+                            <li>Masukkan diskon (jika ada), pilih metode bayar (Tunai, Transfer Bank Mandiri/BCA, QRIS), dan masukkan nama pengirim atau bukti transfer.</li>
+                            <li>Klik <strong>Simpan Transaksi &amp; Cetak Struk</strong>.</li>
+                            <li>Struk Kasir langsung tampil rapi dengan Kop Surat Resmi Klinik, logo, alamat lengkap, dan nomor invoice.</li>
+                        </ul>
+                        <div class="callout callout-tip">
+                            <span class="callout-icon">💡</span>
+                            <div><strong>Otomasi Kuota:</strong> Saat orang tua membeli Paket Terapi (misal Paket 8 Sesi), sistem secara otomatis mencatatkan kuota 8 sesi ke buku besar durasi anak. FO tinggal menjadwalkan 8 sesi tersebut!</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="step-card open">
+                    <div class="step-header" onclick="toggleStep(this)">
+                        <div class="step-badge-wrap">
+                            <div class="step-number">4</div>
+                            <div class="step-header-text">
+                                <h4>Penjadwalan Terapi Rutin &amp; Pencegahan Bentrok Jadwal</h4>
+                                <span class="step-route">GET /scheduling</span>
+                            </div>
+                        </div>
+                        <span class="step-toggle-icon">▼</span>
+                    </div>
+                    <div class="step-body">
+                        <p class="step-instruction">Penjadwalan sesi terapi dilakukan secara presisi dengan deteksi bentrok otomatis:</p>
+                        <ul class="instruction-list">
+                            <li>Buka menu <strong>Jadwal Terapi</strong>.</li>
+                            <li>Ketik nama anak di kolom pencarian pasien (autocomplete instan, mendukung navigasi tombol panah keyboard).</li>
+                            <li>Pilih <strong>Jenis Terapi</strong> (Wicara, Okupasi, Fisioterapi), <strong>Terapis</strong> yang bertugas, dan <strong>Ruangan</strong> terapi.</li>
+                            <li>Tentukan tanggal serta jam mulai sesi.</li>
+                            <li><strong>Deteksi Bentrok Cerdas:</strong> Jika terapis yang dipilih sudah memiliki jadwal terapi atau assessment lain di rentang jam yang sama, sistem langsung menampilkan banner peringatan merah dan menolak pembuatan jadwal bentrok.</li>
+                            <li>Klik <strong>Simpan Jadwal</strong>. Sesi langsung muncul di kalender kerja harian terapis.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Step 5 -->
+                <div class="step-card open">
+                    <div class="step-header" onclick="toggleStep(this)">
+                        <div class="step-badge-wrap">
+                            <div class="step-number">5</div>
+                            <div class="step-header-text">
+                                <h4>Check-In Kehadiran Pasien (Absensi Sesi &amp; Asesmen)</h4>
+                                <span class="step-route">PATCH /scheduling/{id}/attendance</span>
+                            </div>
+                        </div>
+                        <span class="step-toggle-icon">▼</span>
+                    </div>
+                    <div class="step-body">
+                        <p class="step-instruction">Ketika pasien tiba di klinik:</p>
+                        <ul class="instruction-list">
+                            <li>Buka halaman <strong>Dashboard</strong> atau <strong>Jadwal Terapi</strong> hari ini.</li>
+                            <li>Pada kartu atau baris nama pasien yang baru tiba, klik tombol <strong>Konfirmasi Kehadiran</strong>.</li>
+                            <li>Status sesi akan berubah menjadi Hadir, memberi sinyal kepada terapis di ruang terapi bahwa pasien sudah siap masuk ruangan.</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ========================================================================= -->
+        <!-- ROLE 3: TERAPIS SPESIALIS                                                 -->
+        <!-- ========================================================================= -->
+        <div id="section-therapist" class="role-section">
+            
+            <div class="cred-card therapist">
+                <div class="cred-details">
+                    <div class="cred-item">
+                        <span class="cred-label">Akun Login Terapis Demo</span>
+                        <span class="cred-value">terapis@rumahterapi.test <button class="btn-copy" onclick="copyText('terapis@rumahterapi.test')">📋</button></span>
+                    </div>
+                    <div class="cred-item">
+                        <span class="cred-label">Terapis Wicara (TW)</span>
+                        <span class="cred-value">terapis.tw1@rumahterapi.test <button class="btn-copy" onclick="copyText('terapis.tw1@rumahterapi.test')">📋</button></span>
+                    </div>
+                    <div class="cred-item">
+                        <span class="cred-label">Password Default</span>
+                        <span class="cred-value">password <button class="btn-copy" onclick="copyText('password')">📋</button></span>
+                    </div>
+                </div>
+                <a href="/login" class="btn-link" target="_blank" style="background: #2563eb; border-color: #3b82f6;">🚀 Masuk sebagai Terapis</a>
+            </div>
+
+            <div class="section-header">
+                <h3>Panduan Lengkap: Terapis Spesialis</h3>
+                <p>Terapis fokus pada aspek klinis: melakukan assessment tumbuh kembang anak, menyusun rekomendasi terapi, melaksanakan sesi, dan membuat laporan kemajuan (SOAP).</p>
+            </div>
+
+            <div class="timeline">
+                
+                <!-- Step 1 -->
+                <div class="step-card open">
+                    <div class="step-header" onclick="toggleStep(this)">
+                        <div class="step-badge-wrap">
+                            <div class="step-number">1</div>
+                            <div class="step-header-text">
+                                <h4>Dashboard Kerja Pribadi Terapis</h4>
+                                <span class="step-route">GET /dashboard</span>
+                            </div>
+                        </div>
+                        <span class="step-toggle-icon">▼</span>
+                    </div>
+                    <div class="step-body">
+                        <p class="step-instruction">Saat terapis login, tampilan dashboard disesuaikan khusus untuk aktivitas terapis bersangkutan:</p>
+                        <ul class="instruction-list">
+                            <li>Menampilkan salam personal: <em>"Halo [Nama Terapis], Pantau jadwal dan laporan sesi Anda hari ini."</em></li>
+                            <li><strong>Kartu Sesi Hari Ini:</strong> Hanya memuat pasien-pasien anak yang ditangani oleh Anda pada hari ini.</li>
+                            <li><strong>Laporan Menunggu:</strong> Indikator berapa sesi terapi yang sudah selesai namun belum Anda input catatan laporannya.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="step-card open">
+                    <div class="step-header" onclick="toggleStep(this)">
+                        <div class="step-badge-wrap">
+                            <div class="step-number">2</div>
+                            <div class="step-header-text">
+                                <h4>Membaca Riwayat Intake Form Pasien</h4>
+                                <span class="step-route">GET /patient-intakes/{id}</span>
+                            </div>
+                        </div>
+                        <span class="step-toggle-icon">▼</span>
+                    </div>
+                    <div class="step-body">
+                        <p class="step-instruction">Sebelum memulai assessment, pelajari latar belakang anak:</p>
+                        <ul class="instruction-list">
+                            <li>Buka menu <strong>Kuesioner Masuk</strong>.</li>
+                            <li>Baca riwayat kehamilan dan persalinan, tonggak perkembangan (kapan pertama kali merangkak, berjalan, bicara), riwayat medis, serta keluhan perilaku yang diisi oleh ayah/ibu anak.</li>
+                            <li>Informasi ini menjadi bahan dasar observasi Anda di ruang assessment.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="step-card open">
+                    <div class="step-header" onclick="toggleStep(this)">
+                        <div class="step-badge-wrap">
+                            <div class="step-number">3</div>
+                            <div class="step-header-text">
+                                <h4>Mengisi Hasil Assessment Awal &amp; Rekomendasi Terapi</h4>
+                                <span class="step-route">GET /assessments/{id}/complete</span>
+                            </div>
+                        </div>
+                        <span class="step-toggle-icon">▼</span>
+                    </div>
+                    <div class="step-body">
+                        <p class="step-instruction">Setelah observasi langsung dengan anak selesai dilakukan:</p>
+                        <ul class="instruction-list">
+                            <li>Buka menu <strong>Assessment</strong> > Klik tombol <strong>Lengkapi Hasil Assessment</strong> pada nama anak.</li>
+                            <li><strong>Form Hasil Klinis:</strong>
+                                <br>&bull; Masukkan keluhan klinis &amp; observasi awal (Chief Complaint).
+                                <br>&bull; Isi riwayat perkembangan (Motorik Kasar, Motorik Halus, Komunikasi/Wicara, Sosial &amp; Kemandirian).
+                                <br>&bull; Isi aspek perilaku belajar (atensi, kepatuhan instruksi, regulasi emosi).
+                                <br>&bull; Masukkan ringkasan diagnosis &amp; catatan rujukan dokter (bila ada).
+                            </li>
+                            <li><strong>Rekomendasi Terapi:</strong> Tentukan jenis terapi yang dibutuhkan (misal: Terapi Wicara &amp; Okupasi), frekuensi sesi per minggu (misal: 2x seminggu), serta durasi (60 menit).</li>
+                            <li>Klik <strong>Simpan &amp; Selesaikan Assessment</strong>.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="step-card open">
+                    <div class="step-header" onclick="toggleStep(this)">
+                        <div class="step-badge-wrap">
+                            <div class="step-number">4</div>
+                            <div class="step-header-text">
+                                <h4>Mencetak Laporan PDF Resmi Berkop Surat</h4>
+                                <span class="step-route">GET /assessments/{id}/pdf</span>
+                            </div>
+                        </div>
+                        <span class="step-toggle-icon">▼</span>
+                    </div>
+                    <div class="step-body">
+                        <p class="step-instruction">Laporan resmi untuk diserahkan kepada orang tua atau dokter spesialis anak:</p>
+                        <ul class="instruction-list">
+                            <li>Setelah assessment selesai, klik tombol <strong>Unduh PDF Laporan</strong>.</li>
+                            <li>Sistem secara otomatis mengenerate dokumen PDF resmi dengan:
+                                <br>&bull; Kop Surat Resmi Klinik (Logo Kasuari Care, Nama Klinik, Alamat, Kontak WhatsApp).
+                                <br>&bull; Garis pembatas ganda formal (double-rule line).
+                                <br>&bull; Tabel identitas lengkap anak &amp; nomor rekam medis.
+                                <br>&bull; Kolom tanda tangan resmi terapis pemeriksa.
+                            </li>
+                            <li>Dokumen ini siap dicetak langsung atau dikirimkan via WhatsApp ke orang tua.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Step 5 -->
+                <div class="step-card open">
+                    <div class="step-header" onclick="toggleStep(this)">
+                        <div class="step-badge-wrap">
+                            <div class="step-number">5</div>
+                            <div class="step-header-text">
+                                <h4>Pengisian Laporan Sesi Terapi (SOAP &amp; Foto Dokumentasi)</h4>
+                                <span class="step-route">GET /sessions &bull; POST /sessions/{id}/report</span>
+                            </div>
+                        </div>
+                        <span class="step-toggle-icon">▼</span>
+                    </div>
+                    <div class="step-body">
+                        <p class="step-instruction">Setiap kali sesi terapi tatap muka selesai dilaksanakan:</p>
+                        <ul class="instruction-list">
+                            <li>Buka menu <strong>Laporan Sesi</strong>.</li>
+                            <li>Pilih sesi anak yang baru selesai, lalu klik <strong>Tulis Laporan Sesi</strong>.</li>
+                            <li><strong>Isi Catatan Sesi:</strong>
+                                <br>&bull; <em>Aktivitas yang Dijalankan:</em> Kegiatan terapi yang dilakukan selama 60/30 menit (contoh: latihan artikulasi huruf R, stimulasi sensori vestibular, koordinasi mata-tangan).
+                                <br>&bull; <em>Catatan untuk Orang Tua:</em> Respons anak hari ini, kemajuan positif, atau hal yang perlu diperhatikan.
+                                <br>&bull; <em>PR / Tugas Latihan di Rumah (Homework):</em> Latihan sederhana yang harus dilanjutkan orang tua di rumah agar perkembangan anak konsisten.
+                            </li>
+                            <li><strong>Unggah Foto Dokumentasi:</strong> Anda dapat mengunggah foto anak saat melakukan aktivitas terapi di ruangan (foto akan tersimpan aman dan terproteksi).</li>
+                            <li>Klik <strong>Kirim Laporan Sesi</strong>. Laporan tersimpan dan kuota paket sesi anak otomatis terpotong 1 sesi.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Step 6 -->
+                <div class="step-card open">
+                    <div class="step-header" onclick="toggleStep(this)">
+                        <div class="step-badge-wrap">
+                            <div class="step-number">6</div>
+                            <div class="step-header-text">
+                                <h4>Evaluasi Berkala Pasien (Tiap 24 Sesi)</h4>
+                                <span class="step-route">GET /scheduling</span>
+                            </div>
+                        </div>
+                        <span class="step-toggle-icon">▼</span>
+                    </div>
+                    <div class="step-body">
+                        <p class="step-instruction">SOP klinik menetapkan evaluasi berkala setelah 24 pertemuan terapi:</p>
+                        <ul class="instruction-list">
+                            <li>Sistem memiliki indikator penghitung otomatis <em>(Sessions Since Evaluation)</em>.</li>
+                            <li>Ketika pasien telah menyelesaikan 24 sesi terapi, sistem akan menandai bahwa anak membutuhkan sesi evaluasi hasil sebelum memperpanjang paket baru.</li>
+                            <li>Terapis melakukan tes perbandingan antara baseline assessment awal dengan pencapaian saat ini.</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 <strong>Kasuari Care - Ruang Tumbuh</strong>. Hak Cipta Dilindungi Undang-Undang.</p>
+        <p style="margin-top: 4px; font-size: 12px; color: #94a3b8;">Sistem Manajemen Klinik Tumbuh Kembang Anak Terintegrasi</p>
+    </footer>
+
+    <!-- Interactive Script -->
+    <script>
+        function switchRole(role) {
+            // Update active role buttons
+            document.querySelectorAll('.role-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector('.role-btn.' + role).classList.add('active');
+
+            // Update active sections
+            document.querySelectorAll('.role-section').forEach(sec => {
+                sec.classList.remove('active');
+            });
+            document.getElementById('section-' + role).classList.add('active');
+
+            // Reset search filter
+            document.getElementById('searchInput').value = '';
+            filterSteps();
+        }
+
+        function toggleStep(header) {
+            const card = header.closest('.step-card');
+            card.classList.toggle('open');
+        }
+
+        function filterSteps() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const activeSection = document.querySelector('.role-section.active');
+            const stepCards = activeSection.querySelectorAll('.step-card');
+
+            stepCards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (!query || text.includes(query)) {
+                    card.style.display = 'block';
+                    if (query) {
+                        card.classList.add('open');
+                    }
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Teks berhasil disalin: ' + text);
+            }).catch(err => {
+                prompt('Salin teks berikut secara manual:', text);
+            });
+        }
+    </script>
+</body>
+</html>
