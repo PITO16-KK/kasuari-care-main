@@ -27,6 +27,7 @@ class SessionReportController extends Controller
         $user = $request->user();
         $filters = $this->filters($request);
         $appointments = $this->filteredAppointments($filters, $user)
+            ->whereHas('patient')
             ->with([
                 'patient:id,patient_code,name',
                 'therapyType:id,code,name',
@@ -64,7 +65,7 @@ class SessionReportController extends Controller
             'filters' => $filters,
             'appointments' => $appointments,
             'therapists' => $user->hasRole('owner')
-                ? TherapistProfile::query()->with('user:id,name')->get(['id', 'user_id'])->sortBy('user.name')->values()
+                ? TherapistProfile::query()->whereHas('user')->with('user:id,name')->get(['id', 'user_id'])->sortBy('user.name')->values()
                 : [],
             'canFilterTherapist' => $user->hasRole('owner'),
         ]);

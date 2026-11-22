@@ -48,6 +48,7 @@ class DashboardController extends Controller
             && ! $user->hasAnyRole(['owner', 'finance', 'front_office']);
         $canSeeUnpaidSessionAlerts = $canSeeFinance || $canHandleIntake;
         $schedule = Appointment::with(['patient:id,patient_code,name', 'therapyType:id,code,name', 'room:id,name', 'therapist.user:id,name'])
+            ->whereHas('patient')
             ->whereDate('starts_at', $today)->where('status', '!=', 'cancelled');
 
         if ($isTherapistDashboard) {
@@ -79,6 +80,7 @@ class DashboardController extends Controller
                 'sale.lines:id,sale_id,description',
                 'therapist.user:id,name',
             ])
+                ->whereHas('patient')
                 ->whereDate('scheduled_at', $today)
                 ->whereIn('status', ['awaiting_payment', 'paid', 'scheduled'])
                 ->orderBy('scheduled_at')
@@ -107,6 +109,7 @@ class DashboardController extends Controller
             'therapyType:id,code,name',
             'therapist.user:id,name',
         ])
+            ->whereHas('patient')
             ->whereDate('starts_at', $selectedDate)
             ->where('status', '!=', 'cancelled')
             ->when($isTherapistDashboard, fn (EloquentBuilder $query) => $query->whereHas(
@@ -151,6 +154,7 @@ class DashboardController extends Controller
                 'sale.lines:id,sale_id,description',
                 'therapist.user:id,name',
             ])
+                ->whereHas('patient')
                 ->whereDate('scheduled_at', $selectedDate)
                 ->whereIn('status', ['awaiting_payment', 'paid', 'scheduled'])
                 ->when(

@@ -33,6 +33,7 @@ class SaleController extends Controller
         ]);
         $type = $validated['type'] ?? 'all';
         $baseQuery = Sale::query()
+            ->whereHas('patient')
             ->where('status', 'pending')
             ->whereHas('lines', fn (Builder $query) => $query->whereIn('line_type', ['assessment', 'package', 'session']));
         $filterByType = static function (Builder $query, string $type): Builder {

@@ -24,15 +24,16 @@ class AssessmentController extends Controller
 {
     public function index(): Response
     {
-        $assessments = Assessment::with([
-            'patient:id,patient_code,name',
-            'patient.therapists:id,user_id,specialty',
-            'patient.therapists.user:id,name',
-            'therapist.user:id,name',
-            'sale:id,invoice_number,status,subtotal,discount_total,grand_total,paid_at',
-            'sale.payment',
-            'sale.lines',
-        ])
+        $assessments = Assessment::whereHas('patient')
+            ->with([
+                'patient:id,patient_code,name',
+                'patient.therapists:id,user_id,specialty',
+                'patient.therapists.user:id,name',
+                'therapist.user:id,name',
+                'sale:id,invoice_number,status,subtotal,discount_total,grand_total,paid_at',
+                'sale.payment',
+                'sale.lines',
+            ])
             ->withCount('appointments')
             ->latest()
             ->paginate(20)

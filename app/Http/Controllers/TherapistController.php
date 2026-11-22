@@ -19,6 +19,7 @@ class TherapistController extends Controller
     {
         return Inertia::render('Therapists/Index', [
             'therapists' => TherapistProfile::query()
+                ->whereHas('user')
                 ->with('user:id,name,email,phone,is_active')
                 ->latest()
                 ->paginate(12),

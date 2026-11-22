@@ -204,6 +204,7 @@ class AppointmentController extends Controller
             ->values();
 
         $appointments = Appointment::with(['patient:id,patient_code,name,primary_whatsapp', 'therapyType:id,code,name,default_duration_minutes', 'therapist.user:id,name', 'room:id,name', 'assessment:id,patient_id', 'sale:id,appointment_id,status'])
+            ->whereHas('patient')
             ->where('starts_at', '>=', now()->startOfDay())->where('status', '!=', 'cancelled')
             ->orderBy('starts_at')->limit(60)->get();
         $appointments->each(function (Appointment $appointment) use ($coveredAppointmentIds): void {
@@ -229,6 +230,7 @@ class AppointmentController extends Controller
         return Inertia::render('Scheduling/Index', [
             'appointments' => $appointments,
             'scheduledAssessments' => Assessment::with(['patient:id,patient_code,name', 'therapist.user:id,name'])
+                ->whereHas('patient')
                 ->whereIn('status', ['awaiting_payment', 'paid', 'scheduled'])
                 ->where('scheduled_at', '>=', now()->startOfDay())
                 ->orderBy('scheduled_at')->limit(60)
@@ -237,6 +239,7 @@ class AppointmentController extends Controller
             'initialPatientId' => $initialPatientId,
             'initialAssessmentId' => $initialAssessmentId,
             'assessments' => Assessment::where('status', 'completed')
+                ->whereHas('patient')
                 ->with('recommendations.therapyType:id,code,name')
                 ->latest()
                 ->get(['id', 'patient_id', 'scheduled_at', 'chief_complaint', 'summary', 'created_at']),
@@ -244,7 +247,7 @@ class AppointmentController extends Controller
             'patientEvaluationSessionCounts' => $patientEvaluationSessionCounts,
             'patientTherapists' => $patientTherapists,
             'therapyTypes' => TherapyType::where('is_active', true)->orderBy('name')->get(['id', 'code', 'name', 'default_duration_minutes']),
-            'therapists' => TherapistProfile::with('user:id,name')->get(['id', 'user_id', 'specialty']),
+            'therapists' => TherapistProfile::whereHas('user')->with('user:id,name')->get(['id', 'user_id', 'specialty']),
             'rooms' => Room::where('is_active', true)->orderBy('name')->get(['id', 'name']),
         ]);
     }

@@ -106,8 +106,11 @@ function purgeAllOrphans(): void {
         DELETE FROM sale_lines WHERE sale_id NOT IN (SELECT id FROM sales);
         DELETE FROM sales WHERE patient_id IS NOT NULL AND patient_id NOT IN (SELECT id FROM patients);
         DELETE FROM patient_intake_submissions WHERE patient_id IS NOT NULL AND patient_id NOT IN (SELECT id FROM patients);
-        DELETE FROM patient_therapists WHERE patient_id NOT IN (SELECT id FROM patients);
+        DELETE FROM patient_therapists WHERE patient_id NOT IN (SELECT id FROM patients) OR therapist_profile_id NOT IN (SELECT id FROM therapist_profiles);
         DELETE FROM patient_parents WHERE patient_id NOT IN (SELECT id FROM patients);
+        DELETE FROM therapist_profiles WHERE user_id NOT IN (SELECT id FROM users);
+        DELETE FROM appointments WHERE therapist_profile_id IS NOT NULL AND therapist_profile_id NOT IN (SELECT id FROM therapist_profiles);
+        DELETE FROM assessments WHERE therapist_profile_id IS NOT NULL AND therapist_profile_id NOT IN (SELECT id FROM therapist_profiles);
     ");
 
     DB::statement('SET FOREIGN_KEY_CHECKS = 1');
@@ -179,6 +182,7 @@ if ($action === 'clean_orphans') {
 $orphanAssessments = 0;
 $orphanAppointments = 0;
 $orphanSales = 0;
+$orphanTherapists = 0;
 $totalPatients = 0;
 $totalAssessments = 0;
 $totalAppointments = 0;
@@ -202,6 +206,10 @@ try {
     $orphanSales = DB::table('sales')
         ->whereNotNull('patient_id')
         ->whereNotIn('patient_id', DB::table('patients')->select('id'))
+        ->count();
+
+    $orphanTherapists = DB::table('therapist_profiles')
+        ->whereNotIn('user_id', DB::table('users')->select('id'))
         ->count();
 
     $dummyPatientsCount = DB::table('patients')
@@ -294,6 +302,11 @@ if (file_exists($logPath)) {
                 <div class="title">Tagihan Tanpa Pasien (Yatim)</div>
                 <div class="val"><?= $orphanSales ?></div>
                 <div style="font-size: 12px; margin-top: 4px; color: #64748b;">Penyebab White Screen /bills</div>
+            </div>
+            <div class="card <?= $orphanTherapists > 0 ? 'danger' : 'success' ?>">
+                <div class="title">Profil Terapis Tanpa Akun User</div>
+                <div class="val"><?= $orphanTherapists ?></div>
+                <div style="font-size: 12px; margin-top: 4px; color: #64748b;">Penyebab White Screen /therapists</div>
             </div>
             <div class="card">
                 <div class="title">Pasien Dummy Terpasang</div>
